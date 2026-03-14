@@ -373,10 +373,7 @@ describe.each([
           });
 
           it("should work", async () => {
-            const doneSpy = rs.spyOn(
-              getCompilerHooks(compiler).done[0],
-              "fn",
-            );
+            const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
             try {
               await waitUntilValid(instance);
@@ -408,10 +405,7 @@ describe.each([
           });
 
           it("should work", async () => {
-            const doneSpy = rs.spyOn(
-              getCompilerHooks(compiler).done[0],
-              "fn",
-            );
+            const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
             try {
               await waitUntilValid(instance);
@@ -715,7 +709,9 @@ describe.each([
               instance.getFilenameFromUrl("/static-one/unknown.unknown"),
             ).toBeUndefined();
             expect(
-              instance.getFilenameFromUrl("/static-one/unknown/unknown.unknown"),
+              instance.getFilenameFromUrl(
+                "/static-one/unknown/unknown.unknown",
+              ),
             ).toBeUndefined();
 
             expect(instance.getFilenameFromUrl("/static-two/bundle.js")).toBe(
@@ -725,7 +721,9 @@ describe.each([
               instance.getFilenameFromUrl("/static-two/unknown.unknown"),
             ).toBeUndefined();
             expect(
-              instance.getFilenameFromUrl("/static-two/unknown/unknown.unknown"),
+              instance.getFilenameFromUrl(
+                "/static-two/unknown/unknown.unknown",
+              ),
             ).toBeUndefined();
 
             expect(instance.getFilenameFromUrl("/")).toBeUndefined();
@@ -733,7 +731,9 @@ describe.each([
               instance.getFilenameFromUrl("/static-one/unknown.unknown"),
             ).toBeUndefined();
             expect(
-              instance.getFilenameFromUrl("/static-one/unknown/unknown.unknown"),
+              instance.getFilenameFromUrl(
+                "/static-one/unknown/unknown.unknown",
+              ),
             ).toBeUndefined();
           });
         });
