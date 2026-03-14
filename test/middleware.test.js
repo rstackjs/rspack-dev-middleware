@@ -14,8 +14,7 @@ import memfs, { Volume, createFsFromVolume } from "memfs";
 import mime from "mime-types";
 import router from "router";
 import request from "supertest";
-
-const { Stats } = require("@rspack/core");
+import { Stats } from "@rspack/core";
 
 import middleware from "../src";
 
@@ -186,6 +185,19 @@ async function frameworkFactory(
       return [isFastify ? app.server : server, req, instance];
     }
   }
+}
+
+function getAssetFilename(instance, extension) {
+  const stats = instance.context.stats?.toJson({ assets: true });
+  const assetName = stats?.assets
+    ?.map((asset) => asset.name)
+    .find((filename) => filename.endsWith(extension));
+
+  if (!assetName) {
+    throw new Error(`Unable to find asset with "${extension}" extension`);
+  }
+
+  return assetName;
 }
 
 async function closeServer(server) {
@@ -3927,7 +3939,12 @@ describe.each([
 
           expect(response.statusCode).toBe(200);
           expect(spy).toHaveBeenCalledTimes(1);
-          expect(spy.mock.calls[0][0]).toEqual({});
+          expect(spy.mock.calls[0][0]).toEqual(
+            expect.objectContaining({
+              aggregateTimeout: expect.any(Number),
+              ignored: expect.any(RegExp),
+            }),
+          );
         });
       });
 
@@ -3958,10 +3975,12 @@ describe.each([
 
           expect(response.statusCode).toBe(200);
           expect(spy).toHaveBeenCalledTimes(1);
-          expect(spy.mock.calls[0][0]).toEqual({
-            aggregateTimeout: 300,
-            poll: true,
-          });
+          expect(spy.mock.calls[0][0]).toEqual(
+            expect.objectContaining({
+              aggregateTimeout: 300,
+              poll: true,
+            }),
+          );
         });
       });
 
@@ -3997,8 +4016,14 @@ describe.each([
           expect(response2.statusCode).toBe(200);
           expect(spy).toHaveBeenCalledTimes(1);
           expect(spy.mock.calls[0][0]).toEqual([
-            { aggregateTimeout: 800, poll: false },
-            { aggregateTimeout: 300, poll: true },
+            expect.objectContaining({
+              aggregateTimeout: 800,
+              poll: false,
+            }),
+            expect.objectContaining({
+              aggregateTimeout: 300,
+              poll: true,
+            }),
           ]);
         });
       });
@@ -6122,8 +6147,10 @@ describe.each([
 
     describe("cacheImmutable", () => {
       describe("should work and generate `Cache-Control` header for immutable assets with publicPath", () => {
+        let compiler;
+
         beforeEach(async () => {
-          const compiler = getCompiler(webpackConfigImmutable);
+          compiler = getCompiler(webpackConfigImmutable);
 
           [server, req, instance] = await frameworkFactory(
             name,
@@ -6145,7 +6172,11 @@ describe.each([
         });
 
         it('should return the "200" code for the "GET" request to the bundle file and generate `Cache-Control` header', async () => {
-          const response = await req.get("/static/6076fc274f403ebb2d09.svg");
+          await req.get("/static/main.js");
+
+          const response = await req.get(
+            `/static/${getAssetFilename(instance, ".svg")}`,
+          );
 
           expect(response.statusCode).toBe(200);
           expect(response.headers["cache-control"]).toBeDefined();
@@ -6156,8 +6187,10 @@ describe.each([
       });
 
       describe("should work and generate `Cache-Control` header for immutable assets without publicPath", () => {
+        let compiler;
+
         beforeEach(async () => {
-          const compiler = getCompiler({
+          compiler = getCompiler({
             ...webpackConfigImmutable,
             output: {
               path: path.resolve(__dirname, "./outputs/basic"),
@@ -6184,7 +6217,11 @@ describe.each([
         });
 
         it('should return the "200" code for the "GET" request to the bundle file and `Cache-Control` header', async () => {
-          const response = await req.get("/6076fc274f403ebb2d09.svg");
+          await req.get("/main.js");
+
+          const response = await req.get(
+            `/${getAssetFilename(instance, ".svg")}`,
+          );
 
           expect(response.statusCode).toBe(200);
           expect(response.headers["cache-control"]).toBeDefined();
@@ -6195,8 +6232,10 @@ describe.each([
       });
 
       describe("should work and generate `Cache-Control` header for immutable assets and take preference over the `cacheControl` option", () => {
+        let compiler;
+
         beforeEach(async () => {
-          const compiler = getCompiler({
+          compiler = getCompiler({
             ...webpackConfigImmutable,
             output: {
               path: path.resolve(__dirname, "./outputs/basic"),
@@ -6226,7 +6265,11 @@ describe.each([
         });
 
         it('should return the "200" code for the "GET" request to the bundle file and generate `Cache-Control` header #2', async () => {
-          const response = await req.get("/6076fc274f403ebb2d09.svg");
+          await req.get("/main.js");
+
+          const response = await req.get(
+            `/${getAssetFilename(instance, ".svg")}`,
+          );
 
           expect(response.statusCode).toBe(200);
           expect(response.headers["cache-control"]).toBeDefined();

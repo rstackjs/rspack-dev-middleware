@@ -50,9 +50,8 @@ describe("ready", () => {
 
     expect(cb).not.toHaveBeenCalled();
     expect(context.logger.info).toHaveBeenCalledTimes(1);
-    // mockConstructor is the name of the jest.fn() function
     expect(context.logger.info.mock.calls[0]).toEqual([
-      "wait until bundle finished: mockConstructor",
+      `wait until bundle finished: ${cb.name}`,
     ]);
     expect(context.callbacks).toEqual([cb]);
   });
