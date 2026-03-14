@@ -34,9 +34,9 @@
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir types && prettier \"types/**/*.ts\" --write",
     "build:code": "babel src -d dist --copy-files",
     "build": "npm-run-all -p \"build:**\"",
-    "test:watch": "pnpm run test -w",
+    "test:watch": "rstest -w",
     "pretest": "pnpm run lint",
-    "test": "pnpm run test",
+    "test": "rstest",
     "prepare": "pnpm run build"
   },
   "dependencies": {

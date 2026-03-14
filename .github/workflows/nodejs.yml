@@ -45,7 +45,7 @@ jobs:
           package-manager-cache: false
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm i
 
       - name: Run checks
         run: pnpm run lint
@@ -85,7 +85,7 @@ jobs:
           package-manager-cache: false
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm i
 
       - name: Run tests
-        run: pnpm run test:coverage -- --ci
+        run: pnpm run test
