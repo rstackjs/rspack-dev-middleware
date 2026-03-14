@@ -1,5 +1,4 @@
 export = wdm;
-/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").MultiCompiler} MultiCompiler */
 /** @typedef {import("webpack").Configuration} Configuration */
@@ -167,7 +166,6 @@ declare namespace wdm {
     hapiWrapper,
     koaWrapper,
     honoWrapper,
-    Schema,
     Compiler,
     MultiCompiler,
     Configuration,
@@ -259,7 +257,6 @@ declare function honoWrapper<
   compiler: Compiler | MultiCompiler,
   options?: Options<RequestInternal, ResponseInternal> | undefined,
 ): (ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void;
-type Schema = import("schema-utils/declarations/validate").Schema;
 type Compiler = import("webpack").Compiler;
 type MultiCompiler = import("webpack").MultiCompiler;
 type Configuration = import("webpack").Configuration;

@@ -1,8 +1,6 @@
 const mime = require("mime-types");
-const { validate } = require("schema-utils");
 
 const middleware = require("./middleware");
-const schema = require("./options.json");
 const getFilenameFromUrl = require("./utils/getFilenameFromUrl");
 const ready = require("./utils/ready");
 const setupHooks = require("./utils/setupHooks");
@@ -11,7 +9,6 @@ const setupWriteToDisk = require("./utils/setupWriteToDisk");
 
 const noop = () => {};
 
-/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").MultiCompiler} MultiCompiler */
 /** @typedef {import("webpack").Configuration} Configuration */
@@ -198,11 +195,6 @@ const noop = () => {};
  * @returns {API<RequestInternal, ResponseInternal>} webpack dev middleware
  */
 function wdm(compiler, options = {}) {
-  validate(/** @type {Schema} */ (schema), options, {
-    name: "Dev Middleware",
-    baseDataPath: "options",
-  });
-
   const { mimeTypes } = options;
 
   if (mimeTypes) {
