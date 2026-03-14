@@ -1,5 +1,6 @@
-const { version } = require("webpack");
+const { version } = require("@rspack/core");
 
-module.exports = () =>
+module.exports = () => {
   // eslint-disable-next-line no-console
-  console.log(`\n Running tests for webpack @${version} \n`);
+  console.log(`\n Running tests for rspack @${version} \n`);
+};

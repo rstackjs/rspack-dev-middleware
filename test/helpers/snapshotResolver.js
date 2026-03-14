@@ -1,21 +1,14 @@
 const path = require("node:path");
 
-const webpack = require("webpack");
-
-const [webpackVersion] = webpack.version;
-const snapshotExtension = `.snap.webpack${webpackVersion}`;
-
 module.exports = {
   resolveSnapshotPath: (testPath) =>
     path.join(
       path.dirname(testPath),
       "__snapshots__",
-      `${path.basename(testPath)}${snapshotExtension}`,
+      `${path.basename(testPath)}`,
     ),
   resolveTestPath: (snapshotPath) =>
-    snapshotPath
-      .replace(`${path.sep}__snapshots__`, "")
-      .slice(0, -snapshotExtension.length),
+    snapshotPath.replace(`${path.sep}__snapshots__`, ""),
   testPathForConsistencyCheck: path.join(
     "consistency_check",
     "__tests__",

@@ -1,5 +1,6 @@
 export = setupOutputFileSystem;
-/** @typedef {import("webpack").MultiCompiler} MultiCompiler */
+/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
+/** @typedef {import("../index.js").DevServerOption} DevServerOption */
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 /**
@@ -17,8 +18,9 @@ declare function setupOutputFileSystem<
   >,
 ): void;
 declare namespace setupOutputFileSystem {
-  export { MultiCompiler, IncomingMessage, ServerResponse };
+  export { MultiCompiler, DevServerOption, IncomingMessage, ServerResponse };
 }
-type MultiCompiler = import("webpack").MultiCompiler;
+type MultiCompiler = import("@rspack/core").MultiCompiler;
+type DevServerOption = import("../index.js").DevServerOption;
 type IncomingMessage = import("../index.js").IncomingMessage;
 type ServerResponse = import("../index.js").ServerResponse;

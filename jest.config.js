@@ -6,5 +6,4 @@ module.exports = {
   testMatch: ["**/test/**/*.test.js"],
   setupFilesAfterEnv: ["<rootDir>/setupTest.js"],
   globalSetup: "<rootDir>/scripts/globalSetup.js",
-  snapshotResolver: "./test/helpers/snapshotResolver.js",
 };

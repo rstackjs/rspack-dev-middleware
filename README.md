@@ -51,9 +51,9 @@ bun add -D @rspack/dev-middleware
 ```js
 const middleware = require("@rspack/dev-middleware");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
-const compiler = webpack({
+const compiler = rspack({
   // webpack options
 });
 
@@ -261,12 +261,12 @@ This option also accepts a `Function` value, which can be used to filter which f
 The function follows the same premise as [`Array#filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) in which a return value of `false` _will not_ write the file, and a return value of `true` _will_ write the file to disk. eg.
 
 ```js
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
 const configuration = {
   /* Webpack configuration */
 };
-const compiler = webpack(configuration);
+const compiler = rspack(configuration);
 
 middleware(compiler, {
   writeToDisk: (filePath) => /superman\.css$/.test(filePath),
@@ -289,12 +289,12 @@ This can be done simply by using `path.join`:
 const path = require("node:path");
 const mkdirp = require("mkdirp");
 const myOutputFileSystem = require("my-fs");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
 myOutputFileSystem.join = path.join.bind(path); // no need to bind
 myOutputFileSystem.mkdirp = mkdirp.bind(mkdirp); // no need to bind
 
-const compiler = webpack({
+const compiler = rspack({
   /* Webpack configuration */
 });
 
@@ -306,12 +306,12 @@ middleware(compiler, { outputFileSystem: myOutputFileSystem });
 Allows to set up a callback to change the response data.
 
 ```js
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
 const configuration = {
   /* Webpack configuration */
 };
-const compiler = webpack(configuration);
+const compiler = rspack(configuration);
 
 middleware(compiler, {
   // Note - if you send the `Range` header you will have `ReadStream`
@@ -344,9 +344,9 @@ A function executed once the middleware has stopped watching.
 ```js
 const middleware = require("@rspack/dev-middleware");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
-const compiler = webpack({
+const compiler = rspack({
   /* Webpack configuration */
 });
 
@@ -379,9 +379,9 @@ A function executed once the middleware has invalidated.
 ```js
 const middleware = require("@rspack/dev-middleware");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
-const compiler = webpack({
+const compiler = rspack({
   /* Webpack configuration */
 });
 
@@ -419,9 +419,9 @@ If the bundle is valid at the time of calling, the callback is executed immediat
 ```js
 const middleware = require("@rspack/dev-middleware");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
-const compiler = webpack({
+const compiler = rspack({
   /* Webpack configuration */
 });
 
@@ -453,9 +453,9 @@ URL for the requested file.
 ```js
 const middleware = require("@rspack/dev-middleware");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
-const compiler = webpack({
+const compiler = rspack({
   /* Webpack configuration */
 });
 
@@ -484,9 +484,9 @@ But there is a solution to avoid it - mount the middleware to a non-root route, 
 ```js
 const middleware = require("@rspack/dev-middleware");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
-const compiler = webpack({
+const compiler = rspack({
   // webpack options
 });
 
@@ -526,9 +526,9 @@ Example Implementation:
 const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const isObject = require("is-object");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
-const compiler = webpack({
+const compiler = rspack({
   /* Webpack configuration */
 });
 
@@ -614,10 +614,10 @@ Examples of use with other servers will follow here.
 const http = require("node:http");
 const devMiddleware = require("@rspack/dev-middleware");
 const connect = require("connect");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 const webpackConfig = require("./webpack.config.js");
 
-const compiler = webpack(webpackConfig);
+const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -635,10 +635,10 @@ const http = require("node:http");
 const devMiddleware = require("@rspack/dev-middleware");
 const finalhandler = require("finalhandler");
 const Router = require("router");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 const webpackConfig = require("./webpack.config.js");
 
-const compiler = webpack(webpackConfig);
+const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -660,10 +660,10 @@ server.listen(3000);
 ```js
 const devMiddleware = require("@rspack/dev-middleware");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 const webpackConfig = require("./webpack.config.js");
 
-const compiler = webpack(webpackConfig);
+const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -679,10 +679,10 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 ```js
 const middleware = require("@rspack/dev-middleware");
 const Koa = require("koa");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 const webpackConfig = require("./webpack.simple.config");
 
-const compiler = webpack(webpackConfig);
+const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -698,10 +698,10 @@ app.listen(3000);
 ```js
 const Hapi = require("@hapi/hapi");
 const devMiddleware = require("@rspack/dev-middleware");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 const webpackConfig = require("./webpack.config.js");
 
-const compiler = webpack(webpackConfig);
+const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {};
 
 const server = Hapi.server({ port: 3000, host: "localhost" });
@@ -732,10 +732,10 @@ Fastify interop will require the use of `fastify-express` instead of `middie` fo
 ```js
 const devMiddleware = require("@rspack/dev-middleware");
 const fastify = require("fastify")();
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 const webpackConfig = require("./webpack.config.js");
 
-const compiler = webpack(webpackConfig);
+const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -751,10 +751,10 @@ await fastify.listen(3000);
 import { serve } from "@hono/node-server";
 import devMiddleware from "@rspack/dev-middleware";
 import { Hono } from "hono";
-import webpack from "webpack";
+import { rspack } from "@rspack/core";
 import webpackConfig from "./webpack.config.js";
 
-const compiler = webpack(webpackConfig);
+const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
   // options
 };
