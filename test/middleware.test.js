@@ -1194,7 +1194,7 @@ describe.each([
         });
 
         it('should return the "404" code for the "GET" request to the deleted file', async () => {
-          const spy = jest
+          const spy = rs
             .spyOn(instance.context.outputFileSystem, "readFileSync")
             .mockImplementation(() => {
               throw new Error("error");
@@ -5348,7 +5348,7 @@ describe.each([
             },
           );
 
-          isDirectory = jest
+          isDirectory = rs
             .spyOn(instance.context.outputFileSystem, "statSync")
             .mockReturnValue({
               isFile: () => false,
