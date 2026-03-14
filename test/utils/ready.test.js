@@ -2,7 +2,7 @@ import ready from "../../src/utils/ready";
 
 describe("ready", () => {
   it("should call callback if state is true", () => {
-    const cb = jest.fn();
+    const cb = rs.fn();
     const context = {
       state: true,
       stats: "stats",
@@ -14,12 +14,12 @@ describe("ready", () => {
   });
 
   it("should save callback and log req.url if state is false with req.url set", () => {
-    const cb = jest.fn();
+    const cb = rs.fn();
     const context = {
       state: false,
       stats: "stats",
       logger: {
-        info: jest.fn(),
+        info: rs.fn(),
       },
       callbacks: [],
     };
@@ -37,12 +37,12 @@ describe("ready", () => {
   });
 
   it("should save callback and log callback.name if state is false with req.url not set", () => {
-    const cb = jest.fn();
+    const cb = rs.fn();
     const context = {
       state: false,
       stats: "stats",
       logger: {
-        info: jest.fn(),
+        info: rs.fn(),
       },
       callbacks: [],
     };

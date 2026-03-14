@@ -2,14 +2,14 @@ import fs from "node:fs";
 
 import setupWriteToDisk from "../../src/utils/setupWriteToDisk";
 
-const mkdirSpy = jest.spyOn(fs, "mkdir");
-const writeFileSpy = jest.spyOn(fs, "writeFile");
+const mkdirSpy = rs.spyOn(fs, "mkdir");
+const writeFileSpy = rs.spyOn(fs, "writeFile");
 
 describe("setupWriteToDisk", () => {
   let context;
-  const emitHook = jest.fn();
-  const assetEmittedHook = jest.fn();
-  const getPath = jest.fn((outputPath) => outputPath);
+  const emitHook = rs.fn();
+  const assetEmittedHook = rs.fn();
+  const getPath = rs.fn((outputPath) => outputPath);
 
   beforeEach(() => {
     context = {
@@ -28,8 +28,8 @@ describe("setupWriteToDisk", () => {
         },
       },
       logger: {
-        error: jest.fn(),
-        log: jest.fn(),
+        error: rs.fn(),
+        log: rs.fn(),
       },
     };
   });
@@ -60,12 +60,12 @@ describe("setupWriteToDisk", () => {
   });
 
   it("filters out unwanted emits with writeToDisk", () => {
-    const filter = jest.fn(() => false);
+    const filter = rs.fn(() => false);
     context.options = {
       writeToDisk: filter,
     };
     setupWriteToDisk(context);
-    const cb = jest.fn();
+    const cb = rs.fn();
     // webpack@5 info style
     runAssetEmitted(
       null,
@@ -110,7 +110,7 @@ describe("setupWriteToDisk", () => {
     it(`tries to create directories and write file if not filtered out ${writeError.title}`, () => {
       context.options = {};
       setupWriteToDisk(context);
-      const cb = jest.fn();
+      const cb = rs.fn();
       // webpack@5 info style
       runAssetEmitted(
         null,

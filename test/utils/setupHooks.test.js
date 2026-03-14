@@ -1,24 +1,24 @@
 import setupHooks from "../../src/utils/setupHooks";
 
 // Suppress unnecessary stats output
-jest.spyOn(globalThis.console, "log").mockImplementation();
+rs.spyOn(globalThis.console, "log").mockImplementation();
 
 describe("setupHooks", () => {
   let context;
-  const watchRunHook = jest.fn();
-  const invalidHook = jest.fn();
-  const doneHook = jest.fn();
-  const loggerLog = jest.fn();
-  const loggerInfo = jest.fn();
-  const loggerWarn = jest.fn();
-  const loggerError = jest.fn();
+  const watchRunHook = rs.fn();
+  const invalidHook = rs.fn();
+  const doneHook = rs.fn();
+  const loggerLog = rs.fn();
+  const loggerInfo = rs.fn();
+  const loggerWarn = rs.fn();
+  const loggerError = rs.fn();
   let nextTick;
 
-  const cb1 = jest.fn();
-  const cb2 = jest.fn();
+  const cb1 = rs.fn();
+  const cb2 = rs.fn();
 
   beforeEach(() => {
-    nextTick = jest.spyOn(process, "nextTick").mockImplementation(() => {});
+    nextTick = rs.spyOn(process, "nextTick").mockImplementation(() => {});
     context = {
       options: {},
       compiler: {
@@ -95,9 +95,9 @@ describe("setupHooks", () => {
   it("sets state, then logs stats and handles callbacks on nextTick from done hook", () => {
     setupHooks(context);
     doneHook.mock.calls[0][1]({
-      toString: jest.fn(() => "statsString"),
-      hasErrors: jest.fn(() => false),
-      hasWarnings: jest.fn(() => false),
+      toString: rs.fn(() => "statsString"),
+      hasErrors: rs.fn(() => false),
+      hasWarnings: rs.fn(() => false),
     });
     expect(context.stats).toBeTruthy();
     expect(context.state).toBeTruthy();
@@ -142,14 +142,14 @@ describe("setupHooks", () => {
     doneHook.mock.calls[0][1]({
       stats: [
         {
-          toString: jest.fn(() => "statsString1"),
-          hasErrors: jest.fn(() => true),
-          hasWarnings: jest.fn(() => false),
+          toString: rs.fn(() => "statsString1"),
+          hasErrors: rs.fn(() => true),
+          hasWarnings: rs.fn(() => false),
         },
         {
-          toString: jest.fn(() => "statsString2"),
-          hasErrors: jest.fn(() => false),
-          hasWarnings: jest.fn(() => true),
+          toString: rs.fn(() => "statsString2"),
+          hasErrors: rs.fn(() => false),
+          hasWarnings: rs.fn(() => true),
         },
       ],
     });
