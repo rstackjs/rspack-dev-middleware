@@ -35,7 +35,6 @@
     "build:code": "babel src -d dist --copy-files",
     "build": "npm-run-all -p \"build:**\"",
     "test:watch": "rstest -w",
-    "pretest": "pnpm run lint",
     "test": "rstest",
     "prepare": "pnpm run build"
   },
