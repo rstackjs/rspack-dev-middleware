@@ -50,8 +50,7 @@
     "memfs": "^4.43.1",
     "mime-types": "^3.0.1",
     "on-finished": "^2.4.1",
-    "range-parser": "^1.2.1",
-    "schema-utils": "^4.0.0"
+    "range-parser": "^1.2.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.7",
