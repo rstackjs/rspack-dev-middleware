@@ -1,4 +1,4 @@
-# Contributing in webpack-dev-middleware
+# Contributing in @rspack/dev-middleware
 
 We'd always love contributions to further improve the webpack / webpack-contrib ecosystem!
 Here are the guidelines we'd like you to follow:
@@ -140,7 +140,7 @@ module. Thankfully, Github provides a means to do this. Add a dependency to the
 ```json
 {
   "devDependencies": {
-    "webpack-dev-middleware": "webpack/webpack-dev-middleware#{id}/head"
+    "@rspack/dev-middleware": "rstackjs/rspack-dev-middleware#{id}/head"
   }
 }
 ```

@@ -1,15 +1,16 @@
 {
-  "name": "webpack-dev-middleware",
+  "name": "@rspack/dev-middleware",
   "version": "7.4.5",
-  "description": "A development middleware for webpack",
+  "description": "A development middleware for Rspack",
   "keywords": [
+    "rspack",
     "webpack",
     "middleware",
     "development"
   ],
-  "homepage": "https://github.com/webpack/webpack-dev-middleware",
-  "bugs": "https://github.com/webpack/webpack-dev-middleware/issues",
-  "repository": "webpack/webpack-dev-middleware",
+  "homepage": "https://github.com/rstackjs/rspack-dev-middleware",
+  "bugs": "https://github.com/rstackjs/rspack-dev-middleware/issues",
+  "repository": "rstackjs/rspack-dev-middleware",
   "funding": {
     "type": "opencollective",
     "url": "https://opencollective.com/webpack"

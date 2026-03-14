@@ -11,10 +11,10 @@
 [![discussion][discussion]][discussion-url]
 [![size][size]][size-url]
 
-# webpack-dev-middleware
+# @rspack/dev-middleware
 
-An express-style development middleware for use with [webpack](https://webpack.js.org)
-bundles and allows for serving of the files emitted from webpack.
+An express-style development middleware for use with [Rspack](https://rspack.rs) and webpack-compatible compilers. It serves the files emitted by the compiler from memory.
+
 This should be used for **development only**.
 
 Some of the benefits of using this middleware include:
@@ -29,7 +29,7 @@ Some of the benefits of using this middleware include:
 First thing's first, install the module:
 
 ```console
-npm install webpack-dev-middleware --save-dev
+npm install @rspack/dev-middleware -D
 ```
 
 > [!WARNING]
@@ -41,7 +41,7 @@ npm install webpack-dev-middleware --save-dev
 ```js
 const express = require("express");
 const webpack = require("webpack");
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 
 const compiler = webpack({
   // webpack options
@@ -51,7 +51,7 @@ const app = express();
 
 app.use(
   middleware(compiler, {
-    // webpack-dev-middleware options
+    // options
   }),
 );
 
@@ -100,7 +100,7 @@ eg. `{ "X-Custom-Header": "yes" }`
 or
 
 ```js
-webpackDevMiddleware(compiler, {
+middleware(compiler, {
   headers: () => ({
     "Last-Modified": new Date(),
   }),
@@ -110,7 +110,7 @@ webpackDevMiddleware(compiler, {
 or
 
 ```js
-webpackDevMiddleware(compiler, {
+middleware(compiler, {
   headers: (req, res, context) => {
     res.setHeader("Last-Modified", new Date());
   },
@@ -120,7 +120,7 @@ webpackDevMiddleware(compiler, {
 or
 
 ```js
-webpackDevMiddleware(compiler, {
+middleware(compiler, {
   headers: [
     {
       key: "X-custom-header",
@@ -137,7 +137,7 @@ webpackDevMiddleware(compiler, {
 or
 
 ```js
-webpackDevMiddleware(compiler, {
+middleware(compiler, {
   headers: () => [
     {
       key: "X-custom-header",
@@ -242,7 +242,9 @@ Type: `Boolean|Function`
 Default: `false`
 
 If `true`, the option will instruct the module to write files to the configured location on disk as specified in your `webpack` config file.
-_Setting `writeToDisk: true` won't change the behavior of the `webpack-dev-middleware`, and bundle files accessed through the browser will still be served from memory._
+
+_Setting `writeToDisk: true` won't change the behavior of `@rspack/dev-middleware`, and bundle files accessed through the browser will still be served from memory._
+
 This option provides the same capabilities as the [`WriteFilePlugin`](https://github.com/gajus/write-file-webpack-plugin/pulls).
 
 This option also accepts a `Function` value, which can be used to filter which files are written to disk.
@@ -313,12 +315,12 @@ middleware(compiler, {
 
 ## API
 
-`webpack-dev-middleware` also provides convenience methods that can be use to
+`@rspack/dev-middleware` also provides convenience methods that can be use to
 interact with the middleware at runtime:
 
 ### `close(callback)`
 
-Instructs `webpack-dev-middleware` instance to stop watching for file changes.
+Instructs the `@rspack/dev-middleware` instance to stop watching for file changes.
 
 #### Parameters
 
@@ -337,7 +339,7 @@ const compiler = webpack({
   /* Webpack configuration */
 });
 
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -354,7 +356,7 @@ setTimeout(() => {
 
 ### `invalidate(callback)`
 
-Instructs `webpack-dev-middleware` instance to recompile the bundle, e.g. after a change to the configuration.
+Instructs the `@rspack/dev-middleware` instance to recompile the bundle, e.g. after a change to the configuration.
 
 #### Parameters
 
@@ -373,7 +375,7 @@ const compiler = webpack({
   /* Webpack configuration */
 });
 
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -414,7 +416,7 @@ const compiler = webpack({
   /* Webpack configuration */
 });
 
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -449,7 +451,7 @@ const compiler = webpack({
   /* Webpack configuration */
 });
 
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -476,7 +478,7 @@ But there is a solution to avoid it - mount the middleware to a non-root route, 
 ```js
 const express = require("express");
 const webpack = require("webpack");
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 
 const compiler = webpack({
   // webpack options
@@ -489,7 +491,7 @@ const app = express();
 app.use(
   "/dist/",
   middleware(compiler, {
-    // webpack-dev-middleware options
+    // @rspack/dev-middleware options
   }),
 );
 
@@ -504,12 +506,12 @@ In order to develop an app using server-side rendering, we need access to the
 [`stats`](https://github.com/webpack/docs/wiki/node.js-api#stats), which is
 generated with each build.
 
-With server-side rendering enabled, `webpack-dev-middleware` sets the `stats` to `res.locals.webpack.devMiddleware.stats`
+With server-side rendering enabled, `@rspack/dev-middleware` sets the `stats` to `res.locals.webpack.devMiddleware.stats`
 and the filesystem to `res.locals.webpack.devMiddleware.outputFileSystem` before invoking the next middleware,
 allowing a developer to render the page body and manage the response to clients.
 
 _Note: Requests for bundle files will still be handled by
-`webpack-dev-middleware` and all requests will be pending until the build
+`@rspack/dev-middleware` and all requests will be pending until the build
 process is finished with server-side rendering enabled._
 
 Example Implementation:
@@ -518,7 +520,7 @@ Example Implementation:
 const express = require("express");
 const isObject = require("is-object");
 const webpack = require("webpack");
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 
 const compiler = webpack({
   /* Webpack configuration */
@@ -606,12 +608,12 @@ Examples of use with other servers will follow here.
 const http = require("node:http");
 const connect = require("connect");
 const webpack = require("webpack");
-const devMiddleware = require("webpack-dev-middleware");
+const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
 const devMiddlewareOptions = {
-  /** Your webpack-dev-middleware-options */
+  // options
 };
 const app = connect();
 
@@ -627,12 +629,12 @@ const http = require("node:http");
 const finalhandler = require("finalhandler");
 const Router = require("router");
 const webpack = require("webpack");
-const devMiddleware = require("webpack-dev-middleware");
+const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
 const devMiddlewareOptions = {
-  /** Your webpack-dev-middleware-options */
+  // options
 };
 
 // eslint-disable-next-line new-cap
@@ -652,12 +654,12 @@ server.listen(3000);
 ```js
 const express = require("express");
 const webpack = require("webpack");
-const devMiddleware = require("webpack-dev-middleware");
+const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
 const devMiddlewareOptions = {
-  /** Your webpack-dev-middleware-options */
+  // options
 };
 const app = express();
 
@@ -671,12 +673,12 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 ```js
 const Koa = require("koa");
 const webpack = require("webpack");
-const middleware = require("webpack-dev-middleware");
+const middleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.simple.config");
 
 const compiler = webpack(webpackConfig);
 const devMiddlewareOptions = {
-  /** Your webpack-dev-middleware-options */
+  // options
 };
 const app = new Koa();
 
@@ -690,7 +692,7 @@ app.listen(3000);
 ```js
 const Hapi = require("@hapi/hapi");
 const webpack = require("webpack");
-const devMiddleware = require("webpack-dev-middleware");
+const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
@@ -699,7 +701,7 @@ const devMiddlewareOptions = {};
 const server = Hapi.server({ port: 3000, host: "localhost" });
 
 await server.register({
-  plugin: devMiddleware.hapiPlugin(),
+  plugin: devMiddleware.hapiWrapper(),
   options: {
     // The `compiler` option is required
     compiler,
@@ -724,12 +726,12 @@ Fastify interop will require the use of `fastify-express` instead of `middie` fo
 ```js
 const fastify = require("fastify")();
 const webpack = require("webpack");
-const devMiddleware = require("webpack-dev-middleware");
+const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
 const devMiddlewareOptions = {
-  /** Your webpack-dev-middleware-options */
+  // options
 };
 
 await fastify.register(require("@fastify/express"));
@@ -743,12 +745,12 @@ await fastify.listen(3000);
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import webpack from "webpack";
-import devMiddleware from "webpack-dev-middleware";
+import devMiddleware from "@rspack/dev-middleware";
 import webpackConfig from "./webpack.config.js";
 
 const compiler = webpack(webpackConfig);
 const devMiddlewareOptions = {
-  /** Your webpack-dev-middleware-options */
+  // options
 };
 
 const app = new Hono();
@@ -762,27 +764,27 @@ serve(app);
 
 Please take a moment to read our contributing guidelines if you haven't yet done so.
 
-[CONTRIBUTING](https://github.com/webpack/sass-loader?tab=contributing-ov-file#contributing)
+[CONTRIBUTING](./CONTRIBUTING.md)
 
 ## License
 
 [MIT](./LICENSE)
 
-[npm]: https://img.shields.io/npm/v/webpack-dev-middleware.svg
-[npm-url]: https://npmjs.com/package/webpack-dev-middleware
-[node]: https://img.shields.io/node/v/webpack-dev-middleware.svg
+[npm]: https://img.shields.io/npm/v/%40rspack%2Fdev-middleware.svg
+[npm-url]: https://www.npmjs.com/package/@rspack/dev-middleware
+[node]: https://img.shields.io/node/v/%40rspack%2Fdev-middleware.svg
 [node-url]: https://nodejs.org
-[tests]: https://github.com/webpack/webpack-dev-middleware/workflows/webpack-dev-middleware/badge.svg
-[tests-url]: https://github.com/webpack/webpack-dev-middleware/actions
-[cover]: https://codecov.io/gh/webpack/webpack-dev-middleware/branch/main/graph/badge.svg
-[cover-url]: https://codecov.io/gh/webpack/webpack-dev-middleware
+[tests]: https://github.com/rstackjs/rspack-dev-middleware/actions/workflows/test.yml/badge.svg
+[tests-url]: https://github.com/rstackjs/rspack-dev-middleware/actions
+[cover]: https://codecov.io/gh/rstackjs/rspack-dev-middleware/branch/main/graph/badge.svg
+[cover-url]: https://codecov.io/gh/rstackjs/rspack-dev-middleware
 [discussion]: https://img.shields.io/github/discussions/webpack/webpack
 [discussion-url]: https://github.com/webpack/webpack/discussions
-[size]: https://packagephobia.com/badge?p=webpack-dev-middleware
-[size-url]: https://packagephobia.com/result?p=webpack-dev-middleware
-[docs-url]: https://webpack.js.org/guides/development/#using-webpack-dev-middleware
+[size]: https://packagephobia.com/badge?p=%40rspack%2Fdev-middleware
+[size-url]: https://packagephobia.com/result?p=%40rspack%2Fdev-middleware
+[docs-url]: https://github.com/rstackjs/rspack-dev-middleware#readme
 [hash-url]: https://twitter.com/search?q=webpack
-[middleware-url]: https://github.com/webpack/webpack-dev-middleware
-[stack-url]: https://stackoverflow.com/questions/tagged/webpack-dev-middleware
+[middleware-url]: https://github.com/rstackjs/rspack-dev-middleware
+[stack-url]: https://stackoverflow.com/questions/tagged/rspack-dev-middleware
 [chat-url]: https://github.com/webpack/webpack/discussions
 [wjo-url]: https://github.com/webpack/webpack.js.org
