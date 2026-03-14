@@ -24,7 +24,9 @@
     "cachable",
     "finalhandler",
     "hono",
-    "rspack"
+    "rspack",
+    "rstackjs",
+    "sokra"
   ],
   "ignorePaths": [
     "CHANGELOG.md",
@@ -32,6 +34,7 @@
     "dist/**",
     "**/__snapshots__/**",
     "package-lock.json",
+    "pnpm-lock.yaml",
     "node_modules",
     "coverage",
     "*.log",

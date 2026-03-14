@@ -25,26 +25,24 @@
   ],
   "scripts": {
     "commitlint": "commitlint --from=main",
-    "security": "npm audit --production",
     "lint:prettier": "prettier --cache --list-different .",
     "lint:code": "eslint --cache .",
     "lint:spelling": "cspell --cache --no-must-find-files --quiet \"**/*.*\"",
     "lint:types": "tsc --pretty --noEmit",
     "lint": "npm-run-all -l -p \"lint:**\"",
-    "fix:js": "npm run lint:code -- --fix",
-    "fix:prettier": "npm run lint:prettier -- --write",
+    "fix:js": "pnpm run lint:code -- --fix",
+    "fix:prettier": "pnpm run lint:prettier -- --write",
     "fix": "npm-run-all -l fix:js fix:prettier",
     "clean": "del-cli dist types",
-    "prebuild": "npm run clean",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir types && prettier \"types/**/*.ts\" --write",
     "build:code": "babel src -d dist --copy-files",
     "build": "npm-run-all -p \"build:**\"",
     "test:only": "jest",
-    "test:watch": "npm run test:only -- --watch",
-    "test:coverage": "npm run test:only -- --collectCoverageFrom=\"src/**/*.js\" --coverage",
-    "pretest": "npm run lint",
-    "test": "npm run test:coverage",
-    "prepare": "husky && npm run build",
+    "test:watch": "pnpm run test:only -- --watch",
+    "test:coverage": "pnpm run test:only -- --collectCoverageFrom=\"src/**/*.js\" --coverage",
+    "pretest": "pnpm run lint",
+    "test": "pnpm run test:coverage",
+    "prepare": "husky && pnpm run build",
     "release": "standard-version"
   },
   "dependencies": {
@@ -103,6 +101,7 @@
       "optional": true
     }
   },
+  "packageManager": "pnpm@10.21.0",
   "engines": {
     "node": ">= 18.12.0"
   }
