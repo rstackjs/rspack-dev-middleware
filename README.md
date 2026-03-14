@@ -1,19 +1,13 @@
-<div align="center">
-  <a href="https://github.com/webpack/webpack">
-    <img width="200" height="200" src="https://webpack.js.org/assets/icon-square-big.svg">
-  </a>
-</div>
-
-[![npm][npm]][npm-url]
-[![node][node]][node-url]
-[![tests][tests]][tests-url]
-[![coverage][cover]][cover-url]
-[![discussion][discussion]][discussion-url]
-[![size][size]][size-url]
-
 # @rspack/dev-middleware
 
-An express-style development middleware for use with [Rspack](https://rspack.rs) and webpack-compatible compilers. It serves the files emitted by the compiler from memory.
+<p>
+  <a href="https://npmjs.com/package/@rspack/dev-middleware?activeTab=readme"><img src="https://img.shields.io/npm/v/@rspack/dev-middleware?style=flat-square&colorA=564341&colorB=EDED91" alt="npm version" /></a>
+  <a href="https://npmcharts.com/compare/@rspack/dev-middleware?minimal=true"><img src="https://img.shields.io/npm/dm/@rspack/dev-middleware.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="downloads" /></a>
+  <a href="https://nodejs.org/en/about/previous-releases"><img src="https://img.shields.io/node/v/@rspack/dev-middleware.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="node version"></a>
+  <a href="https://github.com/rstackjs/rspack-dev-server/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="license" /></a>
+</p>
+
+An express-style development middleware for use with [Rspack](https://rspack.rs). It serves the files emitted by the compiler from memory.
 
 This should be used for **development only**.
 
@@ -26,7 +20,7 @@ Some of the benefits of using this middleware include:
 
 ## Getting Started
 
-First thing's first, install the module:
+Install the module:
 
 ```bash
 # npm
@@ -41,10 +35,6 @@ yarn add -D @rspack/dev-middleware
 # bun
 bun add -D @rspack/dev-middleware
 ```
-
-> [!WARNING]
->
-> _We do not recommend installing this module globally._
 
 ## Usage
 
@@ -578,32 +568,6 @@ app.use((req, res) => {
 });
 ```
 
-## Support
-
-We do our best to keep Issues in the repository focused on bugs, features, and
-needed modifications to the code for the module. Because of that, we ask users
-with general support, "how-to", or "why isn't this working" questions to try one
-of the other support channels that are available.
-
-Your first-stop-shop for support for webpack-dev-server should by the excellent
-[documentation][docs-url] for the module. If you see an opportunity for improvement
-of those docs, please head over to the [webpack.js.org repo][wjo-url] and open a
-pull request.
-
-From there, we encourage users to visit the [webpack discussions][chat-url] and
-talk to the fine folks there. If your quest for answers comes up dry in chat,
-head over to [StackOverflow][stack-url] and do a quick search or open a new
-question. Remember; It's always much easier to answer questions that include your
-`webpack.config.js` and relevant files!
-
-If you're twitter-savvy you can tweet [#webpack][hash-url] with your question
-and someone should be able to reach out and lend a hand.
-
-If you have discovered a :bug:, have a feature suggestion, or would like to see
-a modification, please feel free to create an issue on Github. _Note: The issue
-template isn't optional, so please be sure not to remove it, and please fill it
-out completely._
-
 ## Other servers
 
 Examples of use with other servers will follow here.
@@ -615,7 +579,7 @@ const http = require("node:http");
 const devMiddleware = require("@rspack/dev-middleware");
 const connect = require("connect");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
 const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
@@ -636,7 +600,7 @@ const devMiddleware = require("@rspack/dev-middleware");
 const finalhandler = require("finalhandler");
 const Router = require("router");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
 const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
@@ -661,7 +625,7 @@ server.listen(3000);
 const devMiddleware = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
 const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
@@ -699,7 +663,7 @@ app.listen(3000);
 const Hapi = require("@hapi/hapi");
 const devMiddleware = require("@rspack/dev-middleware");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
 const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {};
@@ -733,7 +697,7 @@ Fastify interop will require the use of `fastify-express` instead of `middie` fo
 const devMiddleware = require("@rspack/dev-middleware");
 const fastify = require("fastify")();
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
 const compiler = rspack(webpackConfig);
 const devMiddlewareOptions = {
@@ -781,22 +745,3 @@ Please take a moment to read our contributing guidelines if you haven't yet done
 ## License
 
 [MIT](./LICENSE)
-
-[npm]: https://img.shields.io/npm/v/%40rspack%2Fdev-middleware.svg
-[npm-url]: https://www.npmjs.com/package/@rspack/dev-middleware
-[node]: https://img.shields.io/node/v/%40rspack%2Fdev-middleware.svg
-[node-url]: https://nodejs.org
-[tests]: https://github.com/rstackjs/rspack-dev-middleware/actions/workflows/test.yml/badge.svg
-[tests-url]: https://github.com/rstackjs/rspack-dev-middleware/actions
-[cover]: https://codecov.io/gh/rstackjs/rspack-dev-middleware/branch/main/graph/badge.svg
-[cover-url]: https://codecov.io/gh/rstackjs/rspack-dev-middleware
-[discussion]: https://img.shields.io/github/discussions/webpack/webpack
-[discussion-url]: https://github.com/webpack/webpack/discussions
-[size]: https://packagephobia.com/badge?p=%40rspack%2Fdev-middleware
-[size-url]: https://packagephobia.com/result?p=%40rspack%2Fdev-middleware
-[docs-url]: https://github.com/rstackjs/rspack-dev-middleware#readme
-[hash-url]: https://twitter.com/search?q=webpack
-[middleware-url]: https://github.com/rstackjs/rspack-dev-middleware
-[stack-url]: https://stackoverflow.com/questions/tagged/rspack-dev-middleware
-[chat-url]: https://github.com/webpack/webpack/discussions
-[wjo-url]: https://github.com/webpack/webpack.js.org
