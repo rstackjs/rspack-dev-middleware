@@ -1,6 +1,6 @@
-const { version } = require("@rspack/core");
+import { version } from "@rspack/core";
 
-module.exports = () => {
+export function setup() {
   // eslint-disable-next-line no-console
   console.log(`\n Running tests for rspack @${version} \n`);
-};
+}

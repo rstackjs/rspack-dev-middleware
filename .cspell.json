@@ -25,6 +25,7 @@
     "finalhandler",
     "hono",
     "rspack",
+    "rstest",
     "rstackjs",
     "sokra"
   ],
