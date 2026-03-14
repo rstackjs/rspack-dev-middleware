@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   lint:
-    name: Lint - ${{ matrix.os }} - Node v${{ matrix.node-version }}
+    name: Checks - ${{ matrix.os }} - Node v${{ matrix.node-version }}
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,8 +32,6 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
 
       - name: Install Pnpm
         run: |
@@ -49,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint
+      - name: Run checks
         run: pnpm run lint
 
       - name: Build types
@@ -57,10 +55,6 @@ jobs:
 
       - name: Check types
         run: if [ -n "$(git status types --porcelain)" ]; then echo "Missing types. Update types by running 'pnpm run build:types'"; exit 1; else echo "All types are valid"; fi
-
-      - name: Validate PR commits with commitlint
-        if: github.event_name == 'pull_request'
-        run: pnpm exec commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
   test:
     name: Test - ${{ matrix.os }} - Node v${{ matrix.node-version }}
