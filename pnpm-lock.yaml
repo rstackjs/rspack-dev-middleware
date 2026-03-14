@@ -57,6 +57,9 @@ importers:
       '@types/on-finished':
         specifier: ^2.3.4
         version: 2.3.5
+      '@types/range-parser':
+        specifier: ^1.2.7
+        version: 1.2.7
       babel-jest:
         specifier: ^30.1.2
         version: 30.3.0(@babel/core@7.29.0)
