@@ -15,7 +15,7 @@ import mime from "mime-types";
 import router from "router";
 import request from "supertest";
 
-import { Stats } from "webpack";
+const { Stats } = require("@rspack/core");
 
 import middleware from "../src";
 

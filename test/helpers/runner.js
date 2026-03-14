@@ -2,7 +2,7 @@
 
 const merge = require("deepmerge");
 const express = require("express");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
 
 const middleware = require("../../dist");
 const defaultConfig = require("../fixtures/webpack.config");
@@ -33,7 +33,7 @@ fillConfigEntries("WMC_", configMiddlewareEntries);
 
 /**
  * @param {string} name name
- * @returns {import("webpack").Configuration | import("webpack").Configuration[]} configuration
+ * @returns {import("@rspack/core").Configuration | import("@rspack/core").Configuration[]} configuration
  */
 function getWebpackConfig(name) {
   try {
@@ -44,8 +44,8 @@ function getWebpackConfig(name) {
 }
 
 /**
- * @param {import("webpack").Configuration[]} data data
- * @returns {import("webpack").Configuration} configuration
+ * @param {import("@rspack/core").Configuration[]} data data
+ * @returns {import("@rspack/core").Configuration} configuration
  */
 function createConfig(data) {
   /**
@@ -57,8 +57,8 @@ function createConfig(data) {
   }
 
   /**
-   * @param {import("webpack").Configuration[]} arr arr
-   * @returns {import("webpack").Configuration} result
+   * @param {import("@rspack/core").Configuration[]} arr arr
+   * @returns {import("@rspack/core").Configuration} result
    */
   function reduceObject(arr) {
     if (arr.length > 1) {
@@ -89,7 +89,7 @@ if (Array.isArray(config)) {
   config.parallelism = 1;
 }
 
-const compiler = webpack(config);
+const compiler = rspack(config);
 
 if (process.env.WEBPACK_BREAK_WATCH) {
   compiler.watch = function watch() {

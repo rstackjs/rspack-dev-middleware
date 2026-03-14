@@ -1,7 +1,8 @@
-/** @typedef {import("webpack").Compiler} Compiler */
-/** @typedef {import("webpack").Stats} Stats */
-/** @typedef {import("webpack").MultiStats} MultiStats */
-/** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("@rspack/core").Compiler} Compiler */
+/** @typedef {import("@rspack/core").Stats} Stats */
+/** @typedef {import("@rspack/core").MultiStats} MultiStats */
+/** @typedef {import("@rspack/core").Asset} Asset */
+/** @typedef {import("../index.js").DevServerOption} DevServerOption */
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 
@@ -9,7 +10,7 @@
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").FilledContext<Request, Response>} context context
- * @returns {{ outputPath: string, publicPath: string, assetsInfo: Asset["info"] }[]} paths
+ * @returns {{ outputPath: string, publicPath: string, assetsInfo: Map<string, Asset["info"]> | undefined }[]} paths
  */
 function getPaths(context) {
   const { stats, options } = context;
@@ -20,11 +21,14 @@ function getPaths(context) {
     (stats).stats
       ? /** @type {MultiStats} */ (stats).stats
       : [/** @type {Stats} */ (stats)];
-  /** @type {{ outputPath: string, publicPath: string, assetsInfo: Asset["info"] }[]} */
+  /** @type {{ outputPath: string, publicPath: string, assetsInfo: Map<string, Asset["info"]> | undefined }[]} */
   const publicPaths = [];
 
   for (const { compilation } of childStats) {
-    if (compilation.options.devServer === false) {
+    if (
+      /** @type {DevServerOption} */
+      (compilation.options.devServer) === false
+    ) {
       continue;
     }
 
@@ -33,15 +37,20 @@ function getPaths(context) {
       compilation.outputOptions.path || "",
     );
     const publicPath = options.publicPath
-      ? compilation.getPath(options.publicPath)
+      ? compilation.getPath(/** @type {any} */ (options.publicPath))
       : compilation.outputOptions.publicPath
-        ? compilation.getPath(compilation.outputOptions.publicPath)
+        ? compilation.getPath(
+            /** @type {any} */ (compilation.outputOptions.publicPath),
+          )
         : "";
+    const assetsInfo = new Map(
+      compilation.getAssets().map((asset) => [asset.name, asset.info]),
+    );
 
     publicPaths.push({
       outputPath,
       publicPath,
-      assetsInfo: compilation.assetsInfo,
+      assetsInfo,
     });
   }
 

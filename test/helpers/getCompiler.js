@@ -1,16 +1,16 @@
-import webpack from "webpack";
+const { rspack } = require("@rspack/core");
 
 import defaultConfig from "../fixtures/webpack.config";
 
-/** @typedef {import("webpack").Configuration} Configuration */
-/** @typedef {import("webpack").Compiler} Compiler */
+/** @typedef {import("@rspack/core").Configuration} Configuration */
+/** @typedef {import("@rspack/core").Compiler} Compiler */
 
 /**
  * @param {Configuration} config config
  * @returns {Compiler} compiler
  */
 function getCompiler(config) {
-  return webpack(config || defaultConfig);
+  return rspack(config || defaultConfig);
 }
 
 export default getCompiler;

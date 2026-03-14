@@ -1,9 +1,9 @@
 export = wdm;
-/** @typedef {import("webpack").Compiler} Compiler */
-/** @typedef {import("webpack").MultiCompiler} MultiCompiler */
-/** @typedef {import("webpack").Configuration} Configuration */
-/** @typedef {import("webpack").Stats} Stats */
-/** @typedef {import("webpack").MultiStats} MultiStats */
+/** @typedef {import("@rspack/core").Compiler} Compiler */
+/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
+/** @typedef {import("@rspack/core").Configuration} Configuration */
+/** @typedef {import("@rspack/core").Stats} Stats */
+/** @typedef {import("@rspack/core").MultiStats} MultiStats */
 /** @typedef {import("fs").ReadStream} ReadStream */
 /**
  * @typedef {object} ExtendedServerResponse
@@ -22,15 +22,19 @@ export = wdm;
  * @typedef {NonNullable<Configuration["watchOptions"]>} WatchOptions
  */
 /**
+ * @typedef {boolean | Configuration["devServer"] | undefined} DevServerOption
+ */
+/**
  * @typedef {Compiler["watching"]} Watching
  */
 /**
  * @typedef {ReturnType<MultiCompiler["watch"]>} MultiWatching
  */
 /**
- * @typedef {import("webpack").OutputFileSystem & { createReadStream?: import("fs").createReadStream, statSync: import("fs").statSync, readFileSync: import("fs").readFileSync }} OutputFileSystem
+ * @typedef {import("@rspack/core").OutputFileSystem & { createReadStream?: import("fs").createReadStream, statSync: import("fs").statSync, readFileSync: import("fs").readFileSync }} OutputFileSystem
  */
 /** @typedef {ReturnType<Compiler["getInfrastructureLogger"]>} Logger */
+/** @typedef {{ close(callback: (err?: Error | null | undefined) => void): void }} ClosableWatching */
 /**
  * @callback Callback
  * @param {(Stats | MultiStats)=} stats
@@ -179,10 +183,12 @@ declare namespace wdm {
     EXPECTED_FUNCTION,
     NextFunction,
     WatchOptions,
+    DevServerOption,
     Watching,
     MultiWatching,
     OutputFileSystem,
     Logger,
+    ClosableWatching,
     Callback,
     ResponseData,
     ModifyResponseData,
@@ -257,11 +263,11 @@ declare function honoWrapper<
   compiler: Compiler | MultiCompiler,
   options?: Options<RequestInternal, ResponseInternal> | undefined,
 ): (ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void;
-type Compiler = import("webpack").Compiler;
-type MultiCompiler = import("webpack").MultiCompiler;
-type Configuration = import("webpack").Configuration;
-type Stats = import("webpack").Stats;
-type MultiStats = import("webpack").MultiStats;
+type Compiler = import("@rspack/core").Compiler;
+type MultiCompiler = import("@rspack/core").MultiCompiler;
+type Configuration = import("@rspack/core").Configuration;
+type Stats = import("@rspack/core").Stats;
+type MultiStats = import("@rspack/core").MultiStats;
 type ReadStream = import("fs").ReadStream;
 type ExtendedServerResponse = {
   /**
@@ -281,14 +287,18 @@ type EXPECTED_ANY = any;
 type EXPECTED_FUNCTION = Function;
 type NextFunction = (err?: EXPECTED_ANY | undefined) => void;
 type WatchOptions = NonNullable<Configuration["watchOptions"]>;
+type DevServerOption = boolean | Configuration["devServer"] | undefined;
 type Watching = Compiler["watching"];
 type MultiWatching = ReturnType<MultiCompiler["watch"]>;
-type OutputFileSystem = import("webpack").OutputFileSystem & {
+type OutputFileSystem = import("@rspack/core").OutputFileSystem & {
   createReadStream?: typeof import("fs").createReadStream;
   statSync: import("fs").StatSyncFn;
   readFileSync: typeof import("fs").readFileSync;
 };
 type Logger = ReturnType<Compiler["getInfrastructureLogger"]>;
+type ClosableWatching = {
+  close(callback: (err?: Error | null | undefined) => void): void;
+};
 type Callback = (stats?: (Stats | MultiStats) | undefined) => any;
 type ResponseData = {
   /**

@@ -1,8 +1,8 @@
-/** @typedef {import("webpack").Configuration} Configuration */
-/** @typedef {import("webpack").Compiler} Compiler */
-/** @typedef {import("webpack").MultiCompiler} MultiCompiler */
-/** @typedef {import("webpack").Stats} Stats */
-/** @typedef {import("webpack").MultiStats} MultiStats */
+/** @typedef {import("@rspack/core").Configuration} Configuration */
+/** @typedef {import("@rspack/core").Compiler} Compiler */
+/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
+/** @typedef {import("@rspack/core").Stats} Stats */
+/** @typedef {import("@rspack/core").MultiStats} MultiStats */
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 
@@ -108,21 +108,6 @@ function setupHooks(context) {
             (childStatsOptions) => {
               childStatsOptions = normalizeStatsOptions(childStatsOptions);
 
-              if (typeof childStatsOptions.colors === "undefined") {
-                const [firstCompiler] =
-                  /** @type {MultiCompiler} */
-                  (compiler).compilers;
-
-                // TODO remove `colorette` and set minimum supported webpack version is `5.101.0`
-                childStatsOptions.colors =
-                  typeof firstCompiler.webpack !== "undefined" &&
-                  typeof firstCompiler.webpack.cli !== "undefined" &&
-                  typeof firstCompiler.webpack.cli.isColorSupported ===
-                    "function"
-                    ? firstCompiler.webpack.cli.isColorSupported()
-                    : require("colorette").isColorSupported;
-              }
-
               return childStatsOptions;
             },
           );
@@ -132,14 +117,7 @@ function setupHooks(context) {
         );
 
         if (typeof statsOptions.colors === "undefined") {
-          const { compiler } = /** @type {{ compiler: Compiler }} */ (context);
-          // TODO remove `colorette` and set minimum supported webpack version is `5.101.0`
-          statsOptions.colors =
-            typeof compiler.webpack !== "undefined" &&
-            typeof compiler.webpack.cli !== "undefined" &&
-            typeof compiler.webpack.cli.isColorSupported === "function"
-              ? compiler.webpack.cli.isColorSupported()
-              : require("colorette").isColorSupported;
+          statsOptions.colors = require("colorette").isColorSupported;
         }
       }
 

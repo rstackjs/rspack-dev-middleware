@@ -1,6 +1,7 @@
 const memfs = require("memfs");
 
-/** @typedef {import("webpack").MultiCompiler} MultiCompiler */
+/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
+/** @typedef {import("../index.js").DevServerOption} DevServerOption */
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 
@@ -33,7 +34,7 @@ function setupOutputFileSystem(context) {
         (context.compiler).compilers.find(
           (item) =>
             Object.hasOwn(item.options, "devServer") &&
-            item.options.devServer !== false,
+            /** @type {DevServerOption} */ (item.options.devServer) !== false,
         );
 
       ({ outputFileSystem } =
@@ -50,7 +51,7 @@ function setupOutputFileSystem(context) {
     (context.compiler).compilers || [context.compiler];
 
   for (const compiler of compilers) {
-    if (compiler.options.devServer === false) {
+    if (/** @type {DevServerOption} */ (compiler.options.devServer) === false) {
       continue;
     }
 

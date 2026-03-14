@@ -1,9 +1,10 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-/** @typedef {import("webpack").Compiler} Compiler */
-/** @typedef {import("webpack").MultiCompiler} MultiCompiler */
-/** @typedef {import("webpack").Compilation} Compilation */
+/** @typedef {import("@rspack/core").Compiler} Compiler */
+/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
+/** @typedef {import("@rspack/core").Compilation} Compilation */
+/** @typedef {import("../index.js").DevServerOption} DevServerOption */
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 
@@ -21,7 +22,7 @@ function setupWriteToDisk(context) {
     (context.compiler).compilers || [context.compiler];
 
   for (const compiler of compilers) {
-    if (compiler.options.devServer === false) {
+    if (/** @type {DevServerOption} */ (compiler.options.devServer) === false) {
       continue;
     }
 

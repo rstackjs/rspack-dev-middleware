@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with mkdir error 1`] = `
+[
+  [
+    "Child "name": Unable to write "/target/path" directory to disk:
+error1",
+  ],
+]
+`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with mkdir error 2`] = `[]`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with mkdir error 3`] = `
+[
+  [
+    "error1",
+  ],
+]
+`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with no write errors 1`] = `[]`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with no write errors 2`] = `
+[
+  [
+    "Child "name": Asset written to disk: "/target/path/file"",
+  ],
+]
+`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with no write errors 3`] = `
+[
+  [],
+]
+`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with writeFile error 1`] = `
+[
+  [
+    "Child "name": Unable to write "/target/path/file" asset to disk:
+error2",
+  ],
+]
+`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with writeFile error 2`] = `[]`;
+
+exports[`setupWriteToDisk tries to create directories and write file if not filtered out with writeFile error 3`] = `
+[
+  [
+    "error2",
+  ],
+]
+`;

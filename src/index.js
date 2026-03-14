@@ -9,11 +9,11 @@ const setupWriteToDisk = require("./utils/setupWriteToDisk");
 
 const noop = () => {};
 
-/** @typedef {import("webpack").Compiler} Compiler */
-/** @typedef {import("webpack").MultiCompiler} MultiCompiler */
-/** @typedef {import("webpack").Configuration} Configuration */
-/** @typedef {import("webpack").Stats} Stats */
-/** @typedef {import("webpack").MultiStats} MultiStats */
+/** @typedef {import("@rspack/core").Compiler} Compiler */
+/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
+/** @typedef {import("@rspack/core").Configuration} Configuration */
+/** @typedef {import("@rspack/core").Stats} Stats */
+/** @typedef {import("@rspack/core").MultiStats} MultiStats */
 /** @typedef {import("fs").ReadStream} ReadStream */
 
 /**
@@ -40,6 +40,10 @@ const noop = () => {};
  */
 
 /**
+ * @typedef {boolean | Configuration["devServer"] | undefined} DevServerOption
+ */
+
+/**
  * @typedef {Compiler["watching"]} Watching
  */
 
@@ -48,10 +52,11 @@ const noop = () => {};
  */
 
 /**
- * @typedef {import("webpack").OutputFileSystem & { createReadStream?: import("fs").createReadStream, statSync: import("fs").statSync, readFileSync: import("fs").readFileSync }} OutputFileSystem
+ * @typedef {import("@rspack/core").OutputFileSystem & { createReadStream?: import("fs").createReadStream, statSync: import("fs").statSync, readFileSync: import("fs").readFileSync }} OutputFileSystem
  */
 
 /** @typedef {ReturnType<Compiler["getInfrastructureLogger"]>} Logger */
+/** @typedef {{ close(callback: (err?: Error | null | undefined) => void): void }} ClosableWatching */
 
 /**
  * @callback Callback
@@ -284,7 +289,7 @@ function wdm(compiler, options = {}) {
   };
 
   instance.close = (callback = noop) => {
-    filledContext.watching.close(callback);
+    /** @type {ClosableWatching} */ (filledContext.watching).close(callback);
   };
 
   instance.context = filledContext;
