@@ -764,7 +764,7 @@ serve(app);
 
 This repository is forked from [webpack-dev-middleware](https://github.com/webpack/webpack-dev-middleware). It adapts the original implementation for the Rspack ecosystem, bridging behavioral differences with webpack while adding Rspack-specific capabilities.
 
-> Thanks to the webpack-dev-server maintainers and its original creator, [@sokra](https://github.com/sokra).
+> Thanks to the webpack-dev-middleware maintainers and its original creator, [@sokra](https://github.com/sokra).
 
 ## Contributing
 
