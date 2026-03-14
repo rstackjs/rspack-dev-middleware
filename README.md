@@ -28,8 +28,18 @@ Some of the benefits of using this middleware include:
 
 First thing's first, install the module:
 
-```console
+```bash
+# npm
 npm install @rspack/dev-middleware -D
+
+# pnpm
+pnpm add -D @rspack/dev-middleware
+
+# yarn
+yarn add -D @rspack/dev-middleware
+
+# bun
+bun add -D @rspack/dev-middleware
 ```
 
 > [!WARNING]
@@ -39,9 +49,9 @@ npm install @rspack/dev-middleware -D
 ## Usage
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const webpack = require("webpack");
-const middleware = require("@rspack/dev-middleware");
 
 const compiler = webpack({
   // webpack options
@@ -332,14 +342,13 @@ Required: `No`
 A function executed once the middleware has stopped watching.
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const webpack = require("webpack");
 
 const compiler = webpack({
   /* Webpack configuration */
 });
-
-const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -368,14 +377,13 @@ Required: `No`
 A function executed once the middleware has invalidated.
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const webpack = require("webpack");
 
 const compiler = webpack({
   /* Webpack configuration */
 });
-
-const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -409,14 +417,13 @@ A function executed when the bundle becomes valid.
 If the bundle is valid at the time of calling, the callback is executed immediately.
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const webpack = require("webpack");
 
 const compiler = webpack({
   /* Webpack configuration */
 });
-
-const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -444,14 +451,13 @@ Required: `Yes`
 URL for the requested file.
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const webpack = require("webpack");
 
 const compiler = webpack({
   /* Webpack configuration */
 });
-
-const middleware = require("@rspack/dev-middleware");
 
 const instance = middleware(compiler);
 
@@ -476,9 +482,9 @@ Since `output.publicPath` and `output.filename`/`output.chunkFilename` can be dy
 But there is a solution to avoid it - mount the middleware to a non-root route, for example:
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const webpack = require("webpack");
-const middleware = require("@rspack/dev-middleware");
 
 const compiler = webpack({
   // webpack options
@@ -517,10 +523,10 @@ process is finished with server-side rendering enabled._
 Example Implementation:
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const express = require("express");
 const isObject = require("is-object");
 const webpack = require("webpack");
-const middleware = require("@rspack/dev-middleware");
 
 const compiler = webpack({
   /* Webpack configuration */
@@ -606,9 +612,9 @@ Examples of use with other servers will follow here.
 
 ```js
 const http = require("node:http");
+const devMiddleware = require("@rspack/dev-middleware");
 const connect = require("connect");
 const webpack = require("webpack");
-const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
@@ -626,10 +632,10 @@ http.createServer(app).listen(3000);
 
 ```js
 const http = require("node:http");
+const devMiddleware = require("@rspack/dev-middleware");
 const finalhandler = require("finalhandler");
 const Router = require("router");
 const webpack = require("webpack");
-const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
@@ -652,9 +658,9 @@ server.listen(3000);
 ### Express
 
 ```js
+const devMiddleware = require("@rspack/dev-middleware");
 const express = require("express");
 const webpack = require("webpack");
-const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
@@ -671,9 +677,9 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 ### Koa
 
 ```js
+const middleware = require("@rspack/dev-middleware");
 const Koa = require("koa");
 const webpack = require("webpack");
-const middleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.simple.config");
 
 const compiler = webpack(webpackConfig);
@@ -691,8 +697,8 @@ app.listen(3000);
 
 ```js
 const Hapi = require("@hapi/hapi");
-const webpack = require("webpack");
 const devMiddleware = require("@rspack/dev-middleware");
+const webpack = require("webpack");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
@@ -724,9 +730,9 @@ process.on("unhandledRejection", (err) => {
 Fastify interop will require the use of `fastify-express` instead of `middie` for providing middleware support. As the authors of `fastify-express` recommend, this should only be used as a stopgap while full Fastify support is worked on.
 
 ```js
+const devMiddleware = require("@rspack/dev-middleware");
 const fastify = require("fastify")();
 const webpack = require("webpack");
-const devMiddleware = require("@rspack/dev-middleware");
 const webpackConfig = require("./webpack.config.js");
 
 const compiler = webpack(webpackConfig);
@@ -743,9 +749,9 @@ await fastify.listen(3000);
 
 ```js
 import { serve } from "@hono/node-server";
+import devMiddleware from "@rspack/dev-middleware";
 import { Hono } from "hono";
 import webpack from "webpack";
-import devMiddleware from "@rspack/dev-middleware";
 import webpackConfig from "./webpack.config.js";
 
 const compiler = webpack(webpackConfig);
