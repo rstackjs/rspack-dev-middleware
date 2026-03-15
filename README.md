@@ -44,7 +44,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  // webpack options
+  // Rspack options
 });
 
 const app = express();
@@ -76,8 +76,8 @@ See [below](#other-servers) for an example of use with fastify.
 |         **[`publicPath`](#publicpath)**         |             `string`              |                  `undefined`                  | The public path that the middleware is bound to.                                                                     |
 |              **[`stats`](#stats)**              |     `boolean\|string\|Object`     |        `stats` (from a configuration)         | Stats options object or preset name.                                                                                 |
 |   **[`serverSideRender`](#serversiderender)**   |             `boolean`             |                  `undefined`                  | Instructs the module to enable or disable the server-side rendering mode.                                            |
-|        **[`writeToDisk`](#writetodisk)**        |        `boolean\|Function`        |                    `false`                    | Instructs the module to write files to the configured location on disk as specified in your `webpack` configuration. |
-|   **[`outputFileSystem`](#outputfilesystem)**   |             `Object`              | [`memfs`](https://github.com/streamich/memfs) | Set the default file system which will be used by webpack as primary destination of generated files.                 |
+|        **[`writeToDisk`](#writetodisk)**        |        `boolean\|Function`        |                    `false`                    | Instructs the module to write files to the configured location on disk as specified in your Rspack configuration. |
+|   **[`outputFileSystem`](#outputfilesystem)**   |             `Object`              | [`memfs`](https://github.com/streamich/memfs) | Set the default file system which will be used by Rspack as primary destination of generated files.                 |
 | **[`modifyResponseData`](#modifyresponsedata)** |            `Function`             |                  `undefined`                  | Allows to set up a callback to change the response data.                                                             |
 
 The middleware accepts an `options` Object. The following is a property reference for the Object.
@@ -219,7 +219,7 @@ Default: `output.publicPath` (from a configuration)
 
 The public path that the middleware is bound to.
 
-_Best Practice: use the same `publicPath` defined in your webpack config. For more information about `publicPath`, please see [the webpack documentation](https://webpack.js.org/guides/public-path)._
+> Best Practice: use the same `publicPath` defined in your Rspack config.
 
 ### stats
 
@@ -241,11 +241,9 @@ Please see [Server-Side Rendering](#server-side-rendering) for more information.
 Type: `Boolean|Function`  
 Default: `false`
 
-If `true`, the option will instruct the module to write files to the configured location on disk as specified in your `webpack` config file.
+If `true`, the option will instruct the module to write files to the configured location on disk as specified in your Rspack config file.
 
 _Setting `writeToDisk: true` won't change the behavior of `@rspack/dev-middleware`, and bundle files accessed through the browser will still be served from memory._
-
-This option provides the same capabilities as the [`WriteFilePlugin`](https://github.com/gajus/write-file-webpack-plugin/pulls).
 
 This option also accepts a `Function` value, which can be used to filter which files are written to disk.
 The function follows the same premise as [`Array#filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) in which a return value of `false` _will not_ write the file, and a return value of `true` _will_ write the file to disk. eg.
@@ -254,7 +252,7 @@ The function follows the same premise as [`Array#filter`](https://developer.mozi
 const { rspack } = require("@rspack/core");
 
 const configuration = {
-  /* Webpack configuration */
+  /* Rspack configuration */
 };
 const compiler = rspack(configuration);
 
@@ -268,10 +266,8 @@ middleware(compiler, {
 Type: `Object`  
 Default: [memfs](https://github.com/streamich/memfs)
 
-Set the default file system which will be used by webpack as primary destination of generated files.
+Set the default file system which will be used by Rspack as primary destination of generated files.
 This option isn't affected by the [writeToDisk](#writeToDisk) option.
-
-You have to provide `.join()` and `mkdirp` method to the `outputFileSystem` instance manually for compatibility with `webpack@4`.
 
 This can be done simply by using `path.join`:
 
@@ -285,7 +281,7 @@ myOutputFileSystem.join = path.join.bind(path); // no need to bind
 myOutputFileSystem.mkdirp = mkdirp.bind(mkdirp); // no need to bind
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 middleware(compiler, { outputFileSystem: myOutputFileSystem });
@@ -299,7 +295,7 @@ Allows to set up a callback to change the response data.
 const { rspack } = require("@rspack/core");
 
 const configuration = {
-  /* Webpack configuration */
+  /* Rspack configuration */
 };
 const compiler = rspack(configuration);
 
@@ -337,7 +333,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -348,7 +344,7 @@ const app = new express();
 app.use(instance);
 
 setTimeout(() => {
-  // Says `webpack` to stop watch changes
+  // Says Rspack to stop watch changes
   instance.close();
 }, 1000);
 ```
@@ -372,7 +368,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -384,7 +380,7 @@ app.use(instance);
 
 setTimeout(() => {
   // After a short delay the configuration is changed and a banner plugin is added to the config
-  new webpack.BannerPlugin("A new banner").apply(compiler);
+  new rspack.BannerPlugin("A new banner").apply(compiler);
 
   // Recompile the bundle with the banner plugin:
   instance.invalidate();
@@ -412,7 +408,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -446,7 +442,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -465,9 +461,9 @@ instance.waitUntilValid(() => {
 
 ## FAQ
 
-### Avoid blocking requests to non-webpack resources.
+### Avoid blocking requests to non-Rspack resources.
 
-Since `output.publicPath` and `output.filename`/`output.chunkFilename` can be dynamic, it's not possible to know which files are webpack bundles (and they public paths) and which are not, so we can't avoid blocking requests.
+Since `output.publicPath` and `output.filename`/`output.chunkFilename` can be dynamic, it's not possible to know which files are Rspack bundles (and they public paths) and which are not, so we can't avoid blocking requests.
 
 But there is a solution to avoid it - mount the middleware to a non-root route, for example:
 
@@ -477,7 +473,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  // webpack options
+  // Rspack options
 });
 
 const app = express();
@@ -519,13 +515,13 @@ const isObject = require("is-object");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 // eslint-disable-next-line new-cap
 const app = new express();
 
-// This function makes server rendering of asset references consistent with different webpack chunk/entry configurations
+// This function makes server rendering of asset references consistent with different Rspack chunk/entry configurations
 function normalizeAssets(assets) {
   if (isObject(assets)) {
     return Object.values(assets);
@@ -581,7 +577,7 @@ const connect = require("connect");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -602,7 +598,7 @@ const Router = require("router");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -627,7 +623,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -644,9 +640,9 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 const middleware = require("@rspack/dev-middleware");
 const Koa = require("koa");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.simple.config");
+const rspackConfig = require("./rspack.simple.config");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -665,7 +661,7 @@ const devMiddleware = require("@rspack/dev-middleware");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {};
 
 const server = Hapi.server({ port: 3000, host: "localhost" });
@@ -699,7 +695,7 @@ const fastify = require("fastify")();
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -716,9 +712,9 @@ import { serve } from "@hono/node-server";
 import devMiddleware from "@rspack/dev-middleware";
 import { Hono } from "hono";
 import { rspack } from "@rspack/core";
-import webpackConfig from "./webpack.config.js";
+import rspackConfig from "./rspack.config.js";
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
