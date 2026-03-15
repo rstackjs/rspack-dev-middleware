@@ -32,22 +32,6 @@ function setupHooks(context) {
   }
 
   /**
-   * @param {StatsOptions} statsOptions stats options
-   * @returns {StatsObjectOptions} object stats options
-   */
-  function normalizeStatsOptions(statsOptions) {
-    if (typeof statsOptions === "undefined") {
-      statsOptions = { preset: "normal" };
-    } else if (typeof statsOptions === "boolean") {
-      statsOptions = statsOptions ? { preset: "normal" } : { preset: "none" };
-    } else if (typeof statsOptions === "string") {
-      statsOptions = { preset: statsOptions };
-    }
-
-    return statsOptions;
-  }
-
-  /**
    * @param {Stats | MultiStats} stats stats
    */
   function done(stats) {
@@ -94,31 +78,6 @@ function setupHooks(context) {
                 (compiler).compilers.map((child) => child.options.stats),
             }
           : /** @type {Compiler} */ (compiler).options.stats;
-      }
-
-      if (isMultiCompilerMode) {
-        /** @type {MultiStatsOptions} */
-        (statsOptions).children =
-          /** @type {MultiStatsOptions} */
-          (statsOptions).children.map(
-            /**
-             * @param {StatsOptions} childStatsOptions child stats options
-             * @returns {StatsObjectOptions} object child stats options
-             */
-            (childStatsOptions) => {
-              childStatsOptions = normalizeStatsOptions(childStatsOptions);
-
-              return childStatsOptions;
-            },
-          );
-      } else {
-        statsOptions = normalizeStatsOptions(
-          /** @type {StatsOptions} */ (statsOptions),
-        );
-
-        if (typeof statsOptions.colors === "undefined") {
-          statsOptions.colors = require("colorette").isColorSupported;
-        }
       }
 
       const printedStats = stats.toString(
