@@ -39,7 +39,6 @@
     "prepare": "pnpm run build"
   },
   "dependencies": {
-    "colorette": "^2.0.10",
     "memfs": "^4.43.1",
     "mime-types": "^3.0.1",
     "on-finished": "^2.4.1",
