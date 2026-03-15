@@ -32,7 +32,7 @@ import getCompiler from "./helpers/getCompiler";
 import getCompilerHooks from "./helpers/getCompilerHooks";
 
 // Suppress unnecessary stats output
-jest.spyOn(globalThis.console, "log").mockImplementation();
+rs.spyOn(globalThis.console, "log").mockImplementation();
 
 async function startServer(name, app) {
   return new Promise((resolve, reject) => {
@@ -200,6 +200,18 @@ function getAssetFilename(instance, extension) {
   return assetName;
 }
 
+function waitUntilValid(instance) {
+  return new Promise((resolve) => {
+    instance.waitUntilValid(resolve);
+  });
+}
+
+function waitForCompilerDone(compiler, name = "wdm-test") {
+  return new Promise((resolve) => {
+    compiler.hooks.done.tap(name, resolve);
+  });
+}
+
 async function closeServer(server) {
   // hapi
   if (typeof server.stop === "function") {
@@ -360,22 +372,18 @@ describe.each([
             await close(server, instance);
           });
 
-          it("should work", (done) => {
-            const doneSpy = jest.spyOn(
-              getCompilerHooks(compiler).done[0],
-              "fn",
-            );
+          it("should work", async () => {
+            const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
-            instance.waitUntilValid(() => {
+            try {
+              await waitUntilValid(instance);
               instance.close();
 
               expect(compiler.running).toBe(false);
               expect(doneSpy).toHaveBeenCalledTimes(1);
-
+            } finally {
               doneSpy.mockRestore();
-
-              done();
-            });
+            }
           });
         });
 
@@ -396,22 +404,18 @@ describe.each([
             await close(server, instance);
           });
 
-          it("should work", (done) => {
-            const doneSpy = jest.spyOn(
-              getCompilerHooks(compiler).done[0],
-              "fn",
-            );
+          it("should work", async () => {
+            const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
-            instance.waitUntilValid(() => {
+            try {
+              await waitUntilValid(instance);
               instance.close();
 
               expect(compiler.running).toBe(false);
               expect(doneSpy).toHaveBeenCalledTimes(1);
-
+            } finally {
               doneSpy.mockRestore();
-
-              done();
-            });
+            }
           });
         });
       });
@@ -431,79 +435,69 @@ describe.each([
           await close(server, instance);
         });
 
-        it("should work without callback", (done) => {
-          const doneSpy = jest.spyOn(getCompilerHooks(compiler).done[0], "fn");
+        it("should work without callback", async () => {
+          const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
           instance.waitUntilValid();
 
-          const intervalId = setInterval(() => {
-            if (instance.context.state) {
+          try {
+            await rs.waitFor(() => {
               expect(compiler.running).toBe(true);
               expect(instance.context.state).toBe(true);
               expect(doneSpy).toHaveBeenCalledTimes(1);
               expect(doneSpy.mock.calls[0][0]).toBeInstanceOf(Stats);
-
-              doneSpy.mockRestore();
-
-              clearInterval(intervalId);
-
-              done();
-            }
-          });
+            });
+          } finally {
+            doneSpy.mockRestore();
+          }
         });
 
-        it("should work with callback", (done) => {
-          const doneSpy = jest.spyOn(getCompilerHooks(compiler).done[0], "fn");
+        it("should work with callback", async () => {
+          const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
           let callbackCounter = 0;
 
           instance.waitUntilValid(() => {
             callbackCounter += 1;
           });
 
-          const intervalId = setInterval(() => {
-            if (instance.context.state) {
+          try {
+            await rs.waitFor(() => {
               expect(compiler.running).toBe(true);
               expect(instance.context.state).toBe(true);
               expect(callbackCounter).toBe(1);
               expect(doneSpy).toHaveBeenCalledTimes(1);
-
-              doneSpy.mockRestore();
-
-              clearInterval(intervalId);
-
-              done();
-            }
-          });
+            });
+          } finally {
+            doneSpy.mockRestore();
+          }
         });
 
-        it("should run callback immediately when state already valid", (done) => {
-          const doneSpy = jest.spyOn(getCompilerHooks(compiler).done[0], "fn");
+        it("should run callback immediately when state already valid", async () => {
+          const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
           let callbackCounter = 0;
           let validToCheck = false;
 
-          instance.waitUntilValid(() => {
-            callbackCounter += 1;
+          try {
+            await new Promise((resolve) => {
+              instance.waitUntilValid(() => {
+                callbackCounter += 1;
 
-            instance.waitUntilValid(() => {
-              validToCheck = true;
-              callbackCounter += 1;
+                instance.waitUntilValid(() => {
+                  validToCheck = true;
+                  callbackCounter += 1;
+                  resolve();
+                });
+              });
             });
-          });
 
-          const intervalId = setInterval(() => {
-            if (instance.context.state && validToCheck) {
-              expect(compiler.running).toBe(true);
-              expect(instance.context.state).toBe(true);
-              expect(callbackCounter).toBe(2);
-              expect(doneSpy).toHaveBeenCalledTimes(1);
-
-              doneSpy.mockRestore();
-
-              clearInterval(intervalId);
-
-              done();
-            }
-          });
+            expect(compiler.running).toBe(true);
+            expect(instance.context.state).toBe(true);
+            expect(validToCheck).toBe(true);
+            expect(callbackCounter).toBe(2);
+            expect(doneSpy).toHaveBeenCalledTimes(1);
+          } finally {
+            doneSpy.mockRestore();
+          }
         });
       });
 
@@ -522,48 +516,40 @@ describe.each([
           await close(server, instance);
         });
 
-        it("should work without callback", (done) => {
-          const doneSpy = jest.spyOn(getCompilerHooks(compiler).done[0], "fn");
+        it("should work without callback", async () => {
+          const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
           instance.invalidate();
 
-          const intervalId = setInterval(() => {
-            if (instance.context.state) {
+          try {
+            await rs.waitFor(() => {
               expect(compiler.running).toBe(true);
               expect(instance.context.state).toBe(true);
               expect(doneSpy).toHaveBeenCalledTimes(1);
-
-              doneSpy.mockRestore();
-
-              clearInterval(intervalId);
-
-              done();
-            }
-          });
+            });
+          } finally {
+            doneSpy.mockRestore();
+          }
         });
 
-        it("should work with callback", (done) => {
-          const doneSpy = jest.spyOn(getCompilerHooks(compiler).done[0], "fn");
+        it("should work with callback", async () => {
+          const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
           let callbackCounter = 0;
 
           instance.invalidate(() => {
             callbackCounter += 1;
           });
 
-          const intervalId = setInterval(() => {
-            if (instance.context.state) {
+          try {
+            await rs.waitFor(() => {
               expect(compiler.running).toBe(true);
               expect(instance.context.state).toBe(true);
               expect(callbackCounter).toBe(1);
               expect(doneSpy).toHaveBeenCalledTimes(1);
-
-              doneSpy.mockRestore();
-
-              clearInterval(intervalId);
-
-              done();
-            }
-          });
+            });
+          } finally {
+            doneSpy.mockRestore();
+          }
         });
       });
 
@@ -583,29 +569,27 @@ describe.each([
             await close(server, instance);
           });
 
-          it("should work", (done) => {
-            instance.waitUntilValid(() => {
-              expect(instance.getFilenameFromUrl("/bundle.js")).toBe(
-                path.join(webpackConfig.output.path, "/bundle.js"),
-              );
-              expect(instance.getFilenameFromUrl("/")).toBe(
-                path.join(webpackConfig.output.path, "/index.html"),
-              );
-              expect(instance.getFilenameFromUrl("/index.html")).toBe(
-                path.join(webpackConfig.output.path, "/index.html"),
-              );
-              expect(instance.getFilenameFromUrl("/svg.svg")).toBe(
-                path.join(webpackConfig.output.path, "/svg.svg"),
-              );
-              expect(
-                instance.getFilenameFromUrl("/unknown.unknown"),
-              ).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl("/unknown/unknown.unknown"),
-              ).toBeUndefined();
+          it("should work", async () => {
+            await waitUntilValid(instance);
 
-              done();
-            });
+            expect(instance.getFilenameFromUrl("/bundle.js")).toBe(
+              path.join(webpackConfig.output.path, "/bundle.js"),
+            );
+            expect(instance.getFilenameFromUrl("/")).toBe(
+              path.join(webpackConfig.output.path, "/index.html"),
+            );
+            expect(instance.getFilenameFromUrl("/index.html")).toBe(
+              path.join(webpackConfig.output.path, "/index.html"),
+            );
+            expect(instance.getFilenameFromUrl("/svg.svg")).toBe(
+              path.join(webpackConfig.output.path, "/svg.svg"),
+            );
+            expect(
+              instance.getFilenameFromUrl("/unknown.unknown"),
+            ).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl("/unknown/unknown.unknown"),
+            ).toBeUndefined();
           });
         });
 
@@ -627,28 +611,26 @@ describe.each([
             await close(server, instance);
           });
 
-          it("should work", (done) => {
-            instance.waitUntilValid(() => {
-              expect(instance.getFilenameFromUrl("/bundle.js")).toBe(
-                path.join(webpackConfig.output.path, "/bundle.js"),
-              );
+          it("should work", async () => {
+            await waitUntilValid(instance);
 
-              expect(instance.getFilenameFromUrl("/")).toBeUndefined();
-              expect(instance.getFilenameFromUrl("/index.html")).toBe(
-                path.join(webpackConfig.output.path, "/index.html"),
-              );
-              expect(instance.getFilenameFromUrl("/svg.svg")).toBe(
-                path.join(webpackConfig.output.path, "/svg.svg"),
-              );
-              expect(
-                instance.getFilenameFromUrl("/unknown.unknown"),
-              ).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl("/unknown/unknown.unknown"),
-              ).toBeUndefined();
+            expect(instance.getFilenameFromUrl("/bundle.js")).toBe(
+              path.join(webpackConfig.output.path, "/bundle.js"),
+            );
 
-              done();
-            });
+            expect(instance.getFilenameFromUrl("/")).toBeUndefined();
+            expect(instance.getFilenameFromUrl("/index.html")).toBe(
+              path.join(webpackConfig.output.path, "/index.html"),
+            );
+            expect(instance.getFilenameFromUrl("/svg.svg")).toBe(
+              path.join(webpackConfig.output.path, "/svg.svg"),
+            );
+            expect(
+              instance.getFilenameFromUrl("/unknown.unknown"),
+            ).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl("/unknown/unknown.unknown"),
+            ).toBeUndefined();
           });
         });
 
@@ -667,35 +649,29 @@ describe.each([
             await close(server, instance);
           });
 
-          it("should work", (done) => {
-            instance.waitUntilValid(() => {
-              expect(
-                instance.getFilenameFromUrl("/public/path/bundle.js"),
-              ).toBe(
-                path.join(webpackPublicPathConfig.output.path, "/bundle.js"),
-              );
-              expect(instance.getFilenameFromUrl("/public/path/")).toBe(
-                path.join(webpackPublicPathConfig.output.path, "/index.html"),
-              );
-              expect(
-                instance.getFilenameFromUrl("/public/path/index.html"),
-              ).toBe(
-                path.join(webpackPublicPathConfig.output.path, "/index.html"),
-              );
-              expect(instance.getFilenameFromUrl("/public/path/svg.svg")).toBe(
-                path.join(webpackPublicPathConfig.output.path, "/svg.svg"),
-              );
+          it("should work", async () => {
+            await waitUntilValid(instance);
 
-              expect(instance.getFilenameFromUrl("/")).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl("/unknown.unknown"),
-              ).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl("/unknown/unknown.unknown"),
-              ).toBeUndefined();
+            expect(instance.getFilenameFromUrl("/public/path/bundle.js")).toBe(
+              path.join(webpackPublicPathConfig.output.path, "/bundle.js"),
+            );
+            expect(instance.getFilenameFromUrl("/public/path/")).toBe(
+              path.join(webpackPublicPathConfig.output.path, "/index.html"),
+            );
+            expect(instance.getFilenameFromUrl("/public/path/index.html")).toBe(
+              path.join(webpackPublicPathConfig.output.path, "/index.html"),
+            );
+            expect(instance.getFilenameFromUrl("/public/path/svg.svg")).toBe(
+              path.join(webpackPublicPathConfig.output.path, "/svg.svg"),
+            );
 
-              done();
-            });
+            expect(instance.getFilenameFromUrl("/")).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl("/unknown.unknown"),
+            ).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl("/unknown/unknown.unknown"),
+            ).toBeUndefined();
           });
         });
 
@@ -714,55 +690,51 @@ describe.each([
             await close(server, instance);
           });
 
-          it("should work", (done) => {
-            instance.waitUntilValid(() => {
-              expect(instance.getFilenameFromUrl("/static-one/bundle.js")).toBe(
-                path.join(webpackMultiConfig[0].output.path, "/bundle.js"),
-              );
-              expect(instance.getFilenameFromUrl("/static-one/")).toBe(
-                path.join(webpackMultiConfig[0].output.path, "/index.html"),
-              );
-              expect(
-                instance.getFilenameFromUrl("/static-one/index.html"),
-              ).toBe(
-                path.join(webpackMultiConfig[0].output.path, "/index.html"),
-              );
-              expect(instance.getFilenameFromUrl("/static-one/svg.svg")).toBe(
-                path.join(webpackMultiConfig[0].output.path, "/svg.svg"),
-              );
-              expect(
-                instance.getFilenameFromUrl("/static-one/unknown.unknown"),
-              ).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl(
-                  "/static-one/unknown/unknown.unknown",
-                ),
-              ).toBeUndefined();
+          it("should work", async () => {
+            await waitUntilValid(instance);
 
-              expect(instance.getFilenameFromUrl("/static-two/bundle.js")).toBe(
-                path.join(webpackMultiConfig[1].output.path, "/bundle.js"),
-              );
-              expect(
-                instance.getFilenameFromUrl("/static-two/unknown.unknown"),
-              ).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl(
-                  "/static-two/unknown/unknown.unknown",
-                ),
-              ).toBeUndefined();
+            expect(instance.getFilenameFromUrl("/static-one/bundle.js")).toBe(
+              path.join(webpackMultiConfig[0].output.path, "/bundle.js"),
+            );
+            expect(instance.getFilenameFromUrl("/static-one/")).toBe(
+              path.join(webpackMultiConfig[0].output.path, "/index.html"),
+            );
+            expect(instance.getFilenameFromUrl("/static-one/index.html")).toBe(
+              path.join(webpackMultiConfig[0].output.path, "/index.html"),
+            );
+            expect(instance.getFilenameFromUrl("/static-one/svg.svg")).toBe(
+              path.join(webpackMultiConfig[0].output.path, "/svg.svg"),
+            );
+            expect(
+              instance.getFilenameFromUrl("/static-one/unknown.unknown"),
+            ).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl(
+                "/static-one/unknown/unknown.unknown",
+              ),
+            ).toBeUndefined();
 
-              expect(instance.getFilenameFromUrl("/")).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl("/static-one/unknown.unknown"),
-              ).toBeUndefined();
-              expect(
-                instance.getFilenameFromUrl(
-                  "/static-one/unknown/unknown.unknown",
-                ),
-              ).toBeUndefined();
+            expect(instance.getFilenameFromUrl("/static-two/bundle.js")).toBe(
+              path.join(webpackMultiConfig[1].output.path, "/bundle.js"),
+            );
+            expect(
+              instance.getFilenameFromUrl("/static-two/unknown.unknown"),
+            ).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl(
+                "/static-two/unknown/unknown.unknown",
+              ),
+            ).toBeUndefined();
 
-              done();
-            });
+            expect(instance.getFilenameFromUrl("/")).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl("/static-one/unknown.unknown"),
+            ).toBeUndefined();
+            expect(
+              instance.getFilenameFromUrl(
+                "/static-one/unknown/unknown.unknown",
+              ),
+            ).toBeUndefined();
           });
         });
       });
@@ -782,34 +754,35 @@ describe.each([
           await close(server, instance);
         });
 
-        it("should work without callback", (done) => {
-          const doneSpy = jest.spyOn(getCompilerHooks(compiler).done[0], "fn");
+        it("should work without callback", async () => {
+          const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
-          instance.waitUntilValid(() => {
+          try {
+            await waitUntilValid(instance);
             instance.close();
 
             expect(compiler.running).toBe(false);
             expect(doneSpy).toHaveBeenCalledTimes(1);
-
+          } finally {
             doneSpy.mockRestore();
-
-            done();
-          });
+          }
         });
 
-        it("should work with callback", (done) => {
-          const doneSpy = jest.spyOn(getCompilerHooks(compiler).done[0], "fn");
+        it("should work with callback", async () => {
+          const doneSpy = rs.spyOn(getCompilerHooks(compiler).done[0], "fn");
 
-          instance.waitUntilValid(() => {
-            instance.close(() => {
-              expect(compiler.running).toBe(false);
-              expect(doneSpy).toHaveBeenCalledTimes(1);
-
-              doneSpy.mockRestore();
-
-              done();
+          try {
+            await waitUntilValid(instance);
+            await new Promise((resolve) => {
+              instance.close(() => {
+                expect(compiler.running).toBe(false);
+                expect(doneSpy).toHaveBeenCalledTimes(1);
+                resolve();
+              });
             });
-          });
+          } finally {
+            doneSpy.mockRestore();
+          }
         });
       });
 
@@ -828,7 +801,7 @@ describe.each([
           await close(server, instance);
         });
 
-        it("should contain public properties", (done) => {
+        it("should contain public properties", async () => {
           expect(instance.context.state).toBeDefined();
           expect(instance.context.options).toBeDefined();
           expect(instance.context.compiler).toBeDefined();
@@ -837,9 +810,7 @@ describe.each([
 
           // the compilation needs to finish, as it will still be running
           // after the test is done if not finished, potentially impacting other tests
-          compiler.hooks.done.tap("wdm-test", () => {
-            done();
-          });
+          await waitForCompilerDone(compiler);
         });
       });
     });
@@ -1223,7 +1194,7 @@ describe.each([
         });
 
         it('should return the "404" code for the "GET" request to the deleted file', async () => {
-          const spy = jest
+          const spy = rs
             .spyOn(instance.context.outputFileSystem, "readFileSync")
             .mockImplementation(() => {
               throw new Error("error");
@@ -3919,7 +3890,7 @@ describe.each([
 
         beforeAll(async () => {
           compiler = getCompiler(webpackConfig);
-          spy = jest.spyOn(compiler, "watch");
+          spy = rs.spyOn(compiler, "watch");
 
           [server, req, instance] = await frameworkFactory(
             name,
@@ -3955,7 +3926,7 @@ describe.each([
         beforeAll(async () => {
           compiler = getCompiler(webpackWatchOptionsConfig);
 
-          spy = jest.spyOn(compiler, "watch");
+          spy = rs.spyOn(compiler, "watch");
 
           [server, req, instance] = await frameworkFactory(
             name,
@@ -3991,7 +3962,7 @@ describe.each([
         beforeAll(async () => {
           compiler = getCompiler(webpackMultiWatchOptionsConfig);
 
-          spy = jest.spyOn(compiler, "watch");
+          spy = rs.spyOn(compiler, "watch");
 
           [server, req, instance] = await frameworkFactory(
             name,
@@ -4066,39 +4037,35 @@ describe.each([
             await close(server, instance);
           });
 
-          it("should find the bundle file on disk", (done) => {
-            req.get("/public/bundle.js").expect(200, (error) => {
-              if (error) {
-                return done(error);
-              }
+          it("should find the bundle file on disk", async () => {
+            await req.get("/public/bundle.js").expect(200);
 
-              const bundlePath = path.resolve(
-                __dirname,
-                "./outputs/write-to-disk-true/bundle.js",
-              );
+            const bundlePath = path.resolve(
+              __dirname,
+              "./outputs/write-to-disk-true/bundle.js",
+            );
 
-              expect(
-                compiler.hooks.assetEmitted.taps.filter(
-                  (hook) => hook.name === "DevMiddleware",
-                ),
-              ).toHaveLength(0);
-              expect(fs.existsSync(bundlePath)).toBe(true);
+            expect(
+              compiler.hooks.assetEmitted.taps.filter(
+                (hook) => hook.name === "DevMiddleware",
+              ),
+            ).toHaveLength(0);
+            expect(fs.existsSync(bundlePath)).toBe(true);
 
-              instance.invalidate();
+            const donePromise = waitForCompilerDone(
+              compiler,
+              "DevMiddlewareWriteToDiskTest",
+            );
 
-              return compiler.hooks.done.tap(
-                "DevMiddlewareWriteToDiskTest",
-                () => {
-                  expect(
-                    compiler.hooks.assetEmitted.taps.filter(
-                      (hook) => hook.name === "DevMiddleware",
-                    ),
-                  ).toHaveLength(0);
+            instance.invalidate();
 
-                  done();
-                },
-              );
-            });
+            await donePromise;
+
+            expect(
+              compiler.hooks.assetEmitted.taps.filter(
+                (hook) => hook.name === "DevMiddleware",
+              ),
+            ).toHaveLength(0);
           });
 
           it("should not allow to get files above root", async () => {
@@ -4163,40 +4130,36 @@ describe.each([
           await close(server, instance);
         });
 
-        it("should find the bundle file on disk", (done) => {
-          req.get("/bundle.js").expect(200, (error) => {
-            if (error) {
-              return done(error);
-            }
+        it("should find the bundle file on disk", async () => {
+          await req.get("/bundle.js").expect(200);
 
-            const bundlePath = path.resolve(outputPath, "bundle.js");
+          const bundlePath = path.resolve(outputPath, "bundle.js");
 
-            expect(fs.existsSync(path.resolve(outputPath, "test.json"))).toBe(
-              false,
-            );
+          expect(fs.existsSync(path.resolve(outputPath, "test.json"))).toBe(
+            false,
+          );
 
-            expect(
-              compiler.hooks.assetEmitted.taps.filter(
-                (hook) => hook.name === "DevMiddleware",
-              ),
-            ).toHaveLength(0);
-            expect(fs.existsSync(bundlePath)).toBe(true);
+          expect(
+            compiler.hooks.assetEmitted.taps.filter(
+              (hook) => hook.name === "DevMiddleware",
+            ),
+          ).toHaveLength(0);
+          expect(fs.existsSync(bundlePath)).toBe(true);
 
-            instance.invalidate();
+          const donePromise = waitForCompilerDone(
+            compiler,
+            "DevMiddlewareWriteToDiskTest",
+          );
 
-            return compiler.hooks.done.tap(
-              "DevMiddlewareWriteToDiskTest",
-              () => {
-                expect(
-                  compiler.hooks.assetEmitted.taps.filter(
-                    (hook) => hook.name === "DevMiddleware",
-                  ),
-                ).toHaveLength(0);
+          instance.invalidate();
 
-                done();
-              },
-            );
-          });
+          await donePromise;
+
+          expect(
+            compiler.hooks.assetEmitted.taps.filter(
+              (hook) => hook.name === "DevMiddleware",
+            ),
+          ).toHaveLength(0);
         });
       });
 
@@ -4224,39 +4187,35 @@ describe.each([
           await close(server, instance);
         });
 
-        it("should not find the bundle file on disk", (done) => {
-          req.get("/bundle.js").expect(200, (error) => {
-            if (error) {
-              return done(error);
-            }
+        it("should not find the bundle file on disk", async () => {
+          await req.get("/bundle.js").expect(200);
 
-            const bundlePath = path.resolve(
-              __dirname,
-              "./outputs/write-to-disk-false/bundle.js",
-            );
+          const bundlePath = path.resolve(
+            __dirname,
+            "./outputs/write-to-disk-false/bundle.js",
+          );
 
-            expect(
-              compiler.hooks.assetEmitted.taps.filter(
-                (hook) => hook.name === "DevMiddleware",
-              ),
-            ).toHaveLength(0);
-            expect(fs.existsSync(bundlePath)).toBe(false);
+          expect(
+            compiler.hooks.assetEmitted.taps.filter(
+              (hook) => hook.name === "DevMiddleware",
+            ),
+          ).toHaveLength(0);
+          expect(fs.existsSync(bundlePath)).toBe(false);
 
-            instance.invalidate();
+          const donePromise = waitForCompilerDone(
+            compiler,
+            "DevMiddlewareWriteToDiskTest",
+          );
 
-            return compiler.hooks.done.tap(
-              "DevMiddlewareWriteToDiskTest",
-              () => {
-                expect(
-                  compiler.hooks.assetEmitted.taps.filter(
-                    (hook) => hook.name === "DevMiddleware",
-                  ),
-                ).toHaveLength(0);
+          instance.invalidate();
 
-                done();
-              },
-            );
-          });
+          await donePromise;
+
+          expect(
+            compiler.hooks.assetEmitted.taps.filter(
+              (hook) => hook.name === "DevMiddleware",
+            ),
+          ).toHaveLength(0);
         });
       });
 
@@ -5389,7 +5348,7 @@ describe.each([
             },
           );
 
-          isDirectory = jest
+          isDirectory = rs
             .spyOn(instance.context.outputFileSystem, "statSync")
             .mockReturnValue({
               isFile: () => false,

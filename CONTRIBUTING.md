@@ -95,7 +95,7 @@ Must be one of the following:
 - **refactor**: A code change that neither fixes a bug nor adds a feature
 - **revert**: Used when reverting a committed change
 - **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons)
-- **test**: Addition of or updates to Jest tests
+- **test**: Addition of or updates to Rstest tests
 
 #### Scope
 
