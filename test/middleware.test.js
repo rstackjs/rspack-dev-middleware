@@ -8,7 +8,6 @@ import { serve } from "@hono/node-server";
 import { Stats } from "@rspack/core";
 import connect from "connect";
 import express from "express";
-import expressOld from "express-4";
 import fastify from "fastify";
 import finalhandler from "finalhandler";
 import { Hono } from "hono";
@@ -373,7 +372,6 @@ function parseHttpDate(date) {
 describe.each([
   ["connect", connect],
   ["express", express],
-  ["express-v4", expressOld],
   ["router", router],
   ["fastify", fastify],
   ["koa", koa],

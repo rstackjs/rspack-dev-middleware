@@ -62,7 +62,6 @@
     "del-cli": "^6.0.0",
     "execa": "^5.1.1",
     "express": "^5.1.0",
-    "express-4": "npm:express@^4",
     "fastify": "^5.2.1",
     "file-loader": "^6.2.0",
     "finalhandler": "^2.1.0",
