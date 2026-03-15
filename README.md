@@ -1,19 +1,13 @@
-<div align="center">
-  <a href="https://github.com/webpack/webpack">
-    <img width="200" height="200" src="https://webpack.js.org/assets/icon-square-big.svg">
-  </a>
-</div>
-
-[![npm][npm]][npm-url]
-[![node][node]][node-url]
-[![tests][tests]][tests-url]
-[![coverage][cover]][cover-url]
-[![discussion][discussion]][discussion-url]
-[![size][size]][size-url]
-
 # @rspack/dev-middleware
 
-An express-style development middleware for use with [Rspack](https://rspack.rs) and webpack-compatible compilers. It serves the files emitted by the compiler from memory.
+<p>
+  <a href="https://npmjs.com/package/@rspack/dev-middleware?activeTab=readme"><img src="https://img.shields.io/npm/v/@rspack/dev-middleware?style=flat-square&colorA=564341&colorB=EDED91" alt="npm version" /></a>
+  <a href="https://npmcharts.com/compare/@rspack/dev-middleware?minimal=true"><img src="https://img.shields.io/npm/dm/@rspack/dev-middleware.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="downloads" /></a>
+  <a href="https://nodejs.org/en/about/previous-releases"><img src="https://img.shields.io/node/v/@rspack/dev-middleware.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="node version"></a>
+  <a href="https://github.com/rstackjs/rspack-dev-middleware/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="license" /></a>
+</p>
+
+An express-style development middleware for use with [Rspack](https://rspack.rs). It serves the files emitted by the compiler from memory.
 
 This should be used for **development only**.
 
@@ -26,7 +20,7 @@ Some of the benefits of using this middleware include:
 
 ## Getting Started
 
-First thing's first, install the module:
+Install the module:
 
 ```bash
 # npm
@@ -42,10 +36,6 @@ yarn add -D @rspack/dev-middleware
 bun add -D @rspack/dev-middleware
 ```
 
-> [!WARNING]
->
-> _We do not recommend installing this module globally._
-
 ## Usage
 
 ```js
@@ -54,7 +44,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  // webpack options
+  // Rspack options
 });
 
 const app = express();
@@ -86,8 +76,8 @@ See [below](#other-servers) for an example of use with fastify.
 |         **[`publicPath`](#publicpath)**         |             `string`              |                  `undefined`                  | The public path that the middleware is bound to.                                                                     |
 |              **[`stats`](#stats)**              |     `boolean\|string\|Object`     |        `stats` (from a configuration)         | Stats options object or preset name.                                                                                 |
 |   **[`serverSideRender`](#serversiderender)**   |             `boolean`             |                  `undefined`                  | Instructs the module to enable or disable the server-side rendering mode.                                            |
-|        **[`writeToDisk`](#writetodisk)**        |        `boolean\|Function`        |                    `false`                    | Instructs the module to write files to the configured location on disk as specified in your `webpack` configuration. |
-|   **[`outputFileSystem`](#outputfilesystem)**   |             `Object`              | [`memfs`](https://github.com/streamich/memfs) | Set the default file system which will be used by webpack as primary destination of generated files.                 |
+|        **[`writeToDisk`](#writetodisk)**        |        `boolean\|Function`        |                    `false`                    | Instructs the module to write files to the configured location on disk as specified in your Rspack configuration.    |
+|   **[`outputFileSystem`](#outputfilesystem)**   |             `Object`              | [`memfs`](https://github.com/streamich/memfs) | Set the default file system which will be used by Rspack as primary destination of generated files.                  |
 | **[`modifyResponseData`](#modifyresponsedata)** |            `Function`             |                  `undefined`                  | Allows to set up a callback to change the response data.                                                             |
 
 The middleware accepts an `options` Object. The following is a property reference for the Object.
@@ -229,7 +219,7 @@ Default: `output.publicPath` (from a configuration)
 
 The public path that the middleware is bound to.
 
-_Best Practice: use the same `publicPath` defined in your webpack config. For more information about `publicPath`, please see [the webpack documentation](https://webpack.js.org/guides/public-path)._
+> Best Practice: use the same `publicPath` defined in your Rspack config.
 
 ### stats
 
@@ -251,11 +241,9 @@ Please see [Server-Side Rendering](#server-side-rendering) for more information.
 Type: `Boolean|Function`  
 Default: `false`
 
-If `true`, the option will instruct the module to write files to the configured location on disk as specified in your `webpack` config file.
+If `true`, the option will instruct the module to write files to the configured location on disk as specified in your Rspack config file.
 
 _Setting `writeToDisk: true` won't change the behavior of `@rspack/dev-middleware`, and bundle files accessed through the browser will still be served from memory._
-
-This option provides the same capabilities as the [`WriteFilePlugin`](https://github.com/gajus/write-file-webpack-plugin/pulls).
 
 This option also accepts a `Function` value, which can be used to filter which files are written to disk.
 The function follows the same premise as [`Array#filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) in which a return value of `false` _will not_ write the file, and a return value of `true` _will_ write the file to disk. eg.
@@ -264,7 +252,7 @@ The function follows the same premise as [`Array#filter`](https://developer.mozi
 const { rspack } = require("@rspack/core");
 
 const configuration = {
-  /* Webpack configuration */
+  /* Rspack configuration */
 };
 const compiler = rspack(configuration);
 
@@ -278,10 +266,8 @@ middleware(compiler, {
 Type: `Object`  
 Default: [memfs](https://github.com/streamich/memfs)
 
-Set the default file system which will be used by webpack as primary destination of generated files.
+Set the default file system which will be used by Rspack as primary destination of generated files.
 This option isn't affected by the [writeToDisk](#writeToDisk) option.
-
-You have to provide `.join()` and `mkdirp` method to the `outputFileSystem` instance manually for compatibility with `webpack@4`.
 
 This can be done simply by using `path.join`:
 
@@ -295,7 +281,7 @@ myOutputFileSystem.join = path.join.bind(path); // no need to bind
 myOutputFileSystem.mkdirp = mkdirp.bind(mkdirp); // no need to bind
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 middleware(compiler, { outputFileSystem: myOutputFileSystem });
@@ -309,7 +295,7 @@ Allows to set up a callback to change the response data.
 const { rspack } = require("@rspack/core");
 
 const configuration = {
-  /* Webpack configuration */
+  /* Rspack configuration */
 };
 const compiler = rspack(configuration);
 
@@ -347,7 +333,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -358,7 +344,7 @@ const app = new express();
 app.use(instance);
 
 setTimeout(() => {
-  // Says `webpack` to stop watch changes
+  // Says Rspack to stop watch changes
   instance.close();
 }, 1000);
 ```
@@ -382,7 +368,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -394,7 +380,7 @@ app.use(instance);
 
 setTimeout(() => {
   // After a short delay the configuration is changed and a banner plugin is added to the config
-  new webpack.BannerPlugin("A new banner").apply(compiler);
+  new rspack.BannerPlugin("A new banner").apply(compiler);
 
   // Recompile the bundle with the banner plugin:
   instance.invalidate();
@@ -422,7 +408,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -456,7 +442,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 const instance = middleware(compiler);
@@ -475,9 +461,9 @@ instance.waitUntilValid(() => {
 
 ## FAQ
 
-### Avoid blocking requests to non-webpack resources.
+### Avoid blocking requests to non-Rspack resources.
 
-Since `output.publicPath` and `output.filename`/`output.chunkFilename` can be dynamic, it's not possible to know which files are webpack bundles (and they public paths) and which are not, so we can't avoid blocking requests.
+Since `output.publicPath` and `output.filename`/`output.chunkFilename` can be dynamic, it's not possible to know which files are Rspack bundles (and they public paths) and which are not, so we can't avoid blocking requests.
 
 But there is a solution to avoid it - mount the middleware to a non-root route, for example:
 
@@ -487,7 +473,7 @@ const express = require("express");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  // webpack options
+  // Rspack options
 });
 
 const app = express();
@@ -529,13 +515,13 @@ const isObject = require("is-object");
 const { rspack } = require("@rspack/core");
 
 const compiler = rspack({
-  /* Webpack configuration */
+  /* Rspack configuration */
 });
 
 // eslint-disable-next-line new-cap
 const app = new express();
 
-// This function makes server rendering of asset references consistent with different webpack chunk/entry configurations
+// This function makes server rendering of asset references consistent with different Rspack chunk/entry configurations
 function normalizeAssets(assets) {
   if (isObject(assets)) {
     return Object.values(assets);
@@ -578,32 +564,6 @@ app.use((req, res) => {
 });
 ```
 
-## Support
-
-We do our best to keep Issues in the repository focused on bugs, features, and
-needed modifications to the code for the module. Because of that, we ask users
-with general support, "how-to", or "why isn't this working" questions to try one
-of the other support channels that are available.
-
-Your first-stop-shop for support for webpack-dev-server should by the excellent
-[documentation][docs-url] for the module. If you see an opportunity for improvement
-of those docs, please head over to the [webpack.js.org repo][wjo-url] and open a
-pull request.
-
-From there, we encourage users to visit the [webpack discussions][chat-url] and
-talk to the fine folks there. If your quest for answers comes up dry in chat,
-head over to [StackOverflow][stack-url] and do a quick search or open a new
-question. Remember; It's always much easier to answer questions that include your
-`webpack.config.js` and relevant files!
-
-If you're twitter-savvy you can tweet [#webpack][hash-url] with your question
-and someone should be able to reach out and lend a hand.
-
-If you have discovered a :bug:, have a feature suggestion, or would like to see
-a modification, please feel free to create an issue on Github. _Note: The issue
-template isn't optional, so please be sure not to remove it, and please fill it
-out completely._
-
 ## Other servers
 
 Examples of use with other servers will follow here.
@@ -615,9 +575,9 @@ const http = require("node:http");
 const devMiddleware = require("@rspack/dev-middleware");
 const connect = require("connect");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -636,9 +596,9 @@ const devMiddleware = require("@rspack/dev-middleware");
 const finalhandler = require("finalhandler");
 const Router = require("router");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -661,9 +621,9 @@ server.listen(3000);
 const devMiddleware = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -680,9 +640,9 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 const middleware = require("@rspack/dev-middleware");
 const Koa = require("koa");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.simple.config");
+const rspackConfig = require("./rspack.simple.config");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -699,9 +659,9 @@ app.listen(3000);
 const Hapi = require("@hapi/hapi");
 const devMiddleware = require("@rspack/dev-middleware");
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {};
 
 const server = Hapi.server({ port: 3000, host: "localhost" });
@@ -733,9 +693,9 @@ Fastify interop will require the use of `fastify-express` instead of `middie` fo
 const devMiddleware = require("@rspack/dev-middleware");
 const fastify = require("fastify")();
 const { rspack } = require("@rspack/core");
-const webpackConfig = require("./webpack.config.js");
+const rspackConfig = require("./rspack.config.js");
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -752,9 +712,9 @@ import { serve } from "@hono/node-server";
 import devMiddleware from "@rspack/dev-middleware";
 import { Hono } from "hono";
 import { rspack } from "@rspack/core";
-import webpackConfig from "./webpack.config.js";
+import rspackConfig from "./rspack.config.js";
 
-const compiler = rspack(webpackConfig);
+const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
   // options
 };
@@ -781,22 +741,3 @@ Please take a moment to read our contributing guidelines if you haven't yet done
 ## License
 
 [MIT](./LICENSE)
-
-[npm]: https://img.shields.io/npm/v/%40rspack%2Fdev-middleware.svg
-[npm-url]: https://www.npmjs.com/package/@rspack/dev-middleware
-[node]: https://img.shields.io/node/v/%40rspack%2Fdev-middleware.svg
-[node-url]: https://nodejs.org
-[tests]: https://github.com/rstackjs/rspack-dev-middleware/actions/workflows/test.yml/badge.svg
-[tests-url]: https://github.com/rstackjs/rspack-dev-middleware/actions
-[cover]: https://codecov.io/gh/rstackjs/rspack-dev-middleware/branch/main/graph/badge.svg
-[cover-url]: https://codecov.io/gh/rstackjs/rspack-dev-middleware
-[discussion]: https://img.shields.io/github/discussions/webpack/webpack
-[discussion-url]: https://github.com/webpack/webpack/discussions
-[size]: https://packagephobia.com/badge?p=%40rspack%2Fdev-middleware
-[size-url]: https://packagephobia.com/result?p=%40rspack%2Fdev-middleware
-[docs-url]: https://github.com/rstackjs/rspack-dev-middleware#readme
-[hash-url]: https://twitter.com/search?q=webpack
-[middleware-url]: https://github.com/rstackjs/rspack-dev-middleware
-[stack-url]: https://stackoverflow.com/questions/tagged/rspack-dev-middleware
-[chat-url]: https://github.com/webpack/webpack/discussions
-[wjo-url]: https://github.com/webpack/webpack.js.org
