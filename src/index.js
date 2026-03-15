@@ -516,6 +516,7 @@ function honoWrapper(compiler, options) {
   async function rspackDevMiddleware(context, next) {
     const { req, res } = context;
 
+    context.set("webpack", { devMiddleware: devMiddleware.context });
     context.set("rspack", { devMiddleware: devMiddleware.context });
 
     /**
