@@ -72,9 +72,6 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.2.1
-      express-4:
-        specifier: npm:express@^4
-        version: express@4.22.1
       fastify:
         specifier: ^5.2.1
         version: 5.8.2
