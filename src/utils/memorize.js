@@ -46,4 +46,4 @@ function memorize(fn, { cache = new Map() } = {}, callback = undefined) {
   return memoized;
 }
 
-module.exports = memorize;
+export default memorize;

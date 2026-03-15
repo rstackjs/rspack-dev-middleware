@@ -56,4 +56,4 @@ function escapeHtml(string) {
   return lastIndex !== index ? html + str.substring(lastIndex, index) : html;
 }
 
-module.exports = escapeHtml;
+export default escapeHtml;

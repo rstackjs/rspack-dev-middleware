@@ -1,4 +1,19 @@
-export = setupHooks;
+export default setupHooks;
+export type Configuration = import("@rspack/core").Configuration;
+export type Compiler = import("@rspack/core").Compiler;
+export type MultiCompiler = import("@rspack/core").MultiCompiler;
+export type Stats = import("@rspack/core").Stats;
+export type MultiStats = import("@rspack/core").MultiStats;
+export type IncomingMessage = import("../index.js").IncomingMessage;
+export type ServerResponse = import("../index.js").ServerResponse;
+export type StatsOptions = Configuration["stats"];
+export type MultiStatsOptions = {
+  children: Configuration["stats"][];
+};
+export type StatsObjectOptions = Exclude<
+  Configuration["stats"],
+  boolean | string | undefined
+>;
 /** @typedef {import("@rspack/core").Configuration} Configuration */
 /** @typedef {import("@rspack/core").Compiler} Compiler */
 /** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
@@ -23,32 +38,3 @@ declare function setupHooks<
     "watching" | "outputFileSystem"
   >,
 ): void;
-declare namespace setupHooks {
-  export {
-    Configuration,
-    Compiler,
-    MultiCompiler,
-    Stats,
-    MultiStats,
-    IncomingMessage,
-    ServerResponse,
-    StatsOptions,
-    MultiStatsOptions,
-    StatsObjectOptions,
-  };
-}
-type Configuration = import("@rspack/core").Configuration;
-type Compiler = import("@rspack/core").Compiler;
-type MultiCompiler = import("@rspack/core").MultiCompiler;
-type Stats = import("@rspack/core").Stats;
-type MultiStats = import("@rspack/core").MultiStats;
-type IncomingMessage = import("../index.js").IncomingMessage;
-type ServerResponse = import("../index.js").ServerResponse;
-type StatsOptions = Configuration["stats"];
-type MultiStatsOptions = {
-  children: Configuration["stats"][];
-};
-type StatsObjectOptions = Exclude<
-  Configuration["stats"],
-  boolean | string | undefined
->;

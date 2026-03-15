@@ -1,5 +1,5 @@
-const fs = require("node:fs");
-const path = require("node:path");
+import fs from "node:fs";
+import path from "node:path";
 
 /** @typedef {import("@rspack/core").Compiler} Compiler */
 /** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
@@ -83,4 +83,4 @@ function setupWriteToDisk(context) {
   }
 }
 
-module.exports = setupWriteToDisk;
+export default setupWriteToDisk;

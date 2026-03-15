@@ -1,4 +1,4 @@
-export = parseTokenList;
+export default parseTokenList;
 /**
  * Parse a HTTP token list.
  * @param {string} str str

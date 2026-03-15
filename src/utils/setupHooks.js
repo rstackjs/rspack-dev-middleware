@@ -110,4 +110,4 @@ function setupHooks(context) {
   compiler.hooks.done.tap("webpack-dev-middleware", done);
 }
 
-module.exports = setupHooks;
+export default setupHooks;

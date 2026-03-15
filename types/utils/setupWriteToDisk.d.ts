@@ -1,4 +1,10 @@
-export = setupWriteToDisk;
+export default setupWriteToDisk;
+export type Compiler = import("@rspack/core").Compiler;
+export type MultiCompiler = import("@rspack/core").MultiCompiler;
+export type Compilation = import("@rspack/core").Compilation;
+export type DevServerOption = import("../index.js").DevServerOption;
+export type IncomingMessage = import("../index.js").IncomingMessage;
+export type ServerResponse = import("../index.js").ServerResponse;
 /** @typedef {import("@rspack/core").Compiler} Compiler */
 /** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
 /** @typedef {import("@rspack/core").Compilation} Compilation */
@@ -19,19 +25,3 @@ declare function setupWriteToDisk<
     "watching" | "outputFileSystem"
   >,
 ): void;
-declare namespace setupWriteToDisk {
-  export {
-    Compiler,
-    MultiCompiler,
-    Compilation,
-    DevServerOption,
-    IncomingMessage,
-    ServerResponse,
-  };
-}
-type Compiler = import("@rspack/core").Compiler;
-type MultiCompiler = import("@rspack/core").MultiCompiler;
-type Compilation = import("@rspack/core").Compilation;
-type DevServerOption = import("../index.js").DevServerOption;
-type IncomingMessage = import("../index.js").IncomingMessage;
-type ServerResponse = import("../index.js").ServerResponse;

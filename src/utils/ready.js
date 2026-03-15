@@ -23,4 +23,4 @@ function ready(context, callback, req) {
   context.callbacks.push(callback);
 }
 
-module.exports = ready;
+export default ready;

@@ -1,10 +1,10 @@
-const path = require("node:path");
-const querystring = require("node:querystring");
+import path from "node:path";
+import querystring from "node:querystring";
 // eslint-disable-next-line n/no-deprecated-api
-const { parse } = require("node:url");
+import { parse } from "node:url";
 
-const getPaths = require("./getPaths");
-const memorize = require("./memorize");
+import getPaths from "./getPaths.js";
+import memorize from "./memorize.js";
 
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
@@ -164,4 +164,4 @@ function getFilenameFromUrl(context, url, extra = {}) {
   return foundFilename;
 }
 
-module.exports = getFilenameFromUrl;
+export default getFilenameFromUrl;

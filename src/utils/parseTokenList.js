@@ -39,4 +39,4 @@ function parseTokenList(str) {
   return list;
 }
 
-module.exports = parseTokenList;
+export default parseTokenList;

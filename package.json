@@ -1,6 +1,7 @@
 {
   "name": "@rspack/dev-middleware",
   "version": "7.4.5",
+  "type": "module",
   "description": "A development middleware for Rspack",
   "keywords": [
     "rspack",
@@ -32,8 +33,7 @@
     "fix": "pnpm run fix:prettier",
     "clean": "del-cli dist types",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir types && prettier \"types/**/*.ts\" --write",
-    "build:code": "babel src -d dist --copy-files",
-    "build": "npm-run-all -p \"build:**\"",
+    "build": "rslib --syntax es2023 && pnpm run build:types",
     "test:watch": "rstest -w",
     "test": "rstest",
     "prepare": "pnpm run build"
@@ -45,12 +45,10 @@
     "range-parser": "^1.2.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.7",
-    "@babel/core": "^7.16.7",
-    "@babel/preset-env": "^7.16.7",
     "@fastify/express": "^4.0.2",
     "@hapi/hapi": "^21.3.7",
     "@hono/node-server": "^1.12.0",
+    "@rslib/core": "^0.20.0",
     "@rspack/core": "2.0.0-beta.5",
     "@rstest/core": "0.9.2",
     "@types/connect": "^3.4.35",
