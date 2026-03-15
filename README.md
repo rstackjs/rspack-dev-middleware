@@ -4,7 +4,7 @@
   <a href="https://npmjs.com/package/@rspack/dev-middleware?activeTab=readme"><img src="https://img.shields.io/npm/v/@rspack/dev-middleware?style=flat-square&colorA=564341&colorB=EDED91" alt="npm version" /></a>
   <a href="https://npmcharts.com/compare/@rspack/dev-middleware?minimal=true"><img src="https://img.shields.io/npm/dm/@rspack/dev-middleware.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="downloads" /></a>
   <a href="https://nodejs.org/en/about/previous-releases"><img src="https://img.shields.io/node/v/@rspack/dev-middleware.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="node version"></a>
-  <a href="https://github.com/rstackjs/rspack-dev-server/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="license" /></a>
+  <a href="https://github.com/rstackjs/rspack-dev-middleware/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square&colorA=564341&colorB=EDED91" alt="license" /></a>
 </p>
 
 An express-style development middleware for use with [Rspack](https://rspack.rs). It serves the files emitted by the compiler from memory.
