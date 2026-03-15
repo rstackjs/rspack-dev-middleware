@@ -1,8 +1,8 @@
-'use strict';
+import path from "node:path";
 
-const path = require('path');
+const __dirname = import.meta.dirname;
 
-module.exports = [
+export default [
   {
     name: "broken",
     mode: 'development',

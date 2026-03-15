@@ -1,8 +1,11 @@
 import fs from "node:fs";
+import { createServer } from "node:http";
 import path from "node:path";
 
+import fastifyExpress from "@fastify/express";
 import Hapi from "@hapi/hapi";
 import { serve } from "@hono/node-server";
+import { Stats } from "@rspack/core";
 import connect from "connect";
 import express from "express";
 import expressOld from "express-4";
@@ -14,25 +17,30 @@ import memfs, { Volume, createFsFromVolume } from "memfs";
 import { lookup, mimes } from "mrmime";
 import router from "router";
 import request from "supertest";
-import { Stats } from "@rspack/core";
 
-import middleware from "../src";
+import middleware from "../src/index.js";
 
-import webpackMultiConfig from "./fixtures/webpack.array.config";
-import webpackMultiDevServerFalseConfig from "./fixtures/webpack.array.dev-server-false";
-import webpackMultiWatchOptionsConfig from "./fixtures/webpack.array.watch-options.config";
-import webpackClientServerConfig from "./fixtures/webpack.client.server.config";
-import webpackConfig from "./fixtures/webpack.config";
-import webpackConfigImmutable from "./fixtures/webpack.immutable.config";
-import webpackPublicPathConfig from "./fixtures/webpack.public-path.config";
-import webpackQueryStringConfig from "./fixtures/webpack.querystring.config";
-import webpackWatchOptionsConfig from "./fixtures/webpack.watch-options.config";
-import getCompiler from "./helpers/getCompiler";
+import webpackMultiConfig from "./fixtures/webpack.array.config.js";
+import webpackMultiDevServerFalseConfig from "./fixtures/webpack.array.dev-server-false.js";
+import webpackMultiWatchOptionsConfig from "./fixtures/webpack.array.watch-options.config.js";
+import webpackClientServerConfig from "./fixtures/webpack.client.server.config.js";
+import webpackConfig from "./fixtures/webpack.config.js";
+import webpackConfigImmutable from "./fixtures/webpack.immutable.config.js";
+import webpackPublicPathConfig from "./fixtures/webpack.public-path.config.js";
+import webpackQueryStringConfig from "./fixtures/webpack.querystring.config.js";
+import webpackWatchOptionsConfig from "./fixtures/webpack.watch-options.config.js";
+import getCompiler from "./helpers/getCompiler.js";
 
-import getCompilerHooks from "./helpers/getCompilerHooks";
+import getCompilerHooks from "./helpers/getCompilerHooks.js";
 
 // Suppress unnecessary stats output
-rs.spyOn(globalThis.console, "log").mockImplementation();
+const consoleLogSpy = rs.spyOn(globalThis.console, "log").mockImplementation();
+
+const __dirname = import.meta.dirname;
+
+afterAll(() => {
+  consoleLogSpy.mockRestore();
+});
 
 const UTF8_CHARSET_MIME_TYPES = new Set([
   "application/javascript",
@@ -45,11 +53,11 @@ mimes.usdz = "model/vnd.usdz+zip";
 async function startServer(name, app) {
   return new Promise((resolve, reject) => {
     if (name === "router") {
-      const server = require("node:http").createServer((req, res) => {
+      const server = createServer((req, res) => {
         app(req, res, finalhandler(req, res));
       });
 
-      server.listen({ port: 3000 }, (error) => {
+      server.listen({ port: 0 }, (error) => {
         if (error) {
           return reject(error);
         }
@@ -57,9 +65,9 @@ async function startServer(name, app) {
         return resolve(server);
       });
     } else if (name === "hono") {
-      const server = serve(app, () => resolve(server));
+      const server = serve({ fetch: app.fetch, port: 0 }, () => resolve(server));
     } else {
-      const server = app.listen({ port: 3000 }, (error) => {
+      const server = app.listen({ port: 0 }, (error) => {
         if (error) {
           return reject(error);
         }
@@ -162,7 +170,7 @@ async function frameworkFactory(
       const app = framework();
 
       if (isFastify) {
-        await app.register(require("@fastify/express"));
+        await app.register(fastifyExpress);
       }
 
       const instance = middleware(compiler, devMiddlewareOptions);

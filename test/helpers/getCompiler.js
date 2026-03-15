@@ -1,6 +1,6 @@
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
 
-import defaultConfig from "../fixtures/webpack.config";
+import defaultConfig from "../fixtures/webpack.config.js";
 
 /** @typedef {import("@rspack/core").Configuration} Configuration */
 /** @typedef {import("@rspack/core").Compiler} Compiler */
