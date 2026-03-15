@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "memfs": "^4.43.1",
-    "mime-types": "^3.0.1",
+    "mrmime": "^2.0.1",
     "on-finished": "^2.4.1",
     "range-parser": "^1.2.1"
   },
@@ -55,7 +55,6 @@
     "@rstest/core": "0.9.2",
     "@types/connect": "^3.4.35",
     "@types/express": "^5.0.2",
-    "@types/mime-types": "^3.0.1",
     "@types/node": "^22.3.0",
     "@types/on-finished": "^2.3.4",
     "@types/range-parser": "^1.2.7",

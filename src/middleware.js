@@ -1,7 +1,6 @@
 const path = require("node:path");
 
-const mime = require("mime-types");
-
+const { lookup, mimes } = require("mrmime");
 const onFinishedStream = require("on-finished");
 
 const {
@@ -34,6 +33,38 @@ const ready = require("./utils/ready");
 /** @typedef {import("fs").ReadStream} ReadStream */
 
 const BYTES_RANGE_REGEXP = /^ *bytes/i;
+const UTF8_CHARSET_MIME_TYPES = new Set([
+  "application/javascript",
+  "application/json",
+  "application/manifest+json",
+]);
+
+mimes.usdz = "model/vnd.usdz+zip";
+
+/**
+ * @param {string} filename filename or extension
+ * @returns {string | undefined} content type header value
+ */
+function getContentType(filename) {
+  const mimeType = lookup(filename);
+
+  if (!mimeType) {
+    return undefined;
+  }
+
+  if (mimeType.includes(";")) {
+    return mimeType;
+  }
+
+  if (
+    mimeType.startsWith("text/") ||
+    UTF8_CHARSET_MIME_TYPES.has(mimeType)
+  ) {
+    return `${mimeType}; charset=utf-8`;
+  }
+
+  return mimeType;
+}
 
 /**
  * @param {"bytes"} type type
@@ -688,7 +719,7 @@ function wrapper(context) {
       ) {
         removeResponseHeader(res, "Content-Type");
         // content-type name (like application/javascript; charset=utf-8) or false
-        const contentType = mime.contentType(path.extname(filename));
+        const contentType = getContentType(path.extname(filename));
 
         // Only set content-type header if media type is known
         // https://tools.ietf.org/html/rfc7231#section-3.1.1.5
