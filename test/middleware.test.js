@@ -149,7 +149,10 @@ async function frameworkFactory(
       const app = new framework();
       const server = await startServer(name, app);
       const req = request(server);
-      const instance = devMiddleware.honoWrapper(compiler, devMiddlewareOptions);
+      const instance = devMiddleware.honoWrapper(
+        compiler,
+        devMiddlewareOptions,
+      );
       const middlewares =
         typeof options.setupMiddlewares === "function"
           ? options.setupMiddlewares([instance])
