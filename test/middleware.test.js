@@ -17,7 +17,7 @@ import { lookup, mimes } from "mrmime";
 import router from "router";
 import request from "supertest";
 
-import middleware from "../src/index.js";
+import { devMiddleware } from "../src/index.js";
 
 import webpackMultiConfig from "./fixtures/webpack.array.config.js";
 import webpackMultiDevServerFalseConfig from "./fixtures/webpack.array.dev-server-false.js";
@@ -90,7 +90,7 @@ async function frameworkFactory(
     case "hapi": {
       const server = framework.server();
       const hapiPlugin = {
-        plugin: middleware.hapiWrapper(),
+        plugin: devMiddleware.hapiWrapper(),
         options: {
           compiler,
           ...devMiddlewareOptions,
@@ -122,7 +122,7 @@ async function frameworkFactory(
     case "koa": {
       // eslint-disable-next-line new-cap
       const app = new framework();
-      const koaMiddleware = middleware.koaWrapper(
+      const koaMiddleware = devMiddleware.koaWrapper(
         compiler,
         devMiddlewareOptions,
       );
@@ -149,7 +149,7 @@ async function frameworkFactory(
       const app = new framework();
       const server = await startServer(name, app);
       const req = request(server);
-      const instance = middleware.honoWrapper(compiler, devMiddlewareOptions);
+      const instance = devMiddleware.honoWrapper(compiler, devMiddlewareOptions);
       const middlewares =
         typeof options.setupMiddlewares === "function"
           ? options.setupMiddlewares([instance])
@@ -174,7 +174,7 @@ async function frameworkFactory(
         await app.register(fastifyExpress);
       }
 
-      const instance = middleware(compiler, devMiddlewareOptions);
+      const instance = devMiddleware(compiler, devMiddlewareOptions);
       const middlewares =
         typeof options.setupMiddlewares === "function"
           ? options.setupMiddlewares([instance])
@@ -421,7 +421,7 @@ describe.each([
           beforeEach(async () => {
             compiler = getCompiler({ ...webpackConfig, watch: true });
 
-            instance = middleware(compiler);
+            instance = devMiddleware(compiler);
 
             [server, req, instance] = await frameworkFactory(
               name,
