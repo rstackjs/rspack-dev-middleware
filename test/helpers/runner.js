@@ -42,7 +42,9 @@ async function getWebpackConfig(name) {
 
   try {
     const fixtureName = name.endsWith(".js") ? name : `${name}.js`;
-    const module = await import(new URL(`../fixtures/${fixtureName}`, import.meta.url));
+    const module = await import(
+      new URL(`../fixtures/${fixtureName}`, import.meta.url)
+    );
 
     return module.default;
   } catch {

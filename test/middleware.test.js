@@ -65,7 +65,9 @@ async function startServer(name, app) {
         return resolve(server);
       });
     } else if (name === "hono") {
-      const server = serve({ fetch: app.fetch, port: 0 }, () => resolve(server));
+      const server = serve({ fetch: app.fetch, port: 0 }, () =>
+        resolve(server),
+      );
     } else {
       const server = app.listen({ port: 0 }, (error) => {
         if (error) {
