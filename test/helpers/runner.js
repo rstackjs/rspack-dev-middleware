@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const merge = require("deepmerge");
-const express = require("express");
-const { rspack } = require("@rspack/core");
+import merge from "deepmerge";
+import express from "express";
+import { rspack } from "@rspack/core";
 
-const middleware = require("../../dist");
-const defaultConfig = require("../fixtures/webpack.config");
+import middleware from "../../dist/index.js";
+import defaultConfig from "../fixtures/webpack.config.js";
 
 const configEntries = [];
 const configMiddlewareEntries = [];
@@ -33,13 +33,22 @@ fillConfigEntries("WMC_", configMiddlewareEntries);
 
 /**
  * @param {string} name name
- * @returns {import("@rspack/core").Configuration | import("@rspack/core").Configuration[]} configuration
+ * @returns {Promise<import("@rspack/core").Configuration | import("@rspack/core").Configuration[]>} configuration
  */
-function getWebpackConfig(name) {
+async function getWebpackConfig(name) {
+  if (!name) {
+    return defaultConfig;
+  }
+
   try {
-    return require(`../fixtures/${name}`);
+    const fixtureName = name.endsWith(".js") ? name : `${name}.js`;
+    const module = await import(
+      new URL(`../fixtures/${fixtureName}`, import.meta.url)
+    );
+
+    return module.default;
   } catch {
-    return require("../fixtures/webpack.config");
+    return defaultConfig;
   }
 }
 
@@ -78,10 +87,11 @@ function createConfig(data) {
 }
 
 const createdConfig = createConfig(configEntries);
+const webpackConfig = await getWebpackConfig(process.env.WEBPACK_CONFIG);
 const unionConfig =
   Object.keys(createdConfig).length > 0
-    ? merge(getWebpackConfig(process.env.WEBPACK_CONFIG), createdConfig)
-    : getWebpackConfig(process.env.WEBPACK_CONFIG);
+    ? merge(webpackConfig, createdConfig)
+    : webpackConfig;
 const configMiddleware = createConfig(configMiddlewareEntries);
 const config = unionConfig || defaultConfig;
 

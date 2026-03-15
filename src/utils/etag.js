@@ -1,4 +1,4 @@
-const crypto = require("node:crypto");
+import crypto from "node:crypto";
 
 /** @typedef {import("fs").Stats} Stats */
 /** @typedef {import("fs").ReadStream} ReadStream */
@@ -77,4 +77,4 @@ async function etag(entity) {
     : statTag(/** @type {import("fs").Stats} */ (entity));
 }
 
-module.exports = etag;
+export default etag;

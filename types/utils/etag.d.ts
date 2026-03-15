@@ -1,4 +1,6 @@
-export = etag;
+export default etag;
+export type Stats = import("fs").Stats;
+export type ReadStream = import("fs").ReadStream;
 /**
  * Create a simple ETag.
  * @param {Buffer | ReadStream | Stats} entity entity
@@ -8,8 +10,3 @@ declare function etag(entity: Buffer | ReadStream | Stats): Promise<{
   hash: string;
   buffer?: Buffer;
 }>;
-declare namespace etag {
-  export { Stats, ReadStream };
-}
-type Stats = import("fs").Stats;
-type ReadStream = import("fs").ReadStream;

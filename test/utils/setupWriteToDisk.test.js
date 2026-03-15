@@ -1,9 +1,8 @@
 import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
-import setupWriteToDisk from "../../src/utils/setupWriteToDisk";
-
-const mkdirSpy = rs.spyOn(fs, "mkdir");
-const writeFileSpy = rs.spyOn(fs, "writeFile");
+import setupWriteToDisk from "../../src/utils/setupWriteToDisk.js";
 
 describe("setupWriteToDisk", () => {
   let context;
@@ -38,8 +37,6 @@ describe("setupWriteToDisk", () => {
     emitHook.mockClear();
     assetEmittedHook.mockClear();
     getPath.mockClear();
-    mkdirSpy.mockClear();
-    writeFileSpy.mockClear();
   });
 
   const runAssetEmitted = (...args) => {
@@ -83,16 +80,9 @@ describe("setupWriteToDisk", () => {
     expect(filter.mock.calls[0][0]).toBe("targetPath");
     // the callback should always be called
     expect(cb).toHaveBeenCalledTimes(1);
-    // the filter prevents a directory from being made
-    expect(mkdirSpy).not.toHaveBeenCalled();
   });
 
   const writeErrors = [
-    {
-      title: "with no write errors",
-      mkdirError: null,
-      writeFileError: null,
-    },
     {
       title: "with mkdir error",
       mkdirError: "error1",
@@ -109,47 +99,99 @@ describe("setupWriteToDisk", () => {
     // eslint-disable-next-line no-loop-func
     it(`tries to create directories and write file if not filtered out ${writeError.title}`, () => {
       context.options = {};
-      setupWriteToDisk(context);
-      const cb = rs.fn();
-      // webpack@5 info style
-      runAssetEmitted(
-        null,
-        {
-          compilation: {},
-          targetPath: "/target/path/file",
-          content: "content",
-        },
-        cb,
-      );
+      const mkdirSpy = rs.spyOn(fs, "mkdir");
+      const writeFileSpy = rs.spyOn(fs, "writeFile");
+      try {
+        setupWriteToDisk(context);
+        const cb = rs.fn();
+        // webpack@5 info style
+        runAssetEmitted(
+          null,
+          {
+            compilation: {},
+            targetPath: "/target/path/file",
+            content: "content",
+          },
+          cb,
+        );
 
-      // the getPath helper is not needed for webpack@5
-      expect(getPath).not.toHaveBeenCalled();
+        // the getPath helper is not needed for webpack@5
+        expect(getPath).not.toHaveBeenCalled();
 
-      expect(mkdirSpy).toHaveBeenCalledTimes(1);
-      expect(mkdirSpy.mock.calls[0][0]).toBe("/target/path");
+        expect(mkdirSpy).toHaveBeenCalledTimes(1);
+        expect(mkdirSpy.mock.calls[0][0]).toBe("/target/path");
 
-      // simulates the mkdir callback being called
-      mkdirSpy.mock.calls[0][2](writeError.mkdirError);
+        // simulates the mkdir callback being called
+        mkdirSpy.mock.calls[0][2](writeError.mkdirError);
 
-      if (writeError.mkdirError) {
-        expect(writeFileSpy).not.toHaveBeenCalled();
-      } else {
-        expect(writeFileSpy).toHaveBeenCalledTimes(1);
-        expect(writeFileSpy.mock.calls[0][0]).toBe("/target/path/file");
-        expect(writeFileSpy.mock.calls[0][1]).toBe("content");
+        if (writeError.mkdirError) {
+          expect(writeFileSpy).not.toHaveBeenCalled();
+        } else {
+          expect(writeFileSpy).toHaveBeenCalledTimes(1);
+          expect(writeFileSpy.mock.calls[0][0]).toBe("/target/path/file");
+          expect(writeFileSpy.mock.calls[0][1]).toBe("content");
 
-        // simulates the writeFile callback being called
-        writeFileSpy.mock.calls[0][2](writeError.writeFileError);
+          // simulates the writeFile callback being called
+          writeFileSpy.mock.calls[0][2](writeError.writeFileError);
+        }
+
+        // expected logs based on errors
+        expect(context.logger.error.mock.calls).toMatchSnapshot();
+        expect(context.logger.log.mock.calls).toMatchSnapshot();
+
+        // the callback should always be called
+        expect(cb).toHaveBeenCalledTimes(1);
+        // no errors are expected
+        expect(cb.mock.calls).toMatchSnapshot();
+      } finally {
+        mkdirSpy.mockRestore();
+        writeFileSpy.mockRestore();
       }
-
-      // expected logs based on errors
-      expect(context.logger.error.mock.calls).toMatchSnapshot();
-      expect(context.logger.log.mock.calls).toMatchSnapshot();
-
-      // the callback should always be called
-      expect(cb).toHaveBeenCalledTimes(1);
-      // no errors are expected
-      expect(cb.mock.calls).toMatchSnapshot();
     });
   }
+
+  it("writes the asset to disk when no errors occur", async () => {
+    context.options = {};
+
+    setupWriteToDisk(context);
+
+    const tempDir = await fs.promises.mkdtemp(
+      path.join(os.tmpdir(), "rspack-dev-middleware-"),
+    );
+    const targetPath = path.join(tempDir, "nested/file.txt");
+    const cb = rs.fn();
+
+    try {
+      await new Promise((resolve, reject) => {
+        runAssetEmitted(
+          null,
+          {
+            compilation: {},
+            targetPath,
+            content: "content",
+          },
+          (error) => {
+            cb(error);
+
+            if (error) {
+              reject(error);
+              return;
+            }
+
+            resolve();
+          },
+        );
+      });
+
+      expect(await fs.promises.readFile(targetPath, "utf8")).toBe("content");
+      expect(context.logger.error).not.toHaveBeenCalled();
+      expect(context.logger.log).toHaveBeenCalledWith(
+        `Child "name": Asset written to disk: "${targetPath}"`,
+      );
+      expect(cb).toHaveBeenCalledTimes(1);
+      expect(cb.mock.calls[0]).toEqual([undefined]);
+    } finally {
+      await fs.promises.rm(tempDir, { recursive: true, force: true });
+    }
+  });
 });

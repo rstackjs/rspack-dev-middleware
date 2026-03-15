@@ -303,7 +303,7 @@ function setState(res, name, value) {
   (res.locals)[name] = value;
 }
 
-module.exports = {
+export {
   createReadStreamOrReadFileSync,
   finish,
   getHeadersSent,

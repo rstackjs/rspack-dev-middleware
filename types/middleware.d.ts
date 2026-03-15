@@ -1,4 +1,27 @@
-export = wrapper;
+export default wrapper;
+/**
+ * send error options
+ */
+export type SendErrorOptions<
+  Request extends IncomingMessage,
+  Response extends ServerResponse,
+> = {
+  /**
+   * headers
+   */
+  headers?: Record<string, number | string | string[] | undefined> | undefined;
+  /**
+   * modify response data callback
+   */
+  modifyResponseData?:
+    | import("./index").ModifyResponseData<Request, Response>
+    | undefined;
+};
+export type NextFunction = import("./index.js").NextFunction;
+export type IncomingMessage = import("./index.js").IncomingMessage;
+export type ServerResponse = import("./index.js").ServerResponse;
+export type NormalizedHeaders = import("./index.js").NormalizedHeaders;
+export type ReadStream = import("fs").ReadStream;
 /**
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
@@ -18,36 +41,3 @@ declare function wrapper<
 >(
   context: import("./index.js").FilledContext<Request, Response>,
 ): import("./index.js").Middleware<Request, Response>;
-declare namespace wrapper {
-  export {
-    SendErrorOptions,
-    NextFunction,
-    IncomingMessage,
-    ServerResponse,
-    NormalizedHeaders,
-    ReadStream,
-  };
-}
-/**
- * send error options
- */
-type SendErrorOptions<
-  Request extends IncomingMessage,
-  Response extends ServerResponse,
-> = {
-  /**
-   * headers
-   */
-  headers?: Record<string, number | string | string[] | undefined> | undefined;
-  /**
-   * modify response data callback
-   */
-  modifyResponseData?:
-    | import("./index").ModifyResponseData<Request, Response>
-    | undefined;
-};
-type NextFunction = import("./index.js").NextFunction;
-type IncomingMessage = import("./index.js").IncomingMessage;
-type ServerResponse = import("./index.js").ServerResponse;
-type NormalizedHeaders = import("./index.js").NormalizedHeaders;
-type ReadStream = import("fs").ReadStream;

@@ -57,4 +57,4 @@ function getPaths(context) {
   return publicPaths;
 }
 
-module.exports = getPaths;
+export default getPaths;

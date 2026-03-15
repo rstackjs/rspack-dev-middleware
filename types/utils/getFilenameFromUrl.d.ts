@@ -1,4 +1,20 @@
-export = getFilenameFromUrl;
+export default getFilenameFromUrl;
+export type IncomingMessage = import("../index.js").IncomingMessage;
+export type ServerResponse = import("../index.js").ServerResponse;
+export type Extra = {
+  /**
+   * stats
+   */
+  stats?: import("fs").Stats | undefined;
+  /**
+   * error code
+   */
+  errorCode?: number | undefined;
+  /**
+   * true when immutable, otherwise false
+   */
+  immutable?: boolean | undefined;
+};
 /**
  * @typedef {object} Extra
  * @property {import("fs").Stats=} stats stats
@@ -28,22 +44,3 @@ declare function getFilenameFromUrl<
   url: string,
   extra?: Extra | undefined,
 ): string | undefined;
-declare namespace getFilenameFromUrl {
-  export { IncomingMessage, ServerResponse, Extra };
-}
-type IncomingMessage = import("../index.js").IncomingMessage;
-type ServerResponse = import("../index.js").ServerResponse;
-type Extra = {
-  /**
-   * stats
-   */
-  stats?: import("fs").Stats | undefined;
-  /**
-   * error code
-   */
-  errorCode?: number | undefined;
-  /**
-   * true when immutable, otherwise false
-   */
-  immutable?: boolean | undefined;
-};

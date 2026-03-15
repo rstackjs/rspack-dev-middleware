@@ -1,7 +1,4 @@
-import setupHooks from "../../src/utils/setupHooks";
-
-// Suppress unnecessary stats output
-rs.spyOn(globalThis.console, "log").mockImplementation();
+import setupHooks from "../../src/utils/setupHooks.js";
 
 describe("setupHooks", () => {
   let context;
@@ -12,13 +9,15 @@ describe("setupHooks", () => {
   const loggerInfo = rs.fn();
   const loggerWarn = rs.fn();
   const loggerError = rs.fn();
-  let nextTick;
+  let consoleLogSpy;
 
   const cb1 = rs.fn();
   const cb2 = rs.fn();
 
   beforeEach(() => {
-    nextTick = rs.spyOn(process, "nextTick").mockImplementation(() => {});
+    consoleLogSpy = rs
+      .spyOn(globalThis.console, "log")
+      .mockImplementation(() => {});
     context = {
       options: {},
       compiler: {
@@ -52,7 +51,7 @@ describe("setupHooks", () => {
     loggerInfo.mockClear();
     loggerWarn.mockClear();
     loggerError.mockClear();
-    nextTick.mockClear();
+    consoleLogSpy.mockRestore();
     cb1.mockClear();
     cb2.mockClear();
   });
@@ -92,7 +91,7 @@ describe("setupHooks", () => {
     expect(loggerLog.mock.calls[0][0]).toBe("Compilation starting...");
   });
 
-  it("sets state, then logs stats and handles callbacks on nextTick from done hook", () => {
+  it("sets state, then logs stats and handles callbacks on nextTick from done hook", async () => {
     setupHooks(context);
     doneHook.mock.calls[0][1]({
       toString: rs.fn(() => "statsString"),
@@ -101,9 +100,8 @@ describe("setupHooks", () => {
     });
     expect(context.stats).toBeTruthy();
     expect(context.state).toBeTruthy();
-    expect(nextTick).toHaveBeenCalledTimes(1);
 
-    nextTick.mock.calls[0][0]();
+    await new Promise((resolve) => setImmediate(resolve));
     expect(loggerInfo.mock.calls).toMatchSnapshot();
     expect(loggerError).not.toHaveBeenCalled();
     expect(loggerWarn).not.toHaveBeenCalled();
@@ -112,18 +110,17 @@ describe("setupHooks", () => {
     expect(cb2.mock.calls[0][0]).toEqual(context.stats);
   });
 
-  it("stops on done if invalidated before nextTick", () => {
+  it("stops on done if invalidated before nextTick", async () => {
     setupHooks(context);
     doneHook.mock.calls[0][1]("stats");
     expect(context.stats).toBe("stats");
     expect(context.state).toBeTruthy();
-    expect(nextTick).toHaveBeenCalledTimes(1);
     context.state = false;
-    nextTick.mock.calls[0][0]();
+    await new Promise((resolve) => setImmediate(resolve));
     expect(loggerInfo).not.toHaveBeenCalled();
   });
 
-  it("handles multi compiler", () => {
+  it("handles multi compiler", async () => {
     context.compiler.compilers = [
       {
         options: {
@@ -155,9 +152,8 @@ describe("setupHooks", () => {
     });
     expect(context.stats).toBeTruthy();
     expect(context.state).toBeTruthy();
-    expect(nextTick).toHaveBeenCalledTimes(1);
 
-    nextTick.mock.calls[0][0]();
+    await new Promise((resolve) => setImmediate(resolve));
     expect(loggerInfo.mock.calls).toMatchSnapshot();
     expect(loggerError.mock.calls).toMatchSnapshot();
     expect(loggerWarn.mock.calls).toMatchSnapshot();

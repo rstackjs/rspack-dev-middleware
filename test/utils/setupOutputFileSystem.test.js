@@ -1,18 +1,6 @@
-import memfs from "memfs";
-
-import setupOutputFileSystem from "../../src/utils/setupOutputFileSystem";
-
-const createFsFromVolume = rs.spyOn(memfs, "createFsFromVolume");
-
-createFsFromVolume.mockReturnValue({
-  testFs: true,
-});
+import setupOutputFileSystem from "../../src/utils/setupOutputFileSystem.js";
 
 describe("setupOutputFileSystem", () => {
-  afterEach(() => {
-    createFsFromVolume.mockClear();
-  });
-
   it("should create default fs if not provided", () => {
     const context = {
       compiler: { options: {} },
@@ -21,10 +9,11 @@ describe("setupOutputFileSystem", () => {
 
     setupOutputFileSystem(context);
 
-    // make sure that this is the default fs created
-    expect(context.compiler.outputFileSystem.testFs).toBeTruthy();
-    expect(context.outputFileSystem.testFs).toBeTruthy();
-    expect(createFsFromVolume).toHaveBeenCalledTimes(1);
+    expect(context.compiler.outputFileSystem).toBeTruthy();
+    expect(context.outputFileSystem).toBeTruthy();
+    expect(context.compiler.outputFileSystem).toBe(context.outputFileSystem);
+    expect(context.outputFileSystem.readFileSync).toBeTypeOf("function");
+    expect(context.outputFileSystem.statSync).toBeTypeOf("function");
   });
 
   it("should set fs for multi compiler", () => {

@@ -1,4 +1,6 @@
-export = memorize;
+export default memorize;
+export type FunctionReturning<T> = (...args: EXPECTED_ANY) => T;
+export type EXPECTED_ANY = import("../index").EXPECTED_ANY;
 /**
  * @template T
  * @typedef {(...args: EXPECTED_ANY) => T} FunctionReturning
@@ -29,8 +31,3 @@ declare function memorize<T>(
     | undefined,
   callback?: ((value: T) => T) | undefined,
 ): FunctionReturning<T>;
-declare namespace memorize {
-  export { FunctionReturning, EXPECTED_ANY };
-}
-type FunctionReturning<T> = (...args: EXPECTED_ANY) => T;
-type EXPECTED_ANY = import("../index").EXPECTED_ANY;

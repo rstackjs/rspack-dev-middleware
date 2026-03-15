@@ -19,22 +19,6 @@ exports[`setupWriteToDisk > tries to create directories and write file if not fi
 ]
 `;
 
-exports[`setupWriteToDisk > tries to create directories and write file if not filtered out with no write errors 1`] = `[]`;
-
-exports[`setupWriteToDisk > tries to create directories and write file if not filtered out with no write errors 2`] = `
-[
-  [
-    "Child "name": Asset written to disk: "/target/path/file"",
-  ],
-]
-`;
-
-exports[`setupWriteToDisk > tries to create directories and write file if not filtered out with no write errors 3`] = `
-[
-  [],
-]
-`;
-
 exports[`setupWriteToDisk > tries to create directories and write file if not filtered out with writeFile error 1`] = `
 [
   [

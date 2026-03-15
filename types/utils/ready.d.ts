@@ -1,4 +1,7 @@
-export = ready;
+export default ready;
+export type IncomingMessage = import("../index.js").IncomingMessage;
+export type ServerResponse = import("../index.js").ServerResponse;
+export type Callback = import("../index.js").Callback;
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 /** @typedef {import("../index.js").Callback} Callback */
@@ -18,9 +21,3 @@ declare function ready<
   callback: Callback,
   req?: Request | undefined,
 ): void;
-declare namespace ready {
-  export { IncomingMessage, ServerResponse, Callback };
-}
-type IncomingMessage = import("../index.js").IncomingMessage;
-type ServerResponse = import("../index.js").ServerResponse;
-type Callback = import("../index.js").Callback;

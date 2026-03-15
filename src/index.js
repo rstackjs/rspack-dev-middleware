@@ -1,11 +1,11 @@
-const { mimes } = require("mrmime");
+import { mimes } from "mrmime";
 
-const middleware = require("./middleware");
-const getFilenameFromUrl = require("./utils/getFilenameFromUrl");
-const ready = require("./utils/ready");
-const setupHooks = require("./utils/setupHooks");
-const setupOutputFileSystem = require("./utils/setupOutputFileSystem");
-const setupWriteToDisk = require("./utils/setupWriteToDisk");
+import middleware from "./middleware.js";
+import getFilenameFromUrl from "./utils/getFilenameFromUrl.js";
+import ready from "./utils/ready.js";
+import setupHooks from "./utils/setupHooks.js";
+import setupOutputFileSystem from "./utils/setupOutputFileSystem.js";
+import setupWriteToDisk from "./utils/setupWriteToDisk.js";
 
 const noop = () => {};
 
@@ -670,4 +670,4 @@ function honoWrapper(compiler, options) {
 
 wdm.honoWrapper = honoWrapper;
 
-module.exports = wdm;
+export default wdm;

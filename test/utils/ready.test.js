@@ -1,4 +1,4 @@
-import ready from "../../src/utils/ready";
+import ready from "../../src/utils/ready.js";
 
 describe("ready", () => {
   it("should call callback if state is true", () => {

@@ -1,4 +1,4 @@
-import escapeHtml from "../../src/utils/escapeHtml";
+import escapeHtml from "../../src/utils/escapeHtml.js";
 
 describe("escapeHtml", () => {
   it("should work", () => {

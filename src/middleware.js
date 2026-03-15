@@ -1,9 +1,10 @@
-const path = require("node:path");
+import path from "node:path";
 
-const { lookup, mimes } = require("mrmime");
-const onFinishedStream = require("on-finished");
+import { lookup, mimes } from "mrmime";
+import onFinishedStream from "on-finished";
+import rangeParser from "range-parser";
 
-const {
+import {
   createReadStreamOrReadFileSync,
   finish,
   getHeadersSent,
@@ -21,10 +22,13 @@ const {
   setResponseHeader,
   setState,
   setStatusCode,
-} = require("./utils/compatibleAPI");
-const getFilenameFromUrl = require("./utils/getFilenameFromUrl");
-const memorize = require("./utils/memorize");
-const ready = require("./utils/ready");
+} from "./utils/compatibleAPI.js";
+import etag from "./utils/etag.js";
+import escapeHtml from "./utils/escapeHtml.js";
+import getFilenameFromUrl from "./utils/getFilenameFromUrl.js";
+import memorize from "./utils/memorize.js";
+import parseTokenList from "./utils/parseTokenList.js";
+import ready from "./utils/ready.js";
 
 /** @typedef {import("./index.js").NextFunction} NextFunction */
 /** @typedef {import("./index.js").IncomingMessage} IncomingMessage */
@@ -137,15 +141,15 @@ const parseRangeHeaders = memorize(
   (value) => {
     const [len, rangeHeader] = value.split("|");
 
-    return require("range-parser")(Number(len), rangeHeader, {
+    return rangeParser(Number(len), rangeHeader, {
       combine: true,
     });
   },
 );
 
-const getETag = memorize(() => require("./utils/etag"));
-const getEscapeHtml = memorize(() => require("./utils/escapeHtml"));
-const getParseTokenList = memorize(() => require("./utils/parseTokenList"));
+const getETag = memorize(() => etag);
+const getEscapeHtml = memorize(() => escapeHtml);
+const getParseTokenList = memorize(() => parseTokenList);
 
 const MAX_MAX_AGE = 31536000000;
 
@@ -910,4 +914,4 @@ function wrapper(context) {
   };
 }
 
-module.exports = wrapper;
+export default wrapper;
