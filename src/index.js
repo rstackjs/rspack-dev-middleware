@@ -199,7 +199,7 @@ const noop = () => {};
  * @param {Options<RequestInternal, ResponseInternal>=} options options
  * @returns {API<RequestInternal, ResponseInternal>} rspack dev middleware
  */
-function wdm(compiler, options = {}) {
+function rdm(compiler, options = {}) {
   const { mimeTypes } = options;
 
   if (mimeTypes) {
@@ -331,7 +331,7 @@ function hapiWrapper() {
         throw new Error("The compiler options is required.");
       }
 
-      const devMiddleware = wdm(compiler, rest);
+      const devMiddleware = rdm(compiler, rest);
 
       // @ts-expect-error
       if (!server.decorations.server.includes("rspackDevMiddleware")) {
@@ -383,7 +383,7 @@ function hapiWrapper() {
   };
 }
 
-wdm.hapiWrapper = hapiWrapper;
+rdm.hapiWrapper = hapiWrapper;
 
 /**
  * @template {IncomingMessage} [RequestInternal=IncomingMessage]
@@ -393,7 +393,7 @@ wdm.hapiWrapper = hapiWrapper;
  * @returns {(ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void} kow wrapper
  */
 function koaWrapper(compiler, options) {
-  const devMiddleware = wdm(compiler, options);
+  const devMiddleware = rdm(compiler, options);
 
   /**
    * @param {{ req: RequestInternal, res: ResponseInternal & import("./utils/compatibleAPI").ExpectedServerResponse, status: number, body: string | Buffer | import("fs").ReadStream | { message: string }, state: object }} ctx context
@@ -496,7 +496,7 @@ function koaWrapper(compiler, options) {
   return rspackDevMiddleware;
 }
 
-wdm.koaWrapper = koaWrapper;
+rdm.koaWrapper = koaWrapper;
 
 /**
  * @template {IncomingMessage} [RequestInternal=IncomingMessage]
@@ -506,7 +506,7 @@ wdm.koaWrapper = koaWrapper;
  * @returns {(ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void} hono wrapper
  */
 function honoWrapper(compiler, options) {
-  const devMiddleware = wdm(compiler, options);
+  const devMiddleware = rdm(compiler, options);
 
   /**
    * @param {{ env: EXPECTED_ANY, body: EXPECTED_ANY, json: EXPECTED_ANY, status: EXPECTED_ANY, set: EXPECTED_ANY, req: RequestInternal & import("./utils/compatibleAPI").ExpectedIncomingMessage & { header: (name: string) => string }, res: ResponseInternal & import("./utils/compatibleAPI").ExpectedServerResponse & { headers: EXPECTED_ANY, status: EXPECTED_ANY } }} context context
@@ -667,6 +667,6 @@ function honoWrapper(compiler, options) {
   return rspackDevMiddleware;
 }
 
-wdm.honoWrapper = honoWrapper;
+rdm.honoWrapper = honoWrapper;
 
-export default wdm;
+export const devMiddleware = rdm;

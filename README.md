@@ -39,7 +39,7 @@ bun add -D @rspack/dev-middleware
 ## Usage
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
 
@@ -50,7 +50,7 @@ const compiler = rspack({
 const app = express();
 
 app.use(
-  middleware(compiler, {
+  devMiddleware(compiler, {
     // options
   }),
 );
@@ -100,7 +100,7 @@ eg. `{ "X-Custom-Header": "yes" }`
 or
 
 ```js
-middleware(compiler, {
+devMiddleware(compiler, {
   headers: () => ({
     "Last-Modified": new Date(),
   }),
@@ -110,7 +110,7 @@ middleware(compiler, {
 or
 
 ```js
-middleware(compiler, {
+devMiddleware(compiler, {
   headers: (req, res, context) => {
     res.setHeader("Last-Modified", new Date());
   },
@@ -120,7 +120,7 @@ middleware(compiler, {
 or
 
 ```js
-middleware(compiler, {
+devMiddleware(compiler, {
   headers: [
     {
       key: "X-custom-header",
@@ -137,7 +137,7 @@ middleware(compiler, {
 or
 
 ```js
-middleware(compiler, {
+devMiddleware(compiler, {
   headers: () => [
     {
       key: "X-custom-header",
@@ -256,7 +256,7 @@ const configuration = {
 };
 const compiler = rspack(configuration);
 
-middleware(compiler, {
+devMiddleware(compiler, {
   writeToDisk: (filePath) => /superman\.css$/.test(filePath),
 });
 ```
@@ -284,7 +284,7 @@ const compiler = rspack({
   /* Rspack configuration */
 });
 
-middleware(compiler, { outputFileSystem: myOutputFileSystem });
+devMiddleware(compiler, { outputFileSystem: myOutputFileSystem });
 ```
 
 ### modifyResponseData
@@ -299,7 +299,7 @@ const configuration = {
 };
 const compiler = rspack(configuration);
 
-middleware(compiler, {
+devMiddleware(compiler, {
   // Note - if you send the `Range` header you will have `ReadStream`
   // Also `data` can be `string` or `Buffer`
   modifyResponseData: (req, res, data, byteLength) =>
@@ -328,7 +328,7 @@ Required: `No`
 A function executed once the middleware has stopped watching.
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
 
@@ -336,7 +336,7 @@ const compiler = rspack({
   /* Rspack configuration */
 });
 
-const instance = middleware(compiler);
+const instance = devMiddleware(compiler);
 
 // eslint-disable-next-line new-cap
 const app = new express();
@@ -363,7 +363,7 @@ Required: `No`
 A function executed once the middleware has invalidated.
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
 
@@ -371,7 +371,7 @@ const compiler = rspack({
   /* Rspack configuration */
 });
 
-const instance = middleware(compiler);
+const instance = devMiddleware(compiler);
 
 // eslint-disable-next-line new-cap
 const app = new express();
@@ -403,7 +403,7 @@ A function executed when the bundle becomes valid.
 If the bundle is valid at the time of calling, the callback is executed immediately.
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
 
@@ -411,7 +411,7 @@ const compiler = rspack({
   /* Rspack configuration */
 });
 
-const instance = middleware(compiler);
+const instance = devMiddleware(compiler);
 
 // eslint-disable-next-line new-cap
 const app = new express();
@@ -437,7 +437,7 @@ Required: `Yes`
 URL for the requested file.
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
 
@@ -445,7 +445,7 @@ const compiler = rspack({
   /* Rspack configuration */
 });
 
-const instance = middleware(compiler);
+const instance = devMiddleware(compiler);
 
 // eslint-disable-next-line new-cap
 const app = new express();
@@ -468,7 +468,7 @@ Since `output.publicPath` and `output.filename`/`output.chunkFilename` can be dy
 But there is a solution to avoid it - mount the middleware to a non-root route, for example:
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
 
@@ -482,7 +482,7 @@ const app = express();
 // Note - check your public path, if you want to handle `/dist/`, you need to setup `output.publicPath` to `/` value.
 app.use(
   "/dist/",
-  middleware(compiler, {
+  devMiddleware(compiler, {
     // @rspack/dev-middleware options
   }),
 );
@@ -509,7 +509,7 @@ process is finished with server-side rendering enabled._
 Example Implementation:
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const isObject = require("is-object");
 const { rspack } = require("@rspack/core");
@@ -530,7 +530,7 @@ function normalizeAssets(assets) {
   return Array.isArray(assets) ? assets : [assets];
 }
 
-app.use(middleware(compiler, { serverSideRender: true }));
+app.use(devMiddleware(compiler, { serverSideRender: true }));
 
 // The following middleware would not be invoked until the latest build is finished.
 app.use((req, res) => {
@@ -572,7 +572,7 @@ Examples of use with other servers will follow here.
 
 ```js
 const http = require("node:http");
-const devMiddleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const connect = require("connect");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
@@ -592,7 +592,7 @@ http.createServer(app).listen(3000);
 
 ```js
 const http = require("node:http");
-const devMiddleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const finalhandler = require("finalhandler");
 const Router = require("router");
 const { rspack } = require("@rspack/core");
@@ -618,7 +618,7 @@ server.listen(3000);
 ### Express
 
 ```js
-const devMiddleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const express = require("express");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
@@ -637,7 +637,7 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 ### Koa
 
 ```js
-const middleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const Koa = require("koa");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.simple.config");
@@ -657,7 +657,7 @@ app.listen(3000);
 
 ```js
 const Hapi = require("@hapi/hapi");
-const devMiddleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");
 
@@ -690,7 +690,7 @@ process.on("unhandledRejection", (err) => {
 Fastify interop will require the use of `fastify-express` instead of `middie` for providing middleware support. As the authors of `fastify-express` recommend, this should only be used as a stopgap while full Fastify support is worked on.
 
 ```js
-const devMiddleware = require("@rspack/dev-middleware");
+const { devMiddleware } = require("@rspack/dev-middleware");
 const fastify = require("fastify")();
 const { rspack } = require("@rspack/core");
 const rspackConfig = require("./rspack.config.js");

@@ -223,7 +223,7 @@ function waitUntilValid(instance) {
   });
 }
 
-function waitForCompilerDone(compiler, name = "wdm-test") {
+function waitForCompilerDone(compiler, name = "rdm-test") {
   return new Promise((resolve) => {
     compiler.hooks.done.tap(name, resolve);
   });
@@ -860,7 +860,7 @@ describe.each([
               path: outputPath,
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", (params) => {
+          compiler.hooks.afterCompile.tap("rdm-test", (params) => {
             codeContent = params.assets["bundle.js"].source();
           });
 
@@ -2274,7 +2274,7 @@ describe.each([
               path: path.resolve(__dirname, "./outputs/other-basic-[fullhash]"),
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", ({ hash: h }) => {
+          compiler.hooks.afterCompile.tap("rdm-test", ({ hash: h }) => {
             hash = h;
           });
 
@@ -2365,7 +2365,7 @@ describe.each([
               },
             },
           ]);
-          compiler.hooks.done.tap("wdm-test", (stats) => {
+          compiler.hooks.done.tap("rdm-test", (stats) => {
             const [one, two] = stats.stats;
 
             hashOne = one.hash;
@@ -3104,7 +3104,7 @@ describe.each([
               path: outputPath,
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", (params) => {
+          compiler.hooks.afterCompile.tap("rdm-test", (params) => {
             codeContent = params.assets["bundle.js"].source();
           });
 
@@ -4490,7 +4490,7 @@ describe.each([
               ),
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", ({ hash: h }) => {
+          compiler.hooks.afterCompile.tap("rdm-test", ({ hash: h }) => {
             hash = h;
           });
 
