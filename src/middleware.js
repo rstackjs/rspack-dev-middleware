@@ -56,10 +56,7 @@ function getContentType(filename) {
     return mimeType;
   }
 
-  if (
-    mimeType.startsWith("text/") ||
-    UTF8_CHARSET_MIME_TYPES.has(mimeType)
-  ) {
+  if (mimeType.startsWith("text/") || UTF8_CHARSET_MIME_TYPES.has(mimeType)) {
     return `${mimeType}; charset=utf-8`;
   }
 
