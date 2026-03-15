@@ -17,7 +17,7 @@ export default (app, compiler, callback) => {
     return progress();
   });
 
-  compiler.hooks.done.tap("wdm-test", () => progress());
+  compiler.hooks.done.tap("rdm-test", () => progress());
 
   return listen;
 };

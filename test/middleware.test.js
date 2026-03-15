@@ -17,7 +17,7 @@ import { lookup, mimes } from "mrmime";
 import router from "router";
 import request from "supertest";
 
-import middleware from "../src/index.js";
+import { devMiddleware } from "../src/index.js";
 
 import webpackMultiConfig from "./fixtures/webpack.array.config.js";
 import webpackMultiDevServerFalseConfig from "./fixtures/webpack.array.dev-server-false.js";
@@ -90,7 +90,7 @@ async function frameworkFactory(
     case "hapi": {
       const server = framework.server();
       const hapiPlugin = {
-        plugin: middleware.hapiWrapper(),
+        plugin: devMiddleware.hapiWrapper(),
         options: {
           compiler,
           ...devMiddlewareOptions,
@@ -117,12 +117,12 @@ async function frameworkFactory(
 
       const req = request(server.listener);
 
-      return [server, req, server.webpackDevMiddleware];
+      return [server, req, server.rspackDevMiddleware];
     }
     case "koa": {
       // eslint-disable-next-line new-cap
       const app = new framework();
-      const koaMiddleware = middleware.koaWrapper(
+      const koaMiddleware = devMiddleware.koaWrapper(
         compiler,
         devMiddlewareOptions,
       );
@@ -149,7 +149,10 @@ async function frameworkFactory(
       const app = new framework();
       const server = await startServer(name, app);
       const req = request(server);
-      const instance = middleware.honoWrapper(compiler, devMiddlewareOptions);
+      const instance = devMiddleware.honoWrapper(
+        compiler,
+        devMiddlewareOptions,
+      );
       const middlewares =
         typeof options.setupMiddlewares === "function"
           ? options.setupMiddlewares([instance])
@@ -174,7 +177,7 @@ async function frameworkFactory(
         await app.register(fastifyExpress);
       }
 
-      const instance = middleware(compiler, devMiddlewareOptions);
+      const instance = devMiddleware(compiler, devMiddlewareOptions);
       const middlewares =
         typeof options.setupMiddlewares === "function"
           ? options.setupMiddlewares([instance])
@@ -223,7 +226,7 @@ function waitUntilValid(instance) {
   });
 }
 
-function waitForCompilerDone(compiler, name = "wdm-test") {
+function waitForCompilerDone(compiler, name = "rdm-test") {
   return new Promise((resolve) => {
     compiler.hooks.done.tap(name, resolve);
   });
@@ -421,7 +424,7 @@ describe.each([
           beforeEach(async () => {
             compiler = getCompiler({ ...webpackConfig, watch: true });
 
-            instance = middleware(compiler);
+            instance = devMiddleware(compiler);
 
             [server, req, instance] = await frameworkFactory(
               name,
@@ -860,7 +863,7 @@ describe.each([
               path: outputPath,
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", (params) => {
+          compiler.hooks.afterCompile.tap("rdm-test", (params) => {
             codeContent = params.assets["bundle.js"].source();
           });
 
@@ -2274,7 +2277,7 @@ describe.each([
               path: path.resolve(__dirname, "./outputs/other-basic-[fullhash]"),
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", ({ hash: h }) => {
+          compiler.hooks.afterCompile.tap("rdm-test", ({ hash: h }) => {
             hash = h;
           });
 
@@ -2365,7 +2368,7 @@ describe.each([
               },
             },
           ]);
-          compiler.hooks.done.tap("wdm-test", (stats) => {
+          compiler.hooks.done.tap("rdm-test", (stats) => {
             const [one, two] = stats.stats;
 
             hashOne = one.hash;
@@ -3104,7 +3107,7 @@ describe.each([
               path: outputPath,
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", (params) => {
+          compiler.hooks.afterCompile.tap("rdm-test", (params) => {
             codeContent = params.assets["bundle.js"].source();
           });
 
@@ -4490,7 +4493,7 @@ describe.each([
               ),
             },
           });
-          compiler.hooks.afterCompile.tap("wdm-test", ({ hash: h }) => {
+          compiler.hooks.afterCompile.tap("rdm-test", ({ hash: h }) => {
             hash = h;
           });
 
@@ -4876,7 +4879,10 @@ describe.each([
                 });
               } else if (name === "hono") {
                 middlewares.push((c) => {
-                  locals = { webpack: c.get("webpack") };
+                  locals = {
+                    rspack: c.get("rspack"),
+                    webpack: c.get("webpack"),
+                  };
 
                   return c.body("welcome", 200);
                 });
@@ -4928,6 +4934,7 @@ describe.each([
         const response = await req.get("/foo/bar");
 
         expect(response.statusCode).toBe(200);
+        expect(locals.rspack.devMiddleware).toBeDefined();
         expect(locals.webpack.devMiddleware).toBeDefined();
       });
     });

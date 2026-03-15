@@ -105,9 +105,9 @@ function setupHooks(context) {
     /** @type {import("../index.js").Context<Request, Response>} */
     (context).compiler;
 
-  compiler.hooks.watchRun.tap("webpack-dev-middleware", invalid);
-  compiler.hooks.invalid.tap("webpack-dev-middleware", invalid);
-  compiler.hooks.done.tap("webpack-dev-middleware", done);
+  compiler.hooks.watchRun.tap("rspack-dev-middleware", invalid);
+  compiler.hooks.invalid.tap("rspack-dev-middleware", invalid);
+  compiler.hooks.done.tap("rspack-dev-middleware", done);
 }
 
 export default setupHooks;

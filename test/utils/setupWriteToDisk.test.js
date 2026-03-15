@@ -63,7 +63,7 @@ describe("setupWriteToDisk", () => {
     };
     setupWriteToDisk(context);
     const cb = rs.fn();
-    // webpack@5 info style
+    // rspack assetEmitted info style
     runAssetEmitted(
       null,
       {
@@ -73,7 +73,7 @@ describe("setupWriteToDisk", () => {
       cb,
     );
 
-    // the getPath helper is not needed for webpack@5
+    // the getPath helper is not needed here
     expect(getPath).not.toHaveBeenCalled();
 
     expect(filter).toHaveBeenCalledTimes(1);
@@ -104,7 +104,7 @@ describe("setupWriteToDisk", () => {
       try {
         setupWriteToDisk(context);
         const cb = rs.fn();
-        // webpack@5 info style
+        // rspack assetEmitted info style
         runAssetEmitted(
           null,
           {
@@ -115,7 +115,7 @@ describe("setupWriteToDisk", () => {
           cb,
         );
 
-        // the getPath helper is not needed for webpack@5
+        // the getPath helper is not needed here
         expect(getPath).not.toHaveBeenCalled();
 
         expect(mkdirSpy).toHaveBeenCalledTimes(1);
