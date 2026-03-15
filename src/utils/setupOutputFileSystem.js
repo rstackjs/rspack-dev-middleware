@@ -42,7 +42,7 @@ function setupOutputFileSystem(context) {
 
     if (isMultiCompiler) {
       // Prefer compiler with `devServer` option or fallback on the first
-      // TODO we need to support webpack-dev-server as a plugin or revisit it
+      // TODO we need to support rspack-dev-server as a plugin or revisit it
       const compiler =
         /** @type {MultiCompiler} */
         (context.compiler).compilers.find(

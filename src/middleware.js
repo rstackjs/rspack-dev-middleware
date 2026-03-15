@@ -182,6 +182,8 @@ function wrapper(context) {
         ready(
           context,
           () => {
+            setState(res, "rspack", { devMiddleware: context });
+            // Preserve the legacy SSR API shape for existing integrations.
             setState(res, "webpack", { devMiddleware: context });
             resolve(next(err));
           },

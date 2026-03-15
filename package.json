@@ -4,17 +4,12 @@
   "description": "A development middleware for Rspack",
   "keywords": [
     "rspack",
-    "webpack",
     "middleware",
     "development"
   ],
   "homepage": "https://github.com/rstackjs/rspack-dev-middleware",
   "bugs": "https://github.com/rstackjs/rspack-dev-middleware/issues",
   "repository": "rstackjs/rspack-dev-middleware",
-  "funding": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/webpack"
-  },
   "license": "MIT",
   "author": "Tobias Koppers @sokra",
   "type": "module",

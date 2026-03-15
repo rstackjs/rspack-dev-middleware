@@ -8,6 +8,9 @@ import path from "node:path";
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 
+const ASSET_EMITTED_CALLBACK_FLAG =
+  "hasRspackDevMiddlewareAssetEmittedCallback";
+
 /**
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
@@ -28,7 +31,7 @@ function setupWriteToDisk(context) {
 
     compiler.hooks.emit.tap("DevMiddleware", () => {
       // @ts-expect-error
-      if (compiler.hasWebpackDevMiddlewareAssetEmittedCallback) {
+      if (compiler[ASSET_EMITTED_CALLBACK_FLAG]) {
         return;
       }
 
@@ -78,7 +81,7 @@ function setupWriteToDisk(context) {
       );
 
       // @ts-expect-error
-      compiler.hasWebpackDevMiddlewareAssetEmittedCallback = true;
+      compiler[ASSET_EMITTED_CALLBACK_FLAG] = true;
     });
   }
 }

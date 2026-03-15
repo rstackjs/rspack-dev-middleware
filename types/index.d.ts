@@ -11,6 +11,9 @@ export type ExtendedServerResponse = {
    */
   locals?:
     | {
+        rspack?: {
+          devMiddleware?: Context<IncomingMessage, ServerResponse>;
+        };
         webpack?: {
           devMiddleware?: Context<IncomingMessage, ServerResponse>;
         };
@@ -268,7 +271,7 @@ export type HapiOptions = Options & {
 /** @typedef {import("fs").ReadStream} ReadStream */
 /**
  * @typedef {object} ExtendedServerResponse
- * @property {{ webpack?: { devMiddleware?: Context<IncomingMessage, ServerResponse> } }=} locals locals
+ * @property {{ rspack?: { devMiddleware?: Context<IncomingMessage, ServerResponse> }, webpack?: { devMiddleware?: Context<IncomingMessage, ServerResponse> } }=} locals locals
  */
 /** @typedef {import("http").IncomingMessage} IncomingMessage */
 /** @typedef {import("http").ServerResponse & ExtendedServerResponse} ServerResponse */
@@ -417,7 +420,7 @@ export type HapiOptions = Options & {
  * @template {ServerResponse} [ResponseInternal=ServerResponse]
  * @param {Compiler | MultiCompiler} compiler compiler
  * @param {Options<RequestInternal, ResponseInternal>=} options options
- * @returns {API<RequestInternal, ResponseInternal>} webpack dev middleware
+ * @returns {API<RequestInternal, ResponseInternal>} rspack dev middleware
  */
 declare function wdm<
   RequestInternal extends IncomingMessage = import("http").IncomingMessage,

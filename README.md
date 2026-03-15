@@ -495,11 +495,11 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 _Note: this feature is experimental and may be removed or changed completely in the future._
 
 In order to develop an app using server-side rendering, we need access to the
-[`stats`](https://github.com/webpack/docs/wiki/node.js-api#stats), which is
+[`stats`](https://rspack.rs/api/javascript-api/stats), which is
 generated with each build.
 
-With server-side rendering enabled, `@rspack/dev-middleware` sets the `stats` to `res.locals.webpack.devMiddleware.stats`
-and the filesystem to `res.locals.webpack.devMiddleware.outputFileSystem` before invoking the next middleware,
+With server-side rendering enabled, `@rspack/dev-middleware` sets the `stats` to `res.locals.rspack.devMiddleware.stats`
+and the filesystem to `res.locals.rspack.devMiddleware.outputFileSystem` before invoking the next middleware,
 allowing a developer to render the page body and manage the response to clients.
 
 _Note: Requests for bundle files will still be handled by
@@ -534,10 +534,10 @@ app.use(middleware(compiler, { serverSideRender: true }));
 
 // The following middleware would not be invoked until the latest build is finished.
 app.use((req, res) => {
-  const { devMiddleware } = res.locals.webpack;
+  const { devMiddleware } = res.locals.rspack;
   const { outputFileSystem } = devMiddleware;
-  const jsonWebpackStats = devMiddleware.stats.toJson();
-  const { assetsByChunkName, outputPath } = jsonWebpackStats;
+  const jsonStats = devMiddleware.stats.toJson();
+  const { assetsByChunkName, outputPath } = jsonStats;
 
   // Then use `assetsByChunkName` for server-side rendering
   // For example, if you have only one main chunk:

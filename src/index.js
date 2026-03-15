@@ -18,7 +18,7 @@ const noop = () => {};
 
 /**
  * @typedef {object} ExtendedServerResponse
- * @property {{ webpack?: { devMiddleware?: Context<IncomingMessage, ServerResponse> } }=} locals locals
+ * @property {{ rspack?: { devMiddleware?: Context<IncomingMessage, ServerResponse> }, webpack?: { devMiddleware?: Context<IncomingMessage, ServerResponse> } }=} locals locals
  */
 
 /** @typedef {import("http").IncomingMessage} IncomingMessage */
@@ -197,7 +197,7 @@ const noop = () => {};
  * @template {ServerResponse} [ResponseInternal=ServerResponse]
  * @param {Compiler | MultiCompiler} compiler compiler
  * @param {Options<RequestInternal, ResponseInternal>=} options options
- * @returns {API<RequestInternal, ResponseInternal>} webpack dev middleware
+ * @returns {API<RequestInternal, ResponseInternal>} rspack dev middleware
  */
 function wdm(compiler, options = {}) {
   const { mimeTypes } = options;
@@ -220,7 +220,7 @@ function wdm(compiler, options = {}) {
     callbacks: [],
     options,
     compiler,
-    logger: compiler.getInfrastructureLogger("webpack-dev-middleware"),
+    logger: compiler.getInfrastructureLogger("rspack-dev-middleware"),
   };
 
   setupHooks(context);
@@ -242,8 +242,7 @@ function wdm(compiler, options = {}) {
       if (error) {
         // TODO: improve that in future
         // For example - `writeToDisk` can throw an error and right now it is ends watching.
-        // We can improve that and keep watching active, but it is require API on webpack side.
-        // Let's implement that in webpack@5 because it is rare case.
+        // We can improve that and keep watching active, but it requires compiler support.
         context.logger.error(error);
       }
     };
@@ -321,7 +320,7 @@ function wdm(compiler, options = {}) {
 function hapiWrapper() {
   return {
     pkg: {
-      name: "webpack-dev-middleware",
+      name: "rspack-dev-middleware",
     },
     // Allow to have multiple middleware
     multiple: true,
@@ -335,9 +334,9 @@ function hapiWrapper() {
       const devMiddleware = wdm(compiler, rest);
 
       // @ts-expect-error
-      if (!server.decorations.server.includes("webpackDevMiddleware")) {
+      if (!server.decorations.server.includes("rspackDevMiddleware")) {
         // @ts-expect-error
-        server.decorate("server", "webpackDevMiddleware", devMiddleware);
+        server.decorate("server", "rspackDevMiddleware", devMiddleware);
       }
 
       // @ts-expect-error
@@ -401,7 +400,7 @@ function koaWrapper(compiler, options) {
    * @param {EXPECTED_FUNCTION} next next
    * @returns {Promise<void>}
    */
-  async function webpackDevMiddleware(ctx, next) {
+  async function rspackDevMiddleware(ctx, next) {
     const { req, res } = ctx;
 
     res.locals = ctx.state;
@@ -492,9 +491,9 @@ function koaWrapper(compiler, options) {
     }
   }
 
-  webpackDevMiddleware.devMiddleware = devMiddleware;
+  rspackDevMiddleware.devMiddleware = devMiddleware;
 
-  return webpackDevMiddleware;
+  return rspackDevMiddleware;
 }
 
 wdm.koaWrapper = koaWrapper;
@@ -514,10 +513,10 @@ function honoWrapper(compiler, options) {
    * @param {EXPECTED_FUNCTION} next next function
    * @returns {Promise<void>}
    */
-  async function webpackDevMiddleware(context, next) {
+  async function rspackDevMiddleware(context, next) {
     const { req, res } = context;
 
-    context.set("webpack", { devMiddleware: devMiddleware.context });
+    context.set("rspack", { devMiddleware: devMiddleware.context });
 
     /**
      * @returns {string | undefined} method
@@ -663,9 +662,9 @@ function honoWrapper(compiler, options) {
     await next();
   }
 
-  webpackDevMiddleware.devMiddleware = devMiddleware;
+  rspackDevMiddleware.devMiddleware = devMiddleware;
 
-  return webpackDevMiddleware;
+  return rspackDevMiddleware;
 }
 
 wdm.honoWrapper = honoWrapper;

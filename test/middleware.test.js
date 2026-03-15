@@ -117,7 +117,7 @@ async function frameworkFactory(
 
       const req = request(server.listener);
 
-      return [server, req, server.webpackDevMiddleware];
+      return [server, req, server.rspackDevMiddleware];
     }
     case "koa": {
       // eslint-disable-next-line new-cap
@@ -4876,7 +4876,10 @@ describe.each([
                 });
               } else if (name === "hono") {
                 middlewares.push((c) => {
-                  locals = { webpack: c.get("webpack") };
+                  locals = {
+                    rspack: c.get("rspack"),
+                    webpack: c.get("webpack"),
+                  };
 
                   return c.body("welcome", 200);
                 });
@@ -4928,6 +4931,7 @@ describe.each([
         const response = await req.get("/foo/bar");
 
         expect(response.statusCode).toBe(200);
+        expect(locals.rspack.devMiddleware).toBeDefined();
         expect(locals.webpack.devMiddleware).toBeDefined();
       });
     });
