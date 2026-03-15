@@ -11,9 +11,9 @@ importers:
       memfs:
         specifier: ^4.43.1
         version: 4.56.11(tslib@2.8.1)
-      mime-types:
-        specifier: ^3.0.1
-        version: 3.0.2
+      mrmime:
+        specifier: ^2.0.1
+        version: 2.0.1
       on-finished:
         specifier: ^2.4.1
         version: 2.4.1
@@ -51,9 +51,6 @@ importers:
       '@types/express':
         specifier: ^5.0.2
         version: 5.0.6
-      '@types/mime-types':
-        specifier: ^3.0.1
-        version: 3.0.1
       '@types/node':
         specifier: ^22.3.0
         version: 22.19.13
@@ -1337,9 +1334,6 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/mime-types@3.0.1':
-    resolution: {integrity: sha512-xRMsfuQbnRq1Ef+C+RKaENOxXX87Ygl38W1vDfPHRku02TgQr+Qd8iivLtAMcR0KF5/29xlnFihkTlbqFrGOVQ==}
-
   '@types/node@22.19.13':
     resolution: {integrity: sha512-akNQMv0wW5uyRpD2v2IEyRSZiR+BeGuoB6L310EgGObO44HSMNT8z1xzio28V8qOrgYaopIDNA18YgdXd+qTiw==}
 
@@ -2499,6 +2493,10 @@ packages:
 
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
+
+  mrmime@2.0.1:
+    resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
+    engines: {node: '>=10'}
 
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
@@ -4665,8 +4663,6 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/mime-types@3.0.1': {}
-
   '@types/node@22.19.13':
     dependencies:
       undici-types: 6.21.0
@@ -6062,6 +6058,8 @@ snapshots:
   minimatch@3.1.2:
     dependencies:
       brace-expansion: 1.1.12
+
+  mrmime@2.0.1: {}
 
   ms@2.0.0: {}
 

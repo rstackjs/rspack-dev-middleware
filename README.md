@@ -166,7 +166,7 @@ Default: `undefined`
 This property allows a user to register custom mime types or extension mappings.
 eg. `mimeTypes: { phtml: 'text/html' }`.
 
-Please see the documentation for [`mime-types`](https://github.com/jshttp/mime-types) for more information.
+Please see the documentation for [`mrmime`](https://github.com/lukeed/mrmime) for more information.
 
 ### mimeTypeDefault
 

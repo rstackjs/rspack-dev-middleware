@@ -1,4 +1,4 @@
-const mime = require("mime-types");
+const { mimes } = require("mrmime");
 
 const middleware = require("./middleware");
 const getFilenameFromUrl = require("./utils/getFilenameFromUrl");
@@ -203,12 +203,11 @@ function wdm(compiler, options = {}) {
   const { mimeTypes } = options;
 
   if (mimeTypes) {
-    const { types } = mime;
-
-    // mimeTypes from user provided options should take priority
-    // over existing, known types
-    // @ts-expect-error
-    mime.types = { ...types, ...mimeTypes };
+    // mrmime.lookup closes over the exported dictionary, so overrides
+    // need to update the object in place.
+    for (const [extension, type] of Object.entries(mimeTypes)) {
+      mimes[extension.toLowerCase()] = type;
+    }
   }
 
   /**

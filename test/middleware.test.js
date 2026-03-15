@@ -11,7 +11,7 @@ import finalhandler from "finalhandler";
 import { Hono } from "hono";
 import koa from "koa";
 import memfs, { Volume, createFsFromVolume } from "memfs";
-import mime from "mime-types";
+import { lookup, mimes } from "mrmime";
 import router from "router";
 import request from "supertest";
 import { Stats } from "@rspack/core";
@@ -33,6 +33,14 @@ import getCompilerHooks from "./helpers/getCompilerHooks";
 
 // Suppress unnecessary stats output
 rs.spyOn(globalThis.console, "log").mockImplementation();
+
+const UTF8_CHARSET_MIME_TYPES = new Set([
+  "application/javascript",
+  "application/json",
+  "application/manifest+json",
+]);
+
+mimes.usdz = "model/vnd.usdz+zip";
 
 async function startServer(name, app) {
   return new Promise((resolve, reject) => {
@@ -270,7 +278,21 @@ function get404ContentTypeHeader(name) {
 }
 
 function getContentTypeHeader(name, ext = "js") {
-  return mime.contentType(ext);
+  const mimeType = lookup(ext);
+
+  if (!mimeType) {
+    return undefined;
+  }
+
+  if (mimeType.includes(";")) {
+    return mimeType;
+  }
+
+  if (mimeType.startsWith("text/") || UTF8_CHARSET_MIME_TYPES.has(mimeType)) {
+    return `${mimeType}; charset=utf-8`;
+  }
+
+  return mimeType;
 }
 
 function applyTestMiddleware(name, middlewares) {
