@@ -15,10 +15,6 @@ export type ExpectedIncomingMessage = {
    * get URL extra method
    */
   getURL?: (() => string | undefined) | undefined;
-  /**
-   * an extra option for `fastify` (and `@fastify/express`) to get original URL
-   */
-  originalUrl?: string | undefined;
 };
 export type ExpectedServerResponse = {
   /**
@@ -124,7 +120,6 @@ export function getOutgoing<
  * @property {((name: string) => string | string[] | undefined)=} getHeader get header extra method
  * @property {(() => string | undefined)=} getMethod get method extra method
  * @property {(() => string | undefined)=} getURL get URL extra method
- * @property {string=} originalUrl an extra option for `fastify` (and `@fastify/express`) to get original URL
  */
 /**
  * @typedef {object} ExpectedServerResponse

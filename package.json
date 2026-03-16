@@ -32,7 +32,6 @@
     "bump": "npx bumpp"
   },
   "devDependencies": {
-    "@fastify/express": "^4.0.2",
     "@hapi/hapi": "^21.3.7",
     "@hono/node-server": "^1.12.0",
     "@rslib/core": "^0.20.0",
@@ -48,7 +47,6 @@
     "deepmerge": "^4.2.2",
     "execa": "^5.1.1",
     "express": "^5.1.0",
-    "fastify": "^5.2.1",
     "file-loader": "^6.2.0",
     "finalhandler": "^2.1.0",
     "hono": "^4.4.13",

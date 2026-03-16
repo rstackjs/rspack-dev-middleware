@@ -2,13 +2,11 @@ import fs from "node:fs";
 import { createServer } from "node:http";
 import path from "node:path";
 
-import fastifyExpress from "@fastify/express";
 import Hapi from "@hapi/hapi";
 import { serve } from "@hono/node-server";
 import { Stats } from "@rspack/core";
 import connect from "connect";
 import express from "express";
-import fastify from "fastify";
 import finalhandler from "finalhandler";
 import { Hono } from "hono";
 import koa from "koa";
@@ -169,13 +167,8 @@ async function frameworkFactory(
       return [server, req, instance.devMiddleware];
     }
     default: {
-      const isFastify = name === "fastify";
       const isRouter = name === "router";
       const app = framework();
-
-      if (isFastify) {
-        await app.register(fastifyExpress);
-      }
 
       const instance = devMiddleware(compiler, devMiddlewareOptions);
       const middlewares =
@@ -191,18 +184,10 @@ async function frameworkFactory(
         }
       }
 
-      if (isFastify) {
-        await app.ready();
-      }
-
       const server = await startServer(name, app);
-      const req = isFastify
-        ? request(app.server)
-        : isRouter
-          ? request(server)
-          : request(app);
+      const req = isRouter ? request(server) : request(app);
 
-      return [isFastify ? app.server : server, req, instance];
+      return [server, req, instance];
     }
   }
 }
@@ -279,8 +264,6 @@ function get404ContentTypeHeader(name) {
     case "koa":
       return "text/plain; charset=utf-8";
     case "hapi":
-      return "application/json; charset=utf-8";
-    case "fastify":
       return "application/json; charset=utf-8";
     case "hono":
       return "text/plain; charset=UTF-8";
@@ -376,7 +359,6 @@ describe.each([
   ["connect", connect],
   ["express", express],
   ["router", router],
-  ["fastify", fastify],
   ["koa", koa],
   ["hapi", Hapi],
   ["hono", Hono],
@@ -1676,13 +1658,12 @@ describe.each([
             ],
           },
           {
-            // fastify uses the `frameworkErrors` option to handle broken URLs
-            file: name === "fastify" ? "/foo/foo.js" : "/%foo%/%foo%.js",
+            file: "/%foo%/%foo%.js",
             data: 'console.log("foo");',
             urls: [
               // Filenames can contain characters not allowed in URIs
               {
-                value: name === "fastify" ? "foo/foo.js" : "%foo%/%foo%.js",
+                value: "%foo%/%foo%.js",
                 contentType: getContentTypeHeader(),
                 code: 200,
               },
@@ -3863,9 +3844,7 @@ describe.each([
           const response = await req.get("/file.jpg");
 
           expect(response.statusCode).toBe(200);
-          expect(response.headers["content-type"]).toMatch(
-            name === "fastify" ? /text\/plain; charset=utf-8/ : /text\/html/,
-          );
+          expect(response.headers["content-type"]).toMatch(/text\/html/);
         });
       });
     });
@@ -5196,8 +5175,8 @@ describe.each([
           const response = await req.get("/");
 
           expect(response.statusCode).toBe(200);
-          expect(response.headers["content-type"]).toBe(
-            "text/html; charset=utf-8",
+          expect(response.headers["content-type"]).toMatch(
+            /^text\/html; charset=utf-8$/i,
           );
         });
       });

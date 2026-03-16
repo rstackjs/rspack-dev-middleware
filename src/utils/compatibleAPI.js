@@ -8,7 +8,6 @@
  * @property {((name: string) => string | string[] | undefined)=} getHeader get header extra method
  * @property {(() => string | undefined)=} getMethod get method extra method
  * @property {(() => string | undefined)=} getURL get URL extra method
- * @property {string=} originalUrl an extra option for `fastify` (and `@fastify/express`) to get original URL
  */
 
 /**
@@ -65,10 +64,6 @@ function getRequestURL(req) {
   // Pseudo API
   if (typeof req.getURL === "function") {
     return req.getURL();
-  }
-  // Fastify decodes URI by default, Our logic is based on encoded URI
-  else if (typeof req.originalUrl !== "undefined") {
-    return req.originalUrl;
   }
 
   return req.url;
