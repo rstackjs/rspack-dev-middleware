@@ -34,15 +34,18 @@
  */
 function shouldUseOriginalURL(req) {
   if (
-    typeof req.originalUrl === "string" &&
-    typeof req.url === "string" &&
-    req.originalUrl !== req.url
+    typeof req.originalUrl !== "string" ||
+    typeof req.url !== "string" ||
+    req.originalUrl === req.url
   ) {
-    try {
-      return encodeURI(req.url) === req.originalUrl;
-    } catch {}
+    return typeof req.originalUrl === "string";
   }
-  return false;
+
+  try {
+    return encodeURI(req.url) === req.originalUrl;
+  } catch {
+    return false;
+  }
 }
 
 /**
