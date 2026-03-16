@@ -58,7 +58,7 @@ app.use(
 app.listen(3000, () => console.log("Example app listening on port 3000!"));
 ```
 
-See [below](#other-servers) for an example of use with fastify.
+See [below](#other-servers) for examples of use with other servers.
 
 ## Options
 
@@ -683,26 +683,6 @@ process.on("unhandledRejection", (err) => {
   console.log(err);
   process.exit(1);
 });
-```
-
-### Fastify
-
-Fastify interop will require the use of `fastify-express` instead of `middie` for providing middleware support. As the authors of `fastify-express` recommend, this should only be used as a stopgap while full Fastify support is worked on.
-
-```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const fastify = require("fastify")();
-const { rspack } = require("@rspack/core");
-const rspackConfig = require("./rspack.config.js");
-
-const compiler = rspack(rspackConfig);
-const devMiddlewareOptions = {
-  // options
-};
-
-await fastify.register(require("@fastify/express"));
-await fastify.use(devMiddleware(compiler, devMiddlewareOptions));
-await fastify.listen(3000);
 ```
 
 ### Hono

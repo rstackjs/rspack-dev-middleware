@@ -8,7 +8,6 @@
  * @property {((name: string) => string | string[] | undefined)=} getHeader get header extra method
  * @property {(() => string | undefined)=} getMethod get method extra method
  * @property {(() => string | undefined)=} getURL get URL extra method
- * @property {string=} originalUrl an extra option for `fastify` (and `@fastify/express`) to get original URL
  */
 
 /**
@@ -26,27 +25,6 @@
  * @property {(() => EXPECTED_ANY)=} getOutgoing get outgoing
  * @property {((name: string, value: EXPECTED_ANY) => void)=} setState set state
  */
-
-/**
- * @template {IncomingMessage & ExpectedIncomingMessage} Request
- * @param {Request} req req
- * @returns {boolean} true when originalUrl should be preferred
- */
-function shouldUseOriginalURL(req) {
-  if (
-    typeof req.originalUrl !== "string" ||
-    typeof req.url !== "string" ||
-    req.originalUrl === req.url
-  ) {
-    return typeof req.originalUrl === "string";
-  }
-
-  try {
-    return encodeURI(req.url) === req.originalUrl;
-  } catch {
-    return false;
-  }
-}
 
 /**
  * @template {IncomingMessage & ExpectedIncomingMessage} Request
@@ -86,11 +64,6 @@ function getRequestURL(req) {
   // Pseudo API
   if (typeof req.getURL === "function") {
     return req.getURL();
-  }
-  // Fastify decodes URI by default. Prefer the encoded originalUrl only when
-  // it still describes the current request, not when another middleware rewrote req.url.
-  if (shouldUseOriginalURL(req)) {
-    return req.originalUrl;
   }
 
   return req.url;
