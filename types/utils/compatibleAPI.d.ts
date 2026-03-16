@@ -115,32 +115,6 @@ export function getHeadersSent<
 export function getOutgoing<
   Response extends ServerResponse & ExpectedServerResponse,
 >(res: Response): Response;
-/** @typedef {import("../index").IncomingMessage} IncomingMessage */
-/** @typedef {import("../index").ServerResponse} ServerResponse */
-/** @typedef {import("../index").OutputFileSystem} OutputFileSystem */
-/** @typedef {import("../index").EXPECTED_ANY} EXPECTED_ANY */
-/**
- * @typedef {object} ExpectedIncomingMessage
- * @property {((name: string) => string | string[] | undefined)=} getHeader get header extra method
- * @property {(() => string | undefined)=} getMethod get method extra method
- * @property {(() => string | undefined)=} getURL get URL extra method
- * @property {string=} originalUrl an extra option for `fastify` (and `@fastify/express`) to get original URL
- */
-/**
- * @typedef {object} ExpectedServerResponse
- * @property {((status: number) => void)=} setStatusCode set status code
- * @property {(() => number)=} getStatusCode get status code
- * @property {((name: string) => string | string[] | undefined | number)} getHeader get header
- * @property {((name: string, value: number | string | Readonly<string[]>) => ExpectedServerResponse)=} setHeader set header
- * @property {((name: string) => void)=} removeHeader remove header
- * @property {((data: string | Buffer) => void)=} send send
- * @property {((data?: string | Buffer) => void)=} finish finish
- * @property {(() => string[])=} getResponseHeaders get response header
- * @property {(() => boolean)=} getHeadersSent get headers sent
- * @property {((data: EXPECTED_ANY) => void)=} stream stream
- * @property {(() => EXPECTED_ANY)=} getOutgoing get outgoing
- * @property {((name: string, value: EXPECTED_ANY) => void)=} setState set state
- */
 /**
  * @template {IncomingMessage & ExpectedIncomingMessage} Request
  * @param {Request} req req

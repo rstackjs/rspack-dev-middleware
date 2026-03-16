@@ -30,6 +30,24 @@
 /**
  * @template {IncomingMessage & ExpectedIncomingMessage} Request
  * @param {Request} req req
+ * @returns {boolean} true when originalUrl should be preferred
+ */
+function shouldUseOriginalURL(req) {
+  if (
+    typeof req.originalUrl === "string" &&
+    typeof req.url === "string" &&
+    req.originalUrl !== req.url
+  ) {
+    try {
+      return encodeURI(req.url) === req.originalUrl;
+    } catch {}
+  }
+  return false;
+}
+
+/**
+ * @template {IncomingMessage & ExpectedIncomingMessage} Request
+ * @param {Request} req req
  * @param {string} name name
  * @returns {string | string[] | undefined} request header
  */
@@ -66,8 +84,9 @@ function getRequestURL(req) {
   if (typeof req.getURL === "function") {
     return req.getURL();
   }
-  // Fastify decodes URI by default, Our logic is based on encoded URI
-  else if (typeof req.originalUrl !== "undefined") {
+  // Fastify decodes URI by default. Prefer the encoded originalUrl only when
+  // it still describes the current request, not when another middleware rewrote req.url.
+  if (shouldUseOriginalURL(req)) {
     return req.originalUrl;
   }
 
