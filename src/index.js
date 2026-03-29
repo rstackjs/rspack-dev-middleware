@@ -139,7 +139,7 @@ const noop = () => {};
  * @returns {Promise<void>}
  */
 
-/** @typedef {import("./utils/getFilenameFromUrl").Extra} Extra */
+/** @typedef {import("./utils/getFilenameFromUrl.js").Extra} Extra */
 
 /**
  * @callback GetFilenameFromUrl
@@ -396,7 +396,7 @@ function koaWrapper(compiler, options) {
   const devMiddleware = rdm(compiler, options);
 
   /**
-   * @param {{ req: RequestInternal, res: ResponseInternal & import("./utils/compatibleAPI").ExpectedServerResponse, status: number, body: string | Buffer | import("fs").ReadStream | { message: string }, state: object }} ctx context
+   * @param {{ req: RequestInternal, res: ResponseInternal & import("./utils/compatibleAPI.js").ExpectedServerResponse, status: number, body: string | Buffer | import("fs").ReadStream | { message: string }, state: object }} ctx context
    * @param {EXPECTED_FUNCTION} next next
    * @returns {Promise<void>}
    */
@@ -509,7 +509,7 @@ function honoWrapper(compiler, options) {
   const devMiddleware = rdm(compiler, options);
 
   /**
-   * @param {{ env: EXPECTED_ANY, body: EXPECTED_ANY, json: EXPECTED_ANY, status: EXPECTED_ANY, set: EXPECTED_ANY, req: RequestInternal & import("./utils/compatibleAPI").ExpectedIncomingMessage & { header: (name: string) => string }, res: ResponseInternal & import("./utils/compatibleAPI").ExpectedServerResponse & { headers: EXPECTED_ANY, status: EXPECTED_ANY } }} context context
+   * @param {{ env: EXPECTED_ANY, body: EXPECTED_ANY, json: EXPECTED_ANY, status: EXPECTED_ANY, set: EXPECTED_ANY, req: RequestInternal & import("./utils/compatibleAPI.js").ExpectedIncomingMessage & { header: (name: string) => string }, res: ResponseInternal & import("./utils/compatibleAPI.js").ExpectedServerResponse & { headers: EXPECTED_ANY, status: EXPECTED_ANY } }} context context
    * @param {EXPECTED_FUNCTION} next next function
    * @returns {Promise<void>}
    */
@@ -558,7 +558,7 @@ function honoWrapper(compiler, options) {
     /**
      * @param {string} name header name
      * @param {string | number | Readonly<string[]>} value value
-     * @returns {ResponseInternal & import("./utils/compatibleAPI").ExpectedServerResponse & { headers: EXPECTED_ANY, status: EXPECTED_ANY }} response
+     * @returns {ResponseInternal & import("./utils/compatibleAPI.js").ExpectedServerResponse & { headers: EXPECTED_ANY, status: EXPECTED_ANY }} response
      */
     res.setHeader = (name, value) => {
       context.res.headers.append(name, value);

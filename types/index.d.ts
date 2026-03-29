@@ -106,7 +106,7 @@
  * @param {NextFunction} next
  * @returns {Promise<void>}
  */
-/** @typedef {import("./utils/getFilenameFromUrl").Extra} Extra */
+/** @typedef {import("./utils/getFilenameFromUrl.js").Extra} Extra */
 /**
  * @callback GetFilenameFromUrl
  * @param {string} url
@@ -376,7 +376,7 @@ export type Middleware<
   res: ResponseInternal,
   next: NextFunction,
 ) => Promise<void>;
-export type Extra = import("./utils/getFilenameFromUrl").Extra;
+export type Extra = import("./utils/getFilenameFromUrl.js").Extra;
 export type GetFilenameFromUrl = (
   url: string,
   extra?: Extra | undefined,

@@ -14,7 +14,7 @@ export type SendErrorOptions<
    * modify response data callback
    */
   modifyResponseData?:
-    | import("./index").ModifyResponseData<Request, Response>
+    | import("./index.js").ModifyResponseData<Request, Response>
     | undefined;
 };
 export type NextFunction = import("./index.js").NextFunction;
@@ -27,7 +27,7 @@ export type ReadStream = import("fs").ReadStream;
  * @template {ServerResponse} Response
  * @typedef {object} SendErrorOptions send error options
  * @property {Record<string, number | string | string[] | undefined>=} headers headers
- * @property {import("./index").ModifyResponseData<Request, Response>=} modifyResponseData modify response data callback
+ * @property {import("./index.js").ModifyResponseData<Request, Response>=} modifyResponseData modify response data callback
  */
 /**
  * @template {IncomingMessage} Request
