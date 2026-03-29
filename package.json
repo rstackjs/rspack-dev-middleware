@@ -61,7 +61,7 @@
     "range-parser": "^1.2.1",
     "router": "^2.2.0",
     "supertest": "^7.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^6.0.2"
   },
   "peerDependencies": {
     "@rspack/core": "^2.0.0-0"

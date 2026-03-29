@@ -1,4 +1,4 @@
-/** @typedef {import("../index").EXPECTED_ANY} EXPECTED_ANY */
+/** @typedef {import("../index.js").EXPECTED_ANY} EXPECTED_ANY */
 
 const cacheStore = new WeakMap();
 

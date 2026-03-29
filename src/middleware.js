@@ -158,7 +158,7 @@ const MAX_MAX_AGE = 31536000000;
  * @template {ServerResponse} Response
  * @typedef {object} SendErrorOptions send error options
  * @property {Record<string, number | string | string[] | undefined>=} headers headers
- * @property {import("./index").ModifyResponseData<Request, Response>=} modifyResponseData modify response data callback
+ * @property {import("./index.js").ModifyResponseData<Request, Response>=} modifyResponseData modify response data callback
  */
 
 /**
@@ -532,7 +532,7 @@ function wrapper(context) {
      */
     async function processRequest() {
       // Pipe and SendFile
-      /** @type {import("./utils/getFilenameFromUrl").Extra} */
+      /** @type {import("./utils/getFilenameFromUrl.js").Extra} */
       const extra = {};
       const filename = getFilenameFromUrl(
         context,

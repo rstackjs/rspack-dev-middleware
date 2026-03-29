@@ -37,6 +37,11 @@ function setupWriteToDisk(context) {
 
       compiler.hooks.assetEmitted.tapAsync(
         "DevMiddleware",
+        /**
+         * @param {string} file asset file name
+         * @param {{ targetPath: string, content: Buffer }} info emitted asset info
+         * @param {(err?: NodeJS.ErrnoException | null) => void} callback completion callback
+         */
         (file, info, callback) => {
           const { targetPath, content } = info;
           const { writeToDisk: filter } = context.options;

@@ -1,7 +1,7 @@
-export type IncomingMessage = import("../index").IncomingMessage;
-export type ServerResponse = import("../index").ServerResponse;
-export type OutputFileSystem = import("../index").OutputFileSystem;
-export type EXPECTED_ANY = import("../index").EXPECTED_ANY;
+export type IncomingMessage = import("../index.js").IncomingMessage;
+export type ServerResponse = import("../index.js").ServerResponse;
+export type OutputFileSystem = import("../index.js").OutputFileSystem;
+export type EXPECTED_ANY = import("../index.js").EXPECTED_ANY;
 export type ExpectedIncomingMessage = {
   /**
    * get header extra method
@@ -111,10 +111,10 @@ export function getHeadersSent<
 export function getOutgoing<
   Response extends ServerResponse & ExpectedServerResponse,
 >(res: Response): Response;
-/** @typedef {import("../index").IncomingMessage} IncomingMessage */
-/** @typedef {import("../index").ServerResponse} ServerResponse */
-/** @typedef {import("../index").OutputFileSystem} OutputFileSystem */
-/** @typedef {import("../index").EXPECTED_ANY} EXPECTED_ANY */
+/** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
+/** @typedef {import("../index.js").ServerResponse} ServerResponse */
+/** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
+/** @typedef {import("../index.js").EXPECTED_ANY} EXPECTED_ANY */
 /**
  * @typedef {object} ExpectedIncomingMessage
  * @property {((name: string) => string | string[] | undefined)=} getHeader get header extra method

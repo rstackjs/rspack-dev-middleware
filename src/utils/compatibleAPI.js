@@ -1,7 +1,7 @@
-/** @typedef {import("../index").IncomingMessage} IncomingMessage */
-/** @typedef {import("../index").ServerResponse} ServerResponse */
-/** @typedef {import("../index").OutputFileSystem} OutputFileSystem */
-/** @typedef {import("../index").EXPECTED_ANY} EXPECTED_ANY */
+/** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
+/** @typedef {import("../index.js").ServerResponse} ServerResponse */
+/** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
+/** @typedef {import("../index.js").EXPECTED_ANY} EXPECTED_ANY */
 
 /**
  * @typedef {object} ExpectedIncomingMessage
@@ -226,7 +226,7 @@ function createReadStreamOrReadFileSync(
   start,
   end,
 ) {
-  /** @type {string | Buffer | import("fs").ReadStream} */
+  /** @type {Buffer | import("fs").ReadStream} */
   let bufferOrStream;
   /** @type {number} */
   let byteLength;
