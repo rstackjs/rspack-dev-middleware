@@ -146,14 +146,25 @@ function getFilenameFromUrl(context, url) {
 
       /**
        * @param {string} filename filename
+       * @param {Set<string>=} visited visited filenames
        * @returns {FilenameWithExtra | undefined} filename when found, otherwise undefined
        */
-      const resolveIndex = (filename) => {
+      const resolveIndex = (filename, visited = new Set()) => {
         if (index.length === 0) {
           return;
         }
 
-        filename = path.join(filename, index[0]);
+        const nextFilename = path.join(filename, index[0]);
+
+        // Guard against index values like "" or "." that never advance
+        // the path, and against longer cycles such as "..".
+        if (visited.has(nextFilename)) {
+          return;
+        }
+
+        visited.add(nextFilename);
+
+        filename = nextFilename;
 
         let stats;
 
@@ -168,7 +179,7 @@ function getFilenameFromUrl(context, url) {
         }
 
         if (/** @type {FSStats} */ (stats).isDirectory()) {
-          return resolveIndex(filename);
+          return resolveIndex(filename, visited);
         }
 
         /** @type {Extra} */

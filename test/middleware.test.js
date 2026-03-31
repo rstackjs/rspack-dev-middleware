@@ -825,6 +825,31 @@ describe.each([
             }
           });
         });
+
+        describe('should return undefined when the "index" option does not advance the path', () => {
+          beforeEach(async () => {
+            compiler = getCompiler(webpackConfig);
+
+            [server, req, instance] = await frameworkFactory(
+              name,
+              framework,
+              compiler,
+              {
+                index: "",
+              },
+            );
+          });
+
+          afterEach(async () => {
+            await close(server, instance);
+          });
+
+          it("should not recurse forever", async () => {
+            await waitUntilValid(instance);
+
+            expect(instance.getFilenameFromUrl("/")).toBeUndefined();
+          });
+        });
       });
 
       describe("close method", () => {
@@ -5377,6 +5402,39 @@ describe.each([
           const response = await req.get("/");
 
           expect(response.statusCode).toBe(200);
+        });
+      });
+
+      describe('should not recurse forever when "index" resolves to the same directory', () => {
+        beforeAll(async () => {
+          const outputPath = path.resolve(__dirname, "./outputs/basic");
+          const compiler = getCompiler({
+            ...webpackConfig,
+            output: {
+              filename: "bundle.js",
+              path: outputPath,
+            },
+          });
+
+          [server, req, instance] = await frameworkFactory(
+            name,
+            framework,
+            compiler,
+            {
+              index: ".",
+              publicPath: "/",
+            },
+          );
+        });
+
+        afterAll(async () => {
+          await close(server, instance);
+        });
+
+        it('should return the "404" code for the "GET" request to the public path', async () => {
+          const response = await req.get("/");
+
+          expect(response.statusCode).toBe(404);
         });
       });
 
