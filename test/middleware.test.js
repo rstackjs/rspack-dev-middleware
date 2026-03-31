@@ -5,7 +5,7 @@ import path from "node:path";
 import Hapi from "@hapi/hapi";
 import { serve } from "@hono/node-server";
 import { Stats } from "@rspack/core";
-import connect from "connect";
+import { connect } from "connect-next";
 import express from "express";
 import finalhandler from "finalhandler";
 import { Hono } from "hono";
@@ -357,7 +357,7 @@ function parseHttpDate(date) {
 }
 
 describe.each([
-  ["connect", connect],
+  ["connect-next", connect],
   ["express", express],
   ["router", router],
   ["koa", koa],
