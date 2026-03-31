@@ -34,7 +34,11 @@ import ready from "./utils/ready.js";
 /** @typedef {import("./index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("./index.js").ServerResponse} ServerResponse */
 /** @typedef {import("./index.js").NormalizedHeaders} NormalizedHeaders */
+/** @typedef {import("./utils/getFilenameFromUrl.js").FilenameError} FilenameError */
+/** @typedef {import("./utils/getFilenameFromUrl.js").Extra} Extra */
 /** @typedef {import("fs").ReadStream} ReadStream */
+
+/** @typedef {{ filename: string, extra: Extra }} FilenameWithExtra */
 
 const BYTES_RANGE_REGEXP = /^ *bytes/i;
 const UTF8_CHARSET_MIME_TYPES = new Set([
@@ -279,9 +283,11 @@ function wrapper(context) {
 
     /**
      * @param {NodeJS.ErrnoException} error error
+     * @param {string=} message override message
+     * @param {number=} code override code
      * @returns {Promise<void>}
      */
-    async function errorHandler(error) {
+    async function errorHandler(error, message, code) {
       switch (error.code) {
         case "ENAMETOOLONG":
         case "ENOENT":
@@ -291,7 +297,7 @@ function wrapper(context) {
           });
           break;
         default:
-          await sendError(error.message, 500, {
+          await sendError(message || error.message, code || 500, {
             modifyResponseData: context.options.modifyResponseData,
           });
           break;
@@ -532,30 +538,38 @@ function wrapper(context) {
      */
     async function processRequest() {
       // Pipe and SendFile
-      /** @type {import("./utils/getFilenameFromUrl.js").Extra} */
-      const extra = {};
-      const filename = getFilenameFromUrl(
-        context,
-        /** @type {string} */ (getRequestURL(req)),
-        extra,
-      );
+      /** @type {FilenameWithExtra | undefined} */
+      let resolved;
+      const requestUrl = /** @type {string} */ (getRequestURL(req));
 
-      if (extra.errorCode) {
-        if (extra.errorCode === 403) {
-          context.logger.error(`Malicious path "${filename}".`);
+      try {
+        resolved = getFilenameFromUrl(context, requestUrl);
+      } catch (error) {
+        const errorCode =
+          typeof error === "object" &&
+          error !== null &&
+          typeof (/** @type {FilenameError} */ (error).statusCode) !==
+            "undefined"
+            ? /** @type {FilenameError} */ (error).statusCode
+            : undefined;
+
+        if (errorCode === 403) {
+          context.logger.error(`Malicious path "${requestUrl}".`);
         }
 
-        await sendError(
-          extra.errorCode === 400 ? "Bad Request" : "Forbidden",
-          extra.errorCode,
-          {
-            modifyResponseData: context.options.modifyResponseData,
-          },
+        await errorHandler(
+          /** @type {NodeJS.ErrnoException} */ (error),
+          errorCode === 400
+            ? "Bad Request"
+            : errorCode === 403
+              ? "Forbidden"
+              : undefined,
+          errorCode,
         );
         return;
       }
 
-      if (!filename) {
+      if (!resolved) {
         await goNext();
         return;
       }
@@ -565,7 +579,8 @@ function wrapper(context) {
         return;
       }
 
-      const { size } = /** @type {import("fs").Stats} */ (extra.stats);
+      const { extra, filename } = resolved;
+      const { size } = extra.stats;
 
       let len = size;
       let offset = 0;
@@ -686,7 +701,7 @@ function wrapper(context) {
           try {
             const result = createReadStreamOrReadFileSync(
               filename,
-              context.outputFileSystem,
+              extra.outputFileSystem,
               start,
               end,
             );
@@ -831,7 +846,7 @@ function wrapper(context) {
         try {
           ({ bufferOrStream, byteLength } = createReadStreamOrReadFileSync(
             filename,
-            context.outputFileSystem,
+            extra.outputFileSystem,
             start,
             end,
           ));

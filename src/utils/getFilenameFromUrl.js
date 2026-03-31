@@ -1,13 +1,13 @@
 import path from "node:path";
 import querystring from "node:querystring";
-// eslint-disable-next-line n/no-deprecated-api
-import { parse } from "node:url";
 
 import getPaths from "./getPaths.js";
 import memorize from "./memorize.js";
 
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
+/** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
+/** @typedef {import("fs").Stats} FSStats */
 
 /**
  * @param {string} input input
@@ -17,21 +17,20 @@ function decode(input) {
   return querystring.unescape(input);
 }
 
-const memoizedParse = memorize(parse, undefined, (value) => {
-  if (value.pathname) {
-    value.pathname = decode(value.pathname);
-  }
+const memoizedParse = memorize((url) => {
+  const urlObject = new URL(url, "http://localhost");
 
-  return value;
+  // We can't change pathname in URL directly because it won't decode correctly.
+  return { ...urlObject, pathname: decode(urlObject.pathname) };
 });
 
 const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
 
 /**
  * @typedef {object} Extra
- * @property {import("fs").Stats=} stats stats
- * @property {number=} errorCode error code
+ * @property {FSStats} stats stats
  * @property {boolean=} immutable true when immutable, otherwise false
+ * @property {OutputFileSystem} outputFileSystem output file system
  */
 
 /**
@@ -42,43 +41,77 @@ const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
  * @returns {string}
  */
 
-// TODO refactor me in the next major release, this function should return `{ filename, stats, error }`
+class FilenameError extends Error {
+  /**
+   * @param {string} message message
+   * @param {number=} code error code
+   */
+  constructor(message, code) {
+    super(message);
+    this.name = "FilenameError";
+    this.statusCode = code;
+  }
+}
+
+/** @typedef {{ filename: string, extra: Extra }} FilenameWithExtra */
+
+/**
+ * @param {unknown} error error
+ * @returns {boolean} true when error is like not found, otherwise false
+ */
+function isNotFoundError(error) {
+  switch (/** @type {NodeJS.ErrnoException} */ (error).code) {
+    case "ENAMETOOLONG":
+    case "ENOENT":
+    case "ENOTDIR":
+      return true;
+    default:
+      return false;
+  }
+}
+
 // TODO fix redirect logic when `/` at the end, like https://github.com/pillarjs/send/blob/master/index.js#L586
 /**
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").FilledContext<Request, Response>} context context
  * @param {string} url url
- * @param {Extra=} extra extra
- * @returns {string | undefined} filename
+ * @returns {FilenameWithExtra | undefined} result of get filename from url
  */
-function getFilenameFromUrl(context, url, extra = {}) {
+function getFilenameFromUrl(context, url) {
   const { options } = context;
   const paths = getPaths(context);
+  const index =
+    options.index === false
+      ? /** @type {string[]} */ ([])
+      : typeof options.index === "undefined" || options.index === true
+        ? ["index.html"]
+        : [options.index];
 
-  /** @type {string | undefined} */
-  let foundFilename;
-  /** @type {import("node:url").Url} */
+  /** @type {URL} */
   let urlObject;
 
   try {
     // The `url` property of the `request` is contains only  `pathname`, `search` and `hash`
-    urlObject = memoizedParse(url, false, true);
+    urlObject = memoizedParse(url);
   } catch {
     return;
   }
 
-  for (const { publicPath, outputPath, assetsInfo } of paths) {
+  for (const {
+    publicPath,
+    outputPath,
+    assetsInfo,
+    outputFileSystem,
+  } of paths) {
     /** @type {string | undefined} */
     let filename;
-    /** @type {import("node:url").Url} */
+    /** @type {URL} */
     let publicPathObject;
 
     try {
       publicPathObject = memoizedParse(
         publicPath !== "auto" && publicPath ? publicPath : "/",
-        false,
-        true,
       );
     } catch {
       continue;
@@ -94,16 +127,12 @@ function getFilenameFromUrl(context, url, extra = {}) {
     ) {
       // Null byte(s)
       if (pathname.includes("\0")) {
-        extra.errorCode = 400;
-
-        return;
+        throw new FilenameError("Bad Request", 400);
       }
 
       // ".." is malicious
       if (UP_PATH_REGEXP.test(path.normalize(`./${pathname}`))) {
-        extra.errorCode = 403;
-
-        return;
+        throw new FilenameError("Forbidden", 403);
       }
 
       // Strip the `pathname` property from the `publicPath` option from the start of requested url
@@ -115,53 +144,116 @@ function getFilenameFromUrl(context, url, extra = {}) {
         pathname.slice(publicPathPathname.length),
       );
 
-      try {
-        extra.stats = context.outputFileSystem.statSync(filename);
-      } catch {
-        continue;
-      }
-
-      if (extra.stats.isFile()) {
-        foundFilename = filename;
-
-        // Rspack does not yet support `assetsInfo`, so we need to check if `assetsInfo` exists here
-        if (assetsInfo) {
-          const assetInfo = assetsInfo.get(
-            pathname.slice(publicPathPathname.length),
-          );
-
-          extra.immutable = assetInfo ? assetInfo.immutable : false;
+      /**
+       * @param {string} filename filename
+       * @param {Set<string>=} visited visited filenames
+       * @returns {FilenameWithExtra | undefined} filename when found, otherwise undefined
+       */
+      const resolveIndex = (filename, visited = new Set()) => {
+        if (index.length === 0) {
+          return;
         }
 
-        break;
-      } else if (
-        extra.stats.isDirectory() &&
-        (typeof options.index === "undefined" || options.index)
-      ) {
-        const indexValue =
-          typeof options.index === "undefined" ||
-          typeof options.index === "boolean"
-            ? "index.html"
-            : options.index;
+        const nextFilename = path.join(filename, index[0]);
 
-        filename = path.join(filename, indexValue);
+        // Guard against index values like "" or "." that never advance
+        // the path, and against longer cycles such as "..".
+        if (visited.has(nextFilename)) {
+          return;
+        }
+
+        visited.add(nextFilename);
+
+        filename = nextFilename;
+
+        let stats;
 
         try {
-          extra.stats = context.outputFileSystem.statSync(filename);
-        } catch {
+          stats = outputFileSystem.statSync(filename);
+        } catch (error) {
+          if (isNotFoundError(error)) {
+            return;
+          }
+
+          throw error;
+        }
+
+        if (/** @type {FSStats} */ (stats).isDirectory()) {
+          return resolveIndex(filename, visited);
+        }
+
+        /** @type {Extra} */
+        const extra = {
+          immutable: assetsInfo
+            ? assetsInfo.get(pathname.slice(publicPathPathname.length))
+                ?.immutable
+            : false,
+          outputFileSystem,
+          stats: /** @type {FSStats} */ (stats),
+        };
+
+        return { filename, extra };
+      };
+
+      /**
+       * @param {string} filename filename
+       * @returns {FilenameWithExtra | undefined} filename when found, otherwise undefined
+       */
+      const resolveFile = (filename) => {
+        let stats;
+
+        try {
+          stats = outputFileSystem.statSync(filename);
+        } catch (error) {
+          if (isNotFoundError(error)) {
+            return;
+          }
+
+          throw error;
+        }
+
+        if (/** @type {FSStats} */ (stats).isDirectory()) {
+          // Different from send: we resolve the index file instead of issuing a redirect.
+          return resolveIndex(filename);
+        }
+
+        if (filename.endsWith(path.sep)) {
+          return;
+        }
+
+        /** @type {Extra} */
+        const extra = {
+          immutable: assetsInfo
+            ? assetsInfo.get(pathname.slice(publicPathPathname.length))
+                ?.immutable
+            : false,
+          outputFileSystem,
+          stats: /** @type {FSStats} */ (stats),
+        };
+
+        return { filename, extra };
+      };
+
+      if (index.length > 0 && pathname.endsWith("/")) {
+        const result = resolveIndex(filename);
+
+        if (!result) {
           continue;
         }
 
-        if (extra.stats.isFile()) {
-          foundFilename = filename;
-
-          break;
-        }
+        return result;
       }
+
+      const result = resolveFile(filename);
+
+      if (!result) {
+        continue;
+      }
+
+      return result;
     }
   }
-
-  return foundFilename;
 }
 
+export { FilenameError };
 export default getFilenameFromUrl;

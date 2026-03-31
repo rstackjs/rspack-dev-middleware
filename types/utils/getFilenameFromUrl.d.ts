@@ -1,25 +1,31 @@
 export default getFilenameFromUrl;
 export type IncomingMessage = import("../index.js").IncomingMessage;
+export type OutputFileSystem = import("../index.js").OutputFileSystem;
 export type ServerResponse = import("../index.js").ServerResponse;
+export type FSStats = import("fs").Stats;
+export type FilenameWithExtra = {
+  filename: string;
+  extra: Extra;
+};
 export type Extra = {
   /**
    * stats
    */
-  stats?: import("fs").Stats | undefined;
-  /**
-   * error code
-   */
-  errorCode?: number | undefined;
+  stats: FSStats;
   /**
    * true when immutable, otherwise false
    */
   immutable?: boolean | undefined;
+  /**
+   * output file system
+   */
+  outputFileSystem: OutputFileSystem;
 };
 /**
  * @typedef {object} Extra
- * @property {import("fs").Stats=} stats stats
- * @property {number=} errorCode error code
+ * @property {FSStats} stats stats
  * @property {boolean=} immutable true when immutable, otherwise false
+ * @property {OutputFileSystem} outputFileSystem output file system
  */
 /**
  * decodeURIComponent.
@@ -28,13 +34,20 @@ export type Extra = {
  * @param {string} input
  * @returns {string}
  */
+export class FilenameError extends Error {
+  /**
+   * @param {string} message message
+   * @param {number=} code error code
+   */
+  constructor(message: string, code?: number | undefined);
+  statusCode: number | undefined;
+}
 /**
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").FilledContext<Request, Response>} context context
  * @param {string} url url
- * @param {Extra=} extra extra
- * @returns {string | undefined} filename
+ * @returns {FilenameWithExtra | undefined} result of get filename from url
  */
 declare function getFilenameFromUrl<
   Request extends IncomingMessage,
@@ -42,5 +55,4 @@ declare function getFilenameFromUrl<
 >(
   context: import("../index.js").FilledContext<Request, Response>,
   url: string,
-  extra?: Extra | undefined,
-): string | undefined;
+): FilenameWithExtra | undefined;

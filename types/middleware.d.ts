@@ -21,7 +21,14 @@ export type NextFunction = import("./index.js").NextFunction;
 export type IncomingMessage = import("./index.js").IncomingMessage;
 export type ServerResponse = import("./index.js").ServerResponse;
 export type NormalizedHeaders = import("./index.js").NormalizedHeaders;
+export type FilenameError =
+  import("./utils/getFilenameFromUrl.js").FilenameError;
+export type Extra = import("./utils/getFilenameFromUrl.js").Extra;
 export type ReadStream = import("fs").ReadStream;
+export type FilenameWithExtra = {
+  filename: string;
+  extra: Extra;
+};
 /**
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
