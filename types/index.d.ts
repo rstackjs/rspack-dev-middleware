@@ -95,7 +95,7 @@
  * @property {"weak" | "strong"=} etag options to generate etag header
  * @property {boolean=} lastModified options to generate last modified header
  * @property {(boolean | number | string | { maxAge?: number, immutable?: boolean })=} cacheControl options to generate cache headers
- * @property {boolean=} cacheImmutable is cache immutable
+ * @property {boolean=} cacheImmutable enable immutable cache headers for immutable assets (defaults to true when omitted)
  */
 /**
  * @template {IncomingMessage} [RequestInternal=IncomingMessage]
@@ -364,7 +364,7 @@ export type Options<
       )
     | undefined;
   /**
-   * is cache immutable
+   * enable immutable cache headers for immutable assets (defaults to true when omitted)
    */
   cacheImmutable?: boolean | undefined;
 };
