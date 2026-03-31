@@ -127,6 +127,7 @@ const noop = () => {};
  * @property {boolean=} lastModified options to generate last modified header
  * @property {(boolean | number | string | { maxAge?: number, immutable?: boolean })=} cacheControl options to generate cache headers
  * @property {boolean=} cacheImmutable enable immutable cache headers for immutable assets (defaults to true when omitted)
+ * @property {boolean=} forwardError forward errors to the next middleware
  */
 
 /**
@@ -191,6 +192,42 @@ const noop = () => {};
  * @template {keyof T} K
  * @typedef {T & { [P in K]: NonNullable<T[P]> }} WithoutUndefined
  */
+
+/**
+ * @param {import("fs").ReadStream} stream readable stream
+ * @param {(error?: Error) => void} callback callback
+ * @returns {void}
+ */
+function waitUntilStreamReady(stream, callback) {
+  let isResolved = false;
+
+  /**
+   * @param {Error=} error error
+   * @returns {void}
+   */
+  const onEvent = (error) => {
+    if (isResolved) {
+      return;
+    }
+
+    isResolved = true;
+
+    stream.removeListener("error", onEvent);
+    stream.removeListener("readable", onEvent);
+    stream.removeListener("end", onEvent);
+
+    if (error) {
+      stream.destroy();
+    }
+
+    callback(error);
+  };
+
+  stream.once("error", onEvent);
+  stream.once("readable", onEvent);
+  // Empty stream
+  stream.once("end", onEvent);
+}
 
 /**
  * @template {IncomingMessage} [RequestInternal=IncomingMessage]
@@ -435,10 +472,17 @@ function koaWrapper(compiler, options) {
            * @param {import("fs").ReadStream} stream readable stream
            */
           res.stream = (stream) => {
-            ctx.body = stream;
+            waitUntilStreamReady(stream, (error) => {
+              if (error) {
+                reject(error);
+                return;
+              }
 
-            isFinished = true;
-            resolve();
+              ctx.body = stream;
+
+              isFinished = true;
+              resolve();
+            });
           };
           /**
            * @param {string | Buffer} data data
@@ -476,6 +520,10 @@ function koaWrapper(compiler, options) {
         },
       );
     } catch (err) {
+      if (options?.forwardError) {
+        throw err;
+      }
+
       ctx.status =
         /** @type {Error & { statusCode: number }} */ (err).statusCode ||
         /** @type {Error & { status: number }} */ (err).status ||
@@ -602,10 +650,17 @@ function honoWrapper(compiler, options) {
            * @param {import("fs").ReadStream} stream readable stream
            */
           res.stream = (stream) => {
-            body = stream;
+            waitUntilStreamReady(stream, (error) => {
+              if (error) {
+                reject(error);
+                return;
+              }
 
-            isFinished = true;
-            resolve();
+              body = stream;
+
+              isFinished = true;
+              resolve();
+            });
           };
 
           /**
@@ -651,6 +706,10 @@ function honoWrapper(compiler, options) {
         },
       );
     } catch (err) {
+      if (options?.forwardError) {
+        throw err;
+      }
+
       context.status(500);
 
       return context.json({ message: /** @type {Error} */ (err).message });

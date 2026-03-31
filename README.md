@@ -79,6 +79,7 @@ See [below](#other-servers) for examples of use with other servers.
 |        **[`writeToDisk`](#writetodisk)**        |        `boolean\|Function`        |                    `false`                    | Instructs the module to write files to the configured location on disk as specified in your Rspack configuration.    |
 |   **[`outputFileSystem`](#outputfilesystem)**   |             `Object`              | [`memfs`](https://github.com/streamich/memfs) | Set the default file system which will be used by Rspack as primary destination of generated files.                  |
 | **[`modifyResponseData`](#modifyresponsedata)** |            `Function`             |                  `undefined`                  | Allows to set up a callback to change the response data.                                                             |
+|       **[`forwardError`](#forwarderror)**       |             `boolean`             |                    `false`                    | Enable or disable forwarding errors to the next middleware.                                                          |
 
 The middleware accepts an `options` Object. The following is a property reference for the Object.
 
@@ -310,6 +311,33 @@ devMiddleware(compiler, {
     // Your logic
     // Don't use `res.end()` or `res.send()` here
     ({ data, byteLength }),
+});
+```
+
+### forwardError
+
+Type: `Boolean`
+Default: `false`
+
+When enabled, handled errors are forwarded to the next middleware instead of being rendered as the built-in HTML error page.
+This allows Connect/Express/Router and the Koa/Hono wrappers to hand errors to your application's own error middleware.
+Hapi still does not support this option because its request lifecycle does not expose equivalent `next(err)` forwarding semantics.
+
+```js
+const express = require("express");
+const { devMiddleware } = require("@rspack/dev-middleware");
+const { rspack } = require("@rspack/core");
+
+const compiler = rspack({
+  /* Rspack configuration */
+});
+
+const app = express();
+
+app.use(devMiddleware(compiler, { forwardError: true }));
+
+app.use((error, req, res, next) => {
+  res.status(500).send("Something broke!");
 });
 ```
 

@@ -120,6 +120,11 @@ async function frameworkFactory(
     case "koa": {
       // eslint-disable-next-line new-cap
       const app = new framework();
+
+      if (typeof options.setupApp === "function") {
+        options.setupApp(app);
+      }
+
       const koaMiddleware = devMiddleware.koaWrapper(
         compiler,
         devMiddlewareOptions,
@@ -145,8 +150,10 @@ async function frameworkFactory(
     case "hono": {
       // eslint-disable-next-line new-cap
       const app = new framework();
-      const server = await startServer(name, app);
-      const req = request(server);
+
+      if (typeof options.setupApp === "function") {
+        options.setupApp(app);
+      }
       const instance = devMiddleware.honoWrapper(
         compiler,
         devMiddlewareOptions,
@@ -164,11 +171,18 @@ async function frameworkFactory(
         }
       }
 
+      const server = await startServer(name, app);
+      const req = request(server);
+
       return [server, req, instance.devMiddleware];
     }
     default: {
       const isRouter = name === "router";
       const app = framework();
+
+      if (typeof options.setupApp === "function") {
+        options.setupApp(app);
+      }
 
       const instance = devMiddleware(compiler, devMiddlewareOptions);
       const middlewares =
@@ -3601,6 +3615,270 @@ describe.each([
           expect(response3.statusCode).toBe(304);
           expect(response3.headers["last-modified"]).toBeDefined();
           expect(nextWasCalled).toBe(false);
+        });
+      });
+
+      describe("should call the app error middleware for handled errors when forwardError is enabled", () => {
+        let compiler;
+
+        const outputPath = path.resolve(
+          __dirname,
+          "./outputs/basic-test-errors-headers-sent",
+        );
+
+        let nextWasCalled = false;
+        let forwardedError;
+
+        beforeAll(async () => {
+          compiler = getCompiler({
+            ...webpackConfig,
+            output: {
+              filename: "bundle.js",
+              path: outputPath,
+            },
+          });
+
+          [server, req, instance] = await frameworkFactory(
+            name,
+            framework,
+            compiler,
+            {
+              etag: "weak",
+              lastModified: true,
+              forwardError: true,
+            },
+            {
+              setupApp: (app) => {
+                if (name === "hono") {
+                  app.onError((error, c) => {
+                    forwardedError = error;
+                    nextWasCalled = true;
+                    c.status(500);
+
+                    return c.text("error");
+                  });
+                }
+              },
+              setupMiddlewares: (middlewares) => {
+                if (name === "hapi") {
+                  // There's no such thing as "the next route handler" in hapi. One request is matched to one or no route handlers.
+                } else if (name === "koa") {
+                  middlewares.unshift(async (ctx, next) => {
+                    try {
+                      await next();
+                    } catch (error) {
+                      forwardedError = error;
+                      nextWasCalled = true;
+                      ctx.status = 500;
+                      ctx.body = "error";
+                    }
+                  });
+                } else {
+                  middlewares.push((error, _req, res, _next) => {
+                    forwardedError = error;
+                    nextWasCalled = true;
+                    res.statusCode = 500;
+                    res.end("error");
+                  });
+                }
+
+                return middlewares;
+              },
+            },
+          );
+
+          instance.context.outputFileSystem.mkdirSync(outputPath, {
+            recursive: true,
+          });
+          instance.context.outputFileSystem.writeFileSync(
+            path.resolve(outputPath, "index.html"),
+            "HTML",
+          );
+          instance.context.outputFileSystem.writeFileSync(
+            path.resolve(outputPath, "image.svg"),
+            "svg image",
+          );
+          instance.context.outputFileSystem.writeFileSync(
+            path.resolve(outputPath, "file.text"),
+            "text",
+          );
+
+          const originalMethod =
+            instance.context.outputFileSystem.createReadStream;
+
+          instance.context.outputFileSystem.createReadStream =
+            function createReadStream(...args) {
+              if (args[0].endsWith("image.svg")) {
+                const brokenStream = new this.ReadStream(...args);
+
+                brokenStream._read = function _read() {
+                  const error = new Error("test");
+                  error.code = "ENAMETOOLONG";
+                  this.emit("error", error);
+                  this.end();
+                  this.destroy();
+                };
+
+                return brokenStream;
+              }
+
+              return originalMethod(...args);
+            };
+        });
+
+        beforeEach(() => {
+          nextWasCalled = false;
+          forwardedError = undefined;
+        });
+
+        afterAll(async () => {
+          await close(server, instance);
+        });
+
+        it("should work with piping stream", async () => {
+          const response = await req.get("/file.text");
+
+          expect(response.statusCode).toBe(200);
+          expect(nextWasCalled).toBe(false);
+          expect(forwardedError).toBeUndefined();
+        });
+
+        it('should return the "500" code for requests above root', async () => {
+          const response = await req.get("/public/..%2f../middleware.test.js");
+
+          expect(response.statusCode).toBe(500);
+
+          if (name === "hapi") {
+            expect(nextWasCalled).toBe(false);
+            expect(forwardedError).toBeUndefined();
+          } else {
+            if (name !== "hono") {
+              expect(response.text).toBe("error");
+            }
+            expect(nextWasCalled).toBe(true);
+            expect(forwardedError).toBeInstanceOf(Error);
+            expect(forwardedError.statusCode).toBe(403);
+          }
+        });
+
+        it('should return the "500" code for the "GET" request to the bundle file with etag and wrong "if-match" header', async () => {
+          const firstResponse = await req.get("/file.text");
+
+          expect(firstResponse.statusCode).toBe(200);
+          expect(firstResponse.headers.etag).toBeDefined();
+          expect(firstResponse.headers.etag.startsWith("W/")).toBe(true);
+
+          const response = await req.get("/file.text").set("if-match", "test");
+
+          expect(response.statusCode).toBe(500);
+
+          if (name === "hapi") {
+            expect(nextWasCalled).toBe(false);
+            expect(forwardedError).toBeUndefined();
+          } else {
+            if (name !== "hono") {
+              expect(response.text).toBe("error");
+            }
+            expect(nextWasCalled).toBe(true);
+            expect(forwardedError).toBeInstanceOf(Error);
+            expect(forwardedError.statusCode).toBe(412);
+          }
+        });
+
+        it('should return the "500" code for the "GET" request with the invalid range header', async () => {
+          const response = await req
+            .get("/file.text")
+            .set("Range", "bytes=9999999-");
+
+          expect(response.statusCode).toBe(500);
+
+          if (name === "hapi") {
+            expect(nextWasCalled).toBe(false);
+            expect(forwardedError).toBeUndefined();
+          } else {
+            if (name !== "hono") {
+              expect(response.text).toBe("error");
+            }
+            expect(nextWasCalled).toBe(true);
+            expect(forwardedError).toBeInstanceOf(Error);
+            expect(forwardedError.statusCode).toBe(416);
+          }
+        });
+
+        it('should return the "500" code for the "GET" request to the "image.svg" file when it throws a reading error', async () => {
+          const response = await req.get("/image.svg");
+
+          expect(response.statusCode).toBe(500);
+
+          if (name === "hapi") {
+            expect(nextWasCalled).toBe(false);
+            expect(forwardedError).toBeUndefined();
+          } else {
+            if (name !== "hono") {
+              expect(response.text).toBe("error");
+            }
+            expect(nextWasCalled).toBe(true);
+            expect(forwardedError).toBeInstanceOf(Error);
+            expect(forwardedError.statusCode).toBe(404);
+          }
+        });
+
+        it('should return the "200" code for the "HEAD" request to the bundle file', async () => {
+          const response = await req.head("/file.text");
+
+          expect(response.statusCode).toBe(200);
+          expect(response.text).toBeUndefined();
+          expect(nextWasCalled).toBe(false);
+          expect(forwardedError).toBeUndefined();
+        });
+
+        it('should return the "304" code for the "GET" request to the bundle file with etag and "if-none-match"', async () => {
+          const firstResponse = await req.get("/file.text");
+
+          expect(firstResponse.statusCode).toBe(200);
+          expect(firstResponse.headers.etag).toBeDefined();
+          expect(firstResponse.headers.etag.startsWith("W/")).toBe(true);
+
+          const secondResponse = await req
+            .get("/file.text")
+            .set("if-none-match", firstResponse.headers.etag);
+
+          expect(secondResponse.statusCode).toBe(304);
+          expect(secondResponse.headers.etag).toBeDefined();
+          expect(secondResponse.headers.etag.startsWith("W/")).toBe(true);
+
+          const thirdResponse = await req
+            .get("/file.text")
+            .set("if-none-match", firstResponse.headers.etag);
+
+          expect(thirdResponse.statusCode).toBe(304);
+          expect(thirdResponse.headers.etag).toBeDefined();
+          expect(thirdResponse.headers.etag.startsWith("W/")).toBe(true);
+          expect(nextWasCalled).toBe(false);
+          expect(forwardedError).toBeUndefined();
+        });
+
+        it('should return the "304" code for the "GET" request to the bundle file with lastModified and "if-modified-since" header', async () => {
+          const firstResponse = await req.get("/file.text");
+
+          expect(firstResponse.statusCode).toBe(200);
+          expect(firstResponse.headers["last-modified"]).toBeDefined();
+
+          const secondResponse = await req
+            .get("/file.text")
+            .set("if-modified-since", firstResponse.headers["last-modified"]);
+
+          expect(secondResponse.statusCode).toBe(304);
+          expect(secondResponse.headers["last-modified"]).toBeDefined();
+
+          const thirdResponse = await req
+            .get("/file.text")
+            .set("if-modified-since", secondResponse.headers["last-modified"]);
+
+          expect(thirdResponse.statusCode).toBe(304);
+          expect(thirdResponse.headers["last-modified"]).toBeDefined();
+          expect(nextWasCalled).toBe(false);
+          expect(forwardedError).toBeUndefined();
         });
       });
 

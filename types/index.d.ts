@@ -96,6 +96,7 @@
  * @property {boolean=} lastModified options to generate last modified header
  * @property {(boolean | number | string | { maxAge?: number, immutable?: boolean })=} cacheControl options to generate cache headers
  * @property {boolean=} cacheImmutable enable immutable cache headers for immutable assets (defaults to true when omitted)
+ * @property {boolean=} forwardError forward errors to the next middleware
  */
 /**
  * @template {IncomingMessage} [RequestInternal=IncomingMessage]
@@ -367,6 +368,10 @@ export type Options<
    * enable immutable cache headers for immutable assets (defaults to true when omitted)
    */
   cacheImmutable?: boolean | undefined;
+  /**
+   * forward errors to the next middleware
+   */
+  forwardError?: boolean | undefined;
 };
 export type Middleware<
   RequestInternal extends IncomingMessage = import("http").IncomingMessage,
