@@ -580,13 +580,15 @@ app.use((req, res) => {
 
 Examples of use with other servers will follow here.
 
-### Connect
+### connect-next
+
+[connect-next](https://github.com/rstackjs/connect-next) is an actively maintained fork of Connect.
 
 ```js
 import { createServer } from "node:http";
 import { rspack } from "@rspack/core";
 import { devMiddleware } from "@rspack/dev-middleware";
-import connect from "connect";
+import { connect } from "connect-next";
 import rspackConfig from "./rspack.config.js";
 
 const compiler = rspack(rspackConfig);
