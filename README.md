@@ -457,9 +457,21 @@ const app = new express();
 app.use(instance);
 
 instance.waitUntilValid(() => {
-  const filename = instance.getFilenameFromUrl("/bundle.js");
+  let resolved;
 
-  console.log(`Filename is ${filename}`);
+  try {
+    resolved = instance.getFilenameFromUrl("/bundle.js");
+  } catch (error) {
+    console.error(error);
+    return;
+  }
+
+  if (!resolved) {
+    console.log("Not found");
+    return;
+  }
+
+  console.log(`Filename is ${resolved.filename}`);
 });
 ```
 

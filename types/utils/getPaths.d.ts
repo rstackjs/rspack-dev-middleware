@@ -5,6 +5,7 @@ export type MultiStats = import("@rspack/core").MultiStats;
 export type Asset = import("@rspack/core").Asset;
 export type DevServerOption = import("../index.js").DevServerOption;
 export type IncomingMessage = import("../index.js").IncomingMessage;
+export type OutputFileSystem = import("../index.js").OutputFileSystem;
 export type ServerResponse = import("../index.js").ServerResponse;
 /** @typedef {import("@rspack/core").Compiler} Compiler */
 /** @typedef {import("@rspack/core").Stats} Stats */
@@ -12,12 +13,13 @@ export type ServerResponse = import("../index.js").ServerResponse;
 /** @typedef {import("@rspack/core").Asset} Asset */
 /** @typedef {import("../index.js").DevServerOption} DevServerOption */
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
+/** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
 /** @typedef {import("../index.js").ServerResponse} ServerResponse */
 /**
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").FilledContext<Request, Response>} context context
- * @returns {{ outputPath: string, publicPath: string, assetsInfo: Map<string, Asset["info"]> | undefined }[]} paths
+ * @returns {{ outputPath: string, outputFileSystem: OutputFileSystem, publicPath: string, assetsInfo: Map<string, Asset["info"]> | undefined }[]} paths
  */
 declare function getPaths<
   Request extends IncomingMessage,
@@ -26,6 +28,7 @@ declare function getPaths<
   context: import("../index.js").FilledContext<Request, Response>,
 ): {
   outputPath: string;
+  outputFileSystem: OutputFileSystem;
   publicPath: string;
   assetsInfo: Map<string, Asset["info"]> | undefined;
 }[];

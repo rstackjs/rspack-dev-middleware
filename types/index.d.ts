@@ -101,17 +101,16 @@
  * @template {IncomingMessage} [RequestInternal=IncomingMessage]
  * @template {ServerResponse} [ResponseInternal=ServerResponse]
  * @callback Middleware
- * @param {RequestInternal} req
- * @param {ResponseInternal} res
- * @param {NextFunction} next
+ * @param {RequestInternal} req request
+ * @param {ResponseInternal} res response
+ * @param {NextFunction} next next function
  * @returns {Promise<void>}
  */
 /** @typedef {import("./utils/getFilenameFromUrl.js").Extra} Extra */
 /**
  * @callback GetFilenameFromUrl
- * @param {string} url
- * @param {Extra=} extra
- * @returns {string | undefined}
+ * @param {string} url request URL
+ * @returns {{ filename: string, extra: Extra } | undefined} a filename with additional information, or `undefined` if nothing is found
  */
 /**
  * @callback WaitUntilValid
@@ -377,10 +376,12 @@ export type Middleware<
   next: NextFunction,
 ) => Promise<void>;
 export type Extra = import("./utils/getFilenameFromUrl.js").Extra;
-export type GetFilenameFromUrl = (
-  url: string,
-  extra?: Extra | undefined,
-) => string | undefined;
+export type GetFilenameFromUrl = (url: string) =>
+  | {
+      filename: string;
+      extra: Extra;
+    }
+  | undefined;
 export type WaitUntilValid = (callback: Callback) => any;
 export type Invalidate = (callback: Callback) => any;
 export type Close = (callback: (err: Error | null | undefined) => void) => any;

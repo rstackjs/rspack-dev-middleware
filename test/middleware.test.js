@@ -16,6 +16,7 @@ import router from "router";
 import request from "supertest";
 
 import { devMiddleware } from "../src/index.js";
+import { FilenameError } from "../src/utils/getFilenameFromUrl.js";
 
 import webpackMultiConfig from "./fixtures/webpack.array.config.js";
 import webpackMultiDevServerFalseConfig from "./fixtures/webpack.array.dev-server-false.js";
@@ -587,16 +588,22 @@ describe.each([
           it("should work", async () => {
             await waitUntilValid(instance);
 
-            expect(instance.getFilenameFromUrl("/bundle.js")).toBe(
+            const bundle = instance.getFilenameFromUrl("/bundle.js");
+
+            expect(bundle.filename).toBe(
               path.join(webpackConfig.output.path, "/bundle.js"),
             );
-            expect(instance.getFilenameFromUrl("/")).toBe(
+            expect(bundle.extra.outputFileSystem).toBe(
+              instance.context.outputFileSystem,
+            );
+            expect(bundle.extra.stats.isFile()).toBe(true);
+            expect(instance.getFilenameFromUrl("/").filename).toBe(
               path.join(webpackConfig.output.path, "/index.html"),
             );
-            expect(instance.getFilenameFromUrl("/index.html")).toBe(
+            expect(instance.getFilenameFromUrl("/index.html").filename).toBe(
               path.join(webpackConfig.output.path, "/index.html"),
             );
-            expect(instance.getFilenameFromUrl("/svg.svg")).toBe(
+            expect(instance.getFilenameFromUrl("/svg.svg").filename).toBe(
               path.join(webpackConfig.output.path, "/svg.svg"),
             );
             expect(
@@ -629,15 +636,15 @@ describe.each([
           it("should work", async () => {
             await waitUntilValid(instance);
 
-            expect(instance.getFilenameFromUrl("/bundle.js")).toBe(
+            expect(instance.getFilenameFromUrl("/bundle.js").filename).toBe(
               path.join(webpackConfig.output.path, "/bundle.js"),
             );
 
             expect(instance.getFilenameFromUrl("/")).toBeUndefined();
-            expect(instance.getFilenameFromUrl("/index.html")).toBe(
+            expect(instance.getFilenameFromUrl("/index.html").filename).toBe(
               path.join(webpackConfig.output.path, "/index.html"),
             );
-            expect(instance.getFilenameFromUrl("/svg.svg")).toBe(
+            expect(instance.getFilenameFromUrl("/svg.svg").filename).toBe(
               path.join(webpackConfig.output.path, "/svg.svg"),
             );
             expect(
@@ -667,18 +674,22 @@ describe.each([
           it("should work", async () => {
             await waitUntilValid(instance);
 
-            expect(instance.getFilenameFromUrl("/public/path/bundle.js")).toBe(
+            expect(
+              instance.getFilenameFromUrl("/public/path/bundle.js").filename,
+            ).toBe(
               path.join(webpackPublicPathConfig.output.path, "/bundle.js"),
             );
-            expect(instance.getFilenameFromUrl("/public/path/")).toBe(
+            expect(instance.getFilenameFromUrl("/public/path/").filename).toBe(
               path.join(webpackPublicPathConfig.output.path, "/index.html"),
             );
-            expect(instance.getFilenameFromUrl("/public/path/index.html")).toBe(
+            expect(
+              instance.getFilenameFromUrl("/public/path/index.html").filename,
+            ).toBe(
               path.join(webpackPublicPathConfig.output.path, "/index.html"),
             );
-            expect(instance.getFilenameFromUrl("/public/path/svg.svg")).toBe(
-              path.join(webpackPublicPathConfig.output.path, "/svg.svg"),
-            );
+            expect(
+              instance.getFilenameFromUrl("/public/path/svg.svg").filename,
+            ).toBe(path.join(webpackPublicPathConfig.output.path, "/svg.svg"));
 
             expect(instance.getFilenameFromUrl("/")).toBeUndefined();
             expect(
@@ -708,18 +719,18 @@ describe.each([
           it("should work", async () => {
             await waitUntilValid(instance);
 
-            expect(instance.getFilenameFromUrl("/static-one/bundle.js")).toBe(
-              path.join(webpackMultiConfig[0].output.path, "/bundle.js"),
-            );
-            expect(instance.getFilenameFromUrl("/static-one/")).toBe(
+            expect(
+              instance.getFilenameFromUrl("/static-one/bundle.js").filename,
+            ).toBe(path.join(webpackMultiConfig[0].output.path, "/bundle.js"));
+            expect(instance.getFilenameFromUrl("/static-one/").filename).toBe(
               path.join(webpackMultiConfig[0].output.path, "/index.html"),
             );
-            expect(instance.getFilenameFromUrl("/static-one/index.html")).toBe(
-              path.join(webpackMultiConfig[0].output.path, "/index.html"),
-            );
-            expect(instance.getFilenameFromUrl("/static-one/svg.svg")).toBe(
-              path.join(webpackMultiConfig[0].output.path, "/svg.svg"),
-            );
+            expect(
+              instance.getFilenameFromUrl("/static-one/index.html").filename,
+            ).toBe(path.join(webpackMultiConfig[0].output.path, "/index.html"));
+            expect(
+              instance.getFilenameFromUrl("/static-one/svg.svg").filename,
+            ).toBe(path.join(webpackMultiConfig[0].output.path, "/svg.svg"));
             expect(
               instance.getFilenameFromUrl("/static-one/unknown.unknown"),
             ).toBeUndefined();
@@ -729,9 +740,9 @@ describe.each([
               ),
             ).toBeUndefined();
 
-            expect(instance.getFilenameFromUrl("/static-two/bundle.js")).toBe(
-              path.join(webpackMultiConfig[1].output.path, "/bundle.js"),
-            );
+            expect(
+              instance.getFilenameFromUrl("/static-two/bundle.js").filename,
+            ).toBe(path.join(webpackMultiConfig[1].output.path, "/bundle.js"));
             expect(
               instance.getFilenameFromUrl("/static-two/unknown.unknown"),
             ).toBeUndefined();
@@ -750,6 +761,68 @@ describe.each([
                 "/static-one/unknown/unknown.unknown",
               ),
             ).toBeUndefined();
+          });
+        });
+
+        describe("should throw typed errors", () => {
+          beforeEach(async () => {
+            compiler = getCompiler(webpackConfig);
+
+            [server, req, instance] = await frameworkFactory(
+              name,
+              framework,
+              compiler,
+            );
+          });
+
+          afterEach(async () => {
+            await close(server, instance);
+          });
+
+          it("should throw for malicious paths and null bytes", async () => {
+            await waitUntilValid(instance);
+
+            try {
+              instance.getFilenameFromUrl("/..%2f../middleware.test.js");
+              throw new Error("Expected getFilenameFromUrl to throw");
+            } catch (error) {
+              expect(error).toBeInstanceOf(FilenameError);
+              expect(error.statusCode).toBe(403);
+            }
+
+            try {
+              instance.getFilenameFromUrl("/%00");
+              throw new Error("Expected getFilenameFromUrl to throw");
+            } catch (error) {
+              expect(error).toBeInstanceOf(FilenameError);
+              expect(error.statusCode).toBe(400);
+            }
+          });
+
+          it("should rethrow unexpected fs errors", async () => {
+            await waitUntilValid(instance);
+
+            const statSync = rs
+              .spyOn(instance.context.outputFileSystem, "statSync")
+              .mockImplementation(() => {
+                const error = /** @type {NodeJS.ErrnoException} */ (
+                  new Error("boom")
+                );
+
+                error.code = "EACCES";
+
+                throw error;
+              });
+
+            try {
+              instance.getFilenameFromUrl("/bundle.js");
+              throw new Error("Expected getFilenameFromUrl to throw");
+            } catch (error) {
+              expect(error).toBeInstanceOf(Error);
+              expect(error.message).toBe("boom");
+            } finally {
+              statSync.mockRestore();
+            }
           });
         });
       });
@@ -1292,7 +1365,7 @@ describe.each([
         });
       });
 
-      describe('should not work with the broken "publicPath" option', () => {
+      describe('should work with the broken "publicPath" option (malformed URI parsed as "/")', () => {
         let compiler;
 
         const outputPath = path.resolve(__dirname, "./outputs/basic");
@@ -1303,7 +1376,7 @@ describe.each([
             output: {
               filename: "bundle.js",
               path: outputPath,
-              publicPath: "https://test:malfor%5Med@test.example.com",
+              publicPath: "http/s://test:malformed%5Med@test.example.com",
             },
           });
 
