@@ -39,9 +39,9 @@ bun add -D @rspack/dev-middleware
 ## Usage
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
 
 const compiler = rspack({
   // Rspack options
@@ -253,7 +253,7 @@ This option also accepts a `Function` value, which can be used to filter which f
 The function follows the same premise as [`Array#filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) in which a return value of `false` _will not_ write the file, and a return value of `true` _will_ write the file to disk. eg.
 
 ```js
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
 
 const configuration = {
   /* Rspack configuration */
@@ -273,16 +273,16 @@ Default: [memfs](https://github.com/streamich/memfs)
 Set the default file system which will be used by Rspack as primary destination of generated files.
 This option isn't affected by the [writeToDisk](#writeToDisk) option.
 
-This can be done simply by using `path.join`:
+This can be done simply by using `node:path`'s `join`:
 
 ```js
-const path = require("node:path");
-const mkdirp = require("mkdirp");
-const myOutputFileSystem = require("my-fs");
-const { rspack } = require("@rspack/core");
+import { join } from "node:path";
+import { rspack } from "@rspack/core";
+import mkdirp from "mkdirp";
+import myOutputFileSystem from "my-fs";
 
-myOutputFileSystem.join = path.join.bind(path); // no need to bind
-myOutputFileSystem.mkdirp = mkdirp.bind(mkdirp); // no need to bind
+myOutputFileSystem.join = join;
+myOutputFileSystem.mkdirp = mkdirp;
 
 const compiler = rspack({
   /* Rspack configuration */
@@ -296,7 +296,7 @@ devMiddleware(compiler, { outputFileSystem: myOutputFileSystem });
 Allows to set up a callback to change the response data.
 
 ```js
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
 
 const configuration = {
   /* Rspack configuration */
@@ -332,9 +332,9 @@ Required: `No`
 A function executed once the middleware has stopped watching.
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
 
 const compiler = rspack({
   /* Rspack configuration */
@@ -342,8 +342,7 @@ const compiler = rspack({
 
 const instance = devMiddleware(compiler);
 
-// eslint-disable-next-line new-cap
-const app = new express();
+const app = express();
 
 app.use(instance);
 
@@ -367,9 +366,9 @@ Required: `No`
 A function executed once the middleware has invalidated.
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
 
 const compiler = rspack({
   /* Rspack configuration */
@@ -377,8 +376,7 @@ const compiler = rspack({
 
 const instance = devMiddleware(compiler);
 
-// eslint-disable-next-line new-cap
-const app = new express();
+const app = express();
 
 app.use(instance);
 
@@ -407,9 +405,9 @@ A function executed when the bundle becomes valid.
 If the bundle is valid at the time of calling, the callback is executed immediately.
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
 
 const compiler = rspack({
   /* Rspack configuration */
@@ -417,8 +415,7 @@ const compiler = rspack({
 
 const instance = devMiddleware(compiler);
 
-// eslint-disable-next-line new-cap
-const app = new express();
+const app = express();
 
 app.use(instance);
 
@@ -441,9 +438,9 @@ Required: `Yes`
 URL for the requested file.
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
 
 const compiler = rspack({
   /* Rspack configuration */
@@ -451,8 +448,7 @@ const compiler = rspack({
 
 const instance = devMiddleware(compiler);
 
-// eslint-disable-next-line new-cap
-const app = new express();
+const app = express();
 
 app.use(instance);
 
@@ -484,9 +480,9 @@ Since `output.publicPath` and `output.filename`/`output.chunkFilename` can be dy
 But there is a solution to avoid it - mount the middleware to a non-root route, for example:
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const { rspack } = require("@rspack/core");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
 
 const compiler = rspack({
   // Rspack options
@@ -525,17 +521,17 @@ process is finished with server-side rendering enabled._
 Example Implementation:
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const isObject = require("is-object");
-const { rspack } = require("@rspack/core");
+import { join } from "node:path";
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
+import isObject from "is-object";
 
 const compiler = rspack({
   /* Rspack configuration */
 });
 
-// eslint-disable-next-line new-cap
-const app = new express();
+const app = express();
 
 // This function makes server rendering of asset references consistent with different Rspack chunk/entry configurations
 function normalizeAssets(assets) {
@@ -563,16 +559,16 @@ app.use((req, res) => {
     <title>My App</title>
     <style>
     ${normalizeAssets(assetsByChunkName.main)
-      .filter((path) => path.endsWith(".css"))
-      .map((path) => outputFileSystem.readFileSync(path.join(outputPath, path)))
+      .filter((asset) => asset.endsWith(".css"))
+      .map((asset) => outputFileSystem.readFileSync(join(outputPath, asset)))
       .join("\n")}
     </style>
   </head>
   <body>
     <div id="root"></div>
     ${normalizeAssets(assetsByChunkName.main)
-      .filter((path) => path.endsWith(".js"))
-      .map((path) => `<script src="${path}"></script>`)
+      .filter((asset) => asset.endsWith(".js"))
+      .map((asset) => `<script src="${asset}"></script>`)
       .join("\n")}
   </body>
 </html>
@@ -587,11 +583,11 @@ Examples of use with other servers will follow here.
 ### Connect
 
 ```js
-const http = require("node:http");
-const { devMiddleware } = require("@rspack/dev-middleware");
-const connect = require("connect");
-const { rspack } = require("@rspack/core");
-const rspackConfig = require("./rspack.config.js");
+import { createServer } from "node:http";
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import connect from "connect";
+import rspackConfig from "./rspack.config.js";
 
 const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
@@ -601,18 +597,18 @@ const app = connect();
 
 app.use(devMiddleware(compiler, devMiddlewareOptions));
 
-http.createServer(app).listen(3000);
+createServer(app).listen(3000);
 ```
 
 ### Router
 
 ```js
-const http = require("node:http");
-const { devMiddleware } = require("@rspack/dev-middleware");
-const finalhandler = require("finalhandler");
-const Router = require("router");
-const { rspack } = require("@rspack/core");
-const rspackConfig = require("./rspack.config.js");
+import { createServer } from "node:http";
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import finalhandler from "finalhandler";
+import Router from "router";
+import rspackConfig from "./rspack.config.js";
 
 const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
@@ -624,7 +620,7 @@ const router = Router();
 
 router.use(devMiddleware(compiler, devMiddlewareOptions));
 
-const server = http.createServer((req, res) => {
+const server = createServer((req, res) => {
   router(req, res, finalhandler(req, res));
 });
 
@@ -634,10 +630,10 @@ server.listen(3000);
 ### Express
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const express = require("express");
-const { rspack } = require("@rspack/core");
-const rspackConfig = require("./rspack.config.js");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import express from "express";
+import rspackConfig from "./rspack.config.js";
 
 const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
@@ -653,10 +649,10 @@ app.listen(3000, () => console.log("Example app listening on port 3000!"));
 ### Koa
 
 ```js
-const { devMiddleware } = require("@rspack/dev-middleware");
-const Koa = require("koa");
-const { rspack } = require("@rspack/core");
-const rspackConfig = require("./rspack.simple.config");
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import Koa from "koa";
+import rspackConfig from "./rspack.simple.config.js";
 
 const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {
@@ -664,7 +660,7 @@ const devMiddlewareOptions = {
 };
 const app = new Koa();
 
-app.use(middleware.koaWrapper(compiler, devMiddlewareOptions));
+app.use(devMiddleware.koaWrapper(compiler, devMiddlewareOptions));
 
 app.listen(3000);
 ```
@@ -672,10 +668,10 @@ app.listen(3000);
 ### Hapi
 
 ```js
-const Hapi = require("@hapi/hapi");
-const { devMiddleware } = require("@rspack/dev-middleware");
-const { rspack } = require("@rspack/core");
-const rspackConfig = require("./rspack.config.js");
+import Hapi from "@hapi/hapi";
+import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import rspackConfig from "./rspack.config.js";
 
 const compiler = rspack(rspackConfig);
 const devMiddlewareOptions = {};
@@ -704,10 +700,10 @@ process.on("unhandledRejection", (err) => {
 ### Hono
 
 ```js
-import { serve } from "@hono/node-server";
-import devMiddleware from "@rspack/dev-middleware";
-import { Hono } from "hono";
 import { rspack } from "@rspack/core";
+import { devMiddleware } from "@rspack/dev-middleware";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
 import rspackConfig from "./rspack.config.js";
 
 const compiler = rspack(rspackConfig);
