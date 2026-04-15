@@ -99,9 +99,9 @@ function getFilenameFromUrl(context, url) {
   }
 
   for (const {
+    compilation,
     publicPath,
     outputPath,
-    assetsInfo,
     outputFileSystem,
   } of paths) {
     /** @type {string | undefined} */
@@ -144,6 +144,32 @@ function getFilenameFromUrl(context, url) {
         pathname.slice(publicPathPathname.length),
       );
 
+      /** @type {boolean | undefined} */
+      let immutable = undefined;
+
+      /**
+       * @returns {boolean} immutable
+       */
+      const getImmutable = () => {
+        if (immutable === undefined) {
+          const assetName = pathname.slice(publicPathPathname.length);
+          immutable = Boolean(compilation.getAsset(assetName)?.info?.immutable);
+        }
+        return immutable;
+      };
+
+      /**
+       * @param {FSStats} stats stats
+       * @returns {Extra} extra
+       */
+      const createExtra = (stats) => ({
+        get immutable() {
+          return getImmutable();
+        },
+        outputFileSystem,
+        stats,
+      });
+
       /**
        * @param {string} filename filename
        * @param {Set<string>=} visited visited filenames
@@ -182,17 +208,10 @@ function getFilenameFromUrl(context, url) {
           return resolveIndex(filename, visited);
         }
 
-        /** @type {Extra} */
-        const extra = {
-          immutable: assetsInfo
-            ? assetsInfo.get(pathname.slice(publicPathPathname.length))
-                ?.immutable
-            : false,
-          outputFileSystem,
-          stats: /** @type {FSStats} */ (stats),
+        return {
+          filename,
+          extra: createExtra(/** @type {FSStats} */ (stats)),
         };
-
-        return { filename, extra };
       };
 
       /**
@@ -221,17 +240,10 @@ function getFilenameFromUrl(context, url) {
           return;
         }
 
-        /** @type {Extra} */
-        const extra = {
-          immutable: assetsInfo
-            ? assetsInfo.get(pathname.slice(publicPathPathname.length))
-                ?.immutable
-            : false,
-          outputFileSystem,
-          stats: /** @type {FSStats} */ (stats),
+        return {
+          filename,
+          extra: createExtra(/** @type {FSStats} */ (stats)),
         };
-
-        return { filename, extra };
       };
 
       if (index.length > 0 && pathname.endsWith("/")) {

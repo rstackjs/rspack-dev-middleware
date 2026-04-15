@@ -1,7 +1,7 @@
 /** @typedef {import("@rspack/core").Compiler} Compiler */
+/** @typedef {import("@rspack/core").Compilation} Compilation */
 /** @typedef {import("@rspack/core").Stats} Stats */
 /** @typedef {import("@rspack/core").MultiStats} MultiStats */
-/** @typedef {import("@rspack/core").Asset} Asset */
 /** @typedef {import("../index.js").DevServerOption} DevServerOption */
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
@@ -11,7 +11,7 @@
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
  * @param {import("../index.js").FilledContext<Request, Response>} context context
- * @returns {{ outputPath: string, outputFileSystem: OutputFileSystem, publicPath: string, assetsInfo: Map<string, Asset["info"]> | undefined }[]} paths
+ * @returns {{ compilation: Compilation, outputPath: string, outputFileSystem: OutputFileSystem, publicPath: string }[]} paths
  */
 function getPaths(context) {
   const { stats, options } = context;
@@ -22,7 +22,7 @@ function getPaths(context) {
     (stats).stats
       ? /** @type {MultiStats} */ (stats).stats
       : [/** @type {Stats} */ (stats)];
-  /** @type {{ outputPath: string, outputFileSystem: OutputFileSystem, publicPath: string, assetsInfo: Map<string, Asset["info"]> | undefined }[]} */
+  /** @type {{ compilation: Compilation, outputPath: string, outputFileSystem: OutputFileSystem, publicPath: string }[]} */
   const publicPaths = [];
 
   for (const { compilation } of childStats) {
@@ -44,19 +44,16 @@ function getPaths(context) {
             /** @type {any} */ (compilation.outputOptions.publicPath),
           )
         : "";
-    const assetsInfo = new Map(
-      compilation.getAssets().map((asset) => [asset.name, asset.info]),
-    );
     const { outputFileSystem } =
       /** @type {Compiler & { outputFileSystem: OutputFileSystem }} */ (
         compilation.compiler
       );
 
     publicPaths.push({
+      compilation,
       outputPath,
       outputFileSystem,
       publicPath,
-      assetsInfo,
     });
   }
 
