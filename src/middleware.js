@@ -621,8 +621,7 @@ function wrapper(context) {
 
       if (!getResponseHeader(res, "Cache-Control")) {
         const { cacheControl, cacheImmutable } = context.options;
-        const useImmutableCache =
-          (cacheImmutable === undefined || cacheImmutable) && extra.immutable;
+        const useImmutableCache = cacheImmutable === true && extra.immutable;
 
         let cacheControlValue;
 

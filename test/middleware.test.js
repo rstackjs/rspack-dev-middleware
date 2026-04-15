@@ -6262,6 +6262,7 @@ describe.each([
             name,
             framework,
             compiler,
+            { cacheImmutable: true },
           );
         });
 
@@ -6306,6 +6307,7 @@ describe.each([
             name,
             framework,
             compiler,
+            { cacheImmutable: true },
           );
         });
 
@@ -6350,7 +6352,7 @@ describe.each([
             name,
             framework,
             compiler,
-            { cacheControl: 1000000 },
+            { cacheImmutable: true, cacheControl: 1000000 },
           );
         });
 
@@ -6603,7 +6605,7 @@ describe.each([
         });
       });
 
-      describe("should use cacheControl object option with explicit immutable false", () => {
+      describe("should use cacheControl object option with explicit immutable false when cacheImmutable is not enabled", () => {
         beforeEach(async () => {
           const compiler = getCompiler({
             ...webpackConfigImmutable,
@@ -6634,7 +6636,7 @@ describe.each([
           );
         });
 
-        it('should return the "200" code for the "GET" request to the immutable asset and generate `Cache-Control` header for the immutable asset by default', async () => {
+        it('should return the "200" code for the "GET" request to the immutable asset and generate `Cache-Control` header from cacheControl without immutable', async () => {
           await req.get("/main.js");
 
           const response = await req.get(
@@ -6644,7 +6646,7 @@ describe.each([
           expect(response.statusCode).toBe(200);
           expect(response.headers["cache-control"]).toBeDefined();
           expect(response.headers["cache-control"]).toBe(
-            "public, max-age=31536000, immutable",
+            "public, max-age=3000",
           );
         });
       });
