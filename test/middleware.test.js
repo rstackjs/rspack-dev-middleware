@@ -1180,32 +1180,38 @@ describe.each([
         });
 
         it('should return the "206" code for the "GET" request with the valid range header', async () => {
+          const contentSize = Buffer.byteLength(codeContent);
+          const rangeEnd = Math.min(3500, contentSize - 1);
+          const rangeLength = rangeEnd - 3000 + 1;
           const response = await req
             .get("/bundle.js")
             .set("Range", "bytes=3000-3500");
 
           expect(response.statusCode).toBe(206);
           expect(response.headers["content-range"]).toBe(
-            `bytes 3000-3500/${Buffer.byteLength(codeContent)}`,
+            `bytes 3000-${rangeEnd}/${contentSize}`,
           );
-          expect(response.headers["content-length"]).toBe("501");
+          expect(response.headers["content-length"]).toBe(String(rangeLength));
           expect(response.headers["content-type"]).toEqual(
             getContentTypeHeader(),
           );
-          expect(response.text).toBe(codeContent.slice(3000, 3501));
-          expect(response.text).toHaveLength(501);
+          expect(response.text).toBe(codeContent.slice(3000, rangeEnd + 1));
+          expect(response.text).toHaveLength(rangeLength);
         });
 
         it('should return the "206" code for the "HEAD" request with the valid range header', async () => {
+          const contentSize = Buffer.byteLength(codeContent);
+          const rangeEnd = Math.min(3500, contentSize - 1);
+          const rangeLength = rangeEnd - 3000 + 1;
           const response = await req
             .head("/bundle.js")
             .set("Range", "bytes=3000-3500");
 
           expect(response.statusCode).toBe(206);
           expect(response.headers["content-range"]).toBe(
-            `bytes 3000-3500/${Buffer.byteLength(codeContent)}`,
+            `bytes 3000-${rangeEnd}/${contentSize}`,
           );
-          expect(response.headers["content-length"]).toBe("501");
+          expect(response.headers["content-length"]).toBe(String(rangeLength));
           expect(response.headers["content-type"]).toEqual(
             getContentTypeHeader(),
           );
@@ -1213,54 +1219,63 @@ describe.each([
         });
 
         it('should return the "206" code for the "GET" request with the valid range header (lowercase)', async () => {
+          const contentSize = Buffer.byteLength(codeContent);
+          const rangeEnd = Math.min(3500, contentSize - 1);
+          const rangeLength = rangeEnd - 3000 + 1;
           const response = await req
             .get("/bundle.js")
             .set("range", "bytes=3000-3500");
 
           expect(response.statusCode).toBe(206);
           expect(response.headers["content-range"]).toBe(
-            `bytes 3000-3500/${Buffer.byteLength(codeContent)}`,
+            `bytes 3000-${rangeEnd}/${contentSize}`,
           );
-          expect(response.headers["content-length"]).toBe("501");
+          expect(response.headers["content-length"]).toBe(String(rangeLength));
           expect(response.headers["content-type"]).toEqual(
             getContentTypeHeader(),
           );
-          expect(response.text).toBe(codeContent.slice(3000, 3501));
-          expect(response.text).toHaveLength(501);
+          expect(response.text).toBe(codeContent.slice(3000, rangeEnd + 1));
+          expect(response.text).toHaveLength(rangeLength);
         });
 
         it('should return the "206" code for the "GET" request with the valid range header (uppercase)', async () => {
+          const contentSize = Buffer.byteLength(codeContent);
+          const rangeEnd = Math.min(3500, contentSize - 1);
+          const rangeLength = rangeEnd - 3000 + 1;
           const response = await req
             .get("/bundle.js")
             .set("RANGE", "BYTES=3000-3500");
 
           expect(response.statusCode).toBe(206);
           expect(response.headers["content-range"]).toBe(
-            `bytes 3000-3500/${Buffer.byteLength(codeContent)}`,
+            `bytes 3000-${rangeEnd}/${contentSize}`,
           );
-          expect(response.headers["content-length"]).toBe("501");
+          expect(response.headers["content-length"]).toBe(String(rangeLength));
           expect(response.headers["content-type"]).toEqual(
             getContentTypeHeader(),
           );
-          expect(response.text).toBe(codeContent.slice(3000, 3501));
-          expect(response.text).toHaveLength(501);
+          expect(response.text).toBe(codeContent.slice(3000, rangeEnd + 1));
+          expect(response.text).toHaveLength(rangeLength);
         });
 
         it('should return the "206" code for the "GET" request with the valid range header when range starts with 0', async () => {
+          const contentSize = Buffer.byteLength(codeContent);
+          const rangeEnd = Math.min(3500, contentSize - 1);
+          const rangeLength = rangeEnd + 1;
           const response = await req
             .get("/bundle.js")
             .set("Range", "bytes=0-3500");
 
           expect(response.statusCode).toBe(206);
           expect(response.headers["content-range"]).toBe(
-            `bytes 0-3500/${Buffer.byteLength(codeContent)}`,
+            `bytes 0-${rangeEnd}/${contentSize}`,
           );
-          expect(response.headers["content-length"]).toBe("3501");
+          expect(response.headers["content-length"]).toBe(String(rangeLength));
           expect(response.headers["content-type"]).toEqual(
             getContentTypeHeader(),
           );
-          expect(response.text).toBe(codeContent.slice(0, 3501));
-          expect(response.text).toHaveLength(3501);
+          expect(response.text).toBe(codeContent.slice(0, rangeEnd + 1));
+          expect(response.text).toHaveLength(rangeLength);
         });
 
         it('should return the "206" code for the "GET" request with the valid range header with multiple values', async () => {
@@ -5769,13 +5784,18 @@ describe.each([
           const response = await req
             .get("/bundle.js")
             .set("Range", "bytes=3000-3500");
+          const contentRange = /bytes (\d+)-(\d+)\/(\d+)/.exec(
+            response.headers["content-range"],
+          );
+          const rangeLength =
+            Number(contentRange[2]) - Number(contentRange[1]) + 1;
 
           expect(response.statusCode).toBe(206);
-          expect(response.headers["content-length"]).toBe("501");
+          expect(response.headers["content-length"]).toBe(String(rangeLength));
           expect(response.headers["content-type"]).toEqual(
             getContentTypeHeader(),
           );
-          expect(response.text).toHaveLength(501);
+          expect(Buffer.byteLength(response.text)).toBe(rangeLength);
           expect(response.headers.etag).toBeDefined();
 
           const response1 = await req
