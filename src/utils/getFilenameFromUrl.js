@@ -148,23 +148,19 @@ function getFilenameFromUrl(context, url) {
       let immutable = undefined;
 
       /**
-       * @returns {boolean} immutable
-       */
-      const getImmutable = () => {
-        if (immutable === undefined) {
-          const assetName = pathname.slice(publicPathPathname.length);
-          immutable = Boolean(compilation.getAsset(assetName)?.info?.immutable);
-        }
-        return immutable;
-      };
-
-      /**
        * @param {FSStats} stats stats
        * @returns {Extra} extra
        */
       const createExtra = (stats) => ({
+        // Lazy evaluate immutable because it may be expensive to get asset info
         get immutable() {
-          return getImmutable();
+          if (immutable === undefined) {
+            const assetName = pathname.slice(publicPathPathname.length);
+            immutable = Boolean(
+              compilation.getAsset(assetName)?.info?.immutable,
+            );
+          }
+          return immutable;
         },
         outputFileSystem,
         stats,
