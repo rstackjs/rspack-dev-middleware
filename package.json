@@ -40,7 +40,7 @@
     "@rspack/core": "2.0.0",
     "@rstest/core": "0.9.9",
     "@types/express": "^5.0.6",
-    "@types/node": "^22.19.17",
+    "@types/node": "^24.12.2",
     "@types/on-finished": "^2.3.5",
     "@types/range-parser": "^1.2.7",
     "connect-next": "^4.0.1",
