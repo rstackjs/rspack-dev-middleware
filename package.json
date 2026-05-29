@@ -27,7 +27,6 @@
     "lint:prettier": "prettier --cache --list-different .",
     "lint:spelling": "cspell --cache --no-must-find-files --quiet \"**/*.*\"",
     "lint:types": "tsc --pretty --noEmit",
-    "prepare": "pnpm run build",
     "test": "rstest",
     "test:watch": "rstest -w",
     "bump": "npx bumpp"
