@@ -34,23 +34,23 @@
   "devDependencies": {
     "@hapi/hapi": "^21.4.9",
     "@hono/node-server": "^1.19.14",
-    "@rslib/core": "^0.21.5",
+    "@rslib/core": "^0.22.0",
     "@rslint/core": "^0.5.3",
-    "@rspack/core": "2.0.4",
-    "@rstest/core": "0.10.2",
+    "@rspack/core": "2.0.5",
+    "@rstest/core": "0.10.3",
     "@types/express": "^5.0.6",
     "@types/node": "^24.12.4",
     "@types/on-finished": "^2.3.5",
     "@types/range-parser": "^1.2.7",
-    "connect-next": "^4.0.1",
+    "connect-next": "^4.0.2",
     "cspell": "^10.0.0",
     "deepmerge": "^4.3.1",
     "execa": "^9.6.1",
     "express": "^5.2.1",
     "finalhandler": "^2.1.1",
-    "hono": "^4.12.22",
+    "hono": "^4.12.23",
     "koa": "^3.2.1",
-    "memfs": "^4.57.2",
+    "memfs": "^4.57.3",
     "mrmime": "^2.0.1",
     "npm-run-all2": "^5.0.2",
     "on-finished": "^2.4.1",
@@ -68,7 +68,7 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@11.3.0",
+  "packageManager": "pnpm@11.5.0",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   }
