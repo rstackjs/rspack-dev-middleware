@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@hapi/hapi": "^21.4.9",
-    "@hono/node-server": "^1.19.14",
+    "@hono/node-server": "^2.0.8",
     "@rslib/core": "^0.22.1",
     "@rslint/core": "^0.6.1",
     "@rspack/core": "2.0.8",
