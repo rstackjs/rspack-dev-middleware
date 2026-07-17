@@ -668,4 +668,11 @@ function honoWrapper(compiler, options) {
 
 rdm.honoWrapper = honoWrapper;
 
+/**
+ * @type {typeof rdm & {
+ *   hapiWrapper: typeof hapiWrapper,
+ *   koaWrapper: typeof koaWrapper,
+ *   honoWrapper: typeof honoWrapper,
+ * }}
+ */
 export const devMiddleware = rdm;

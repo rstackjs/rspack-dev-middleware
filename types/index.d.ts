@@ -429,5 +429,67 @@ export type HapiPlugin<S, O> = HapiPluginBase<S, O> & {
 export type HapiOptions = Options & {
   compiler: Compiler | MultiCompiler;
 };
-export declare const devMiddleware: typeof rdm;
+/**
+ * @template S
+ * @template O
+ * @typedef {object} HapiPluginBase
+ * @property {(server: S, options: O) => void | Promise<void>} register register
+ */
+/**
+ * @template S
+ * @template O
+ * @typedef {HapiPluginBase<S, O> & { pkg: { name: string }, multiple: boolean }} HapiPlugin
+ */
+/**
+ * @typedef {Options & { compiler: Compiler | MultiCompiler }} HapiOptions
+ */
+/**
+ * @template HapiServer
+ * @template {HapiOptions} HapiOptionsInternal
+ * @returns {HapiPlugin<HapiServer, HapiOptionsInternal>} hapi wrapper
+ */
+declare function hapiWrapper<
+  HapiServer,
+  HapiOptionsInternal extends HapiOptions,
+>(): HapiPlugin<HapiServer, HapiOptionsInternal>;
+/**
+ * @template {IncomingMessage} [RequestInternal=IncomingMessage]
+ * @template {ServerResponse} [ResponseInternal=ServerResponse]
+ * @param {Compiler | MultiCompiler} compiler compiler
+ * @param {Options<RequestInternal, ResponseInternal>=} options options
+ * @returns {(ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void} kow wrapper
+ */
+declare function koaWrapper<
+  RequestInternal extends IncomingMessage = IncomingMessage,
+  ResponseInternal extends ServerResponse = ServerResponse,
+>(
+  compiler: Compiler | MultiCompiler,
+  options?: Options<RequestInternal, ResponseInternal> | undefined,
+): (ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void;
+/**
+ * @template {IncomingMessage} [RequestInternal=IncomingMessage]
+ * @template {ServerResponse} [ResponseInternal=ServerResponse]
+ * @param {Compiler | MultiCompiler} compiler compiler
+ * @param {Options<RequestInternal, ResponseInternal>=} options options
+ * @returns {(ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void} hono wrapper
+ */
+declare function honoWrapper<
+  RequestInternal extends IncomingMessage = IncomingMessage,
+  ResponseInternal extends ServerResponse = ServerResponse,
+>(
+  compiler: Compiler | MultiCompiler,
+  options?: Options<RequestInternal, ResponseInternal> | undefined,
+): (ctx: EXPECTED_ANY, next: EXPECTED_FUNCTION) => Promise<void> | void;
+/**
+ * @type {typeof rdm & {
+ *   hapiWrapper: typeof hapiWrapper,
+ *   koaWrapper: typeof koaWrapper,
+ *   honoWrapper: typeof honoWrapper,
+ * }}
+ */
+export declare const devMiddleware: typeof rdm & {
+  hapiWrapper: typeof hapiWrapper;
+  koaWrapper: typeof koaWrapper;
+  honoWrapper: typeof honoWrapper;
+};
 export {};
