@@ -1,4 +1,3 @@
-export default setupWriteToDisk;
 export type Compiler = import("@rspack/core").Compiler;
 export type MultiCompiler = import("@rspack/core").MultiCompiler;
 export type Compilation = import("@rspack/core").Compilation;
@@ -19,3 +18,4 @@ declare function setupWriteToDisk<
     "watching" | "outputFileSystem"
   >,
 ): void;
+export default setupWriteToDisk;

@@ -1,4 +1,3 @@
-export default etag;
 export type Stats = import("fs").Stats;
 export type ReadStream = import("fs").ReadStream;
 /**
@@ -10,3 +9,4 @@ declare function etag(entity: Buffer | ReadStream | Stats): Promise<{
   hash: string;
   buffer?: Buffer;
 }>;
+export default etag;

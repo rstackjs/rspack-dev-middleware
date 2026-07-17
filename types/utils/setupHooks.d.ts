@@ -1,4 +1,10 @@
-export default setupHooks;
+/** @typedef {import("@rspack/core").Configuration} Configuration */
+/** @typedef {import("@rspack/core").Compiler} Compiler */
+/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
+/** @typedef {import("@rspack/core").Stats} Stats */
+/** @typedef {import("@rspack/core").MultiStats} MultiStats */
+/** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
+/** @typedef {import("../index.js").ServerResponse} ServerResponse */
 export type Configuration = import("@rspack/core").Configuration;
 export type Compiler = import("@rspack/core").Compiler;
 export type MultiCompiler = import("@rspack/core").MultiCompiler;
@@ -14,13 +20,6 @@ export type StatsObjectOptions = Exclude<
   Configuration["stats"],
   boolean | string | undefined
 >;
-/** @typedef {import("@rspack/core").Configuration} Configuration */
-/** @typedef {import("@rspack/core").Compiler} Compiler */
-/** @typedef {import("@rspack/core").MultiCompiler} MultiCompiler */
-/** @typedef {import("@rspack/core").Stats} Stats */
-/** @typedef {import("@rspack/core").MultiStats} MultiStats */
-/** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
-/** @typedef {import("../index.js").ServerResponse} ServerResponse */
 /** @typedef {Configuration["stats"]} StatsOptions */
 /** @typedef {{ children: Configuration["stats"][] }} MultiStatsOptions */
 /** @typedef {Exclude<Configuration["stats"], boolean | string | undefined>} StatsObjectOptions */
@@ -38,3 +37,4 @@ declare function setupHooks<
     "watching" | "outputFileSystem"
   >,
 ): void;
+export default setupHooks;
