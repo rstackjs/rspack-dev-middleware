@@ -52,7 +52,7 @@ const noop = () => {};
  */
 
 /**
- * @typedef {import("@rspack/core").OutputFileSystem & { createReadStream?: import("fs").createReadStream, statSync: import("fs").statSync, readFileSync: import("fs").readFileSync }} OutputFileSystem
+ * @typedef {import("@rspack/core").OutputFileSystem & { createReadStream?: typeof import("fs").createReadStream, statSync: typeof import("fs").statSync, readFileSync: typeof import("fs").readFileSync }} OutputFileSystem
  */
 
 /** @typedef {ReturnType<Compiler["getInfrastructureLogger"]>} Logger */

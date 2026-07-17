@@ -1,6 +1,6 @@
-export default memorize;
-export type FunctionReturning<T> = (...args: EXPECTED_ANY) => T;
+/** @typedef {import("../index.js").EXPECTED_ANY} EXPECTED_ANY */
 export type EXPECTED_ANY = import("../index.js").EXPECTED_ANY;
+export type FunctionReturning<T> = (...args: EXPECTED_ANY) => T;
 /**
  * @template T
  * @typedef {(...args: EXPECTED_ANY) => T} FunctionReturning
@@ -31,3 +31,4 @@ declare function memorize<T>(
     | undefined,
   callback?: ((value: T) => T) | undefined,
 ): FunctionReturning<T>;
+export default memorize;

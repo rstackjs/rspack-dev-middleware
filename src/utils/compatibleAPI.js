@@ -237,7 +237,7 @@ function createReadStreamOrReadFileSync(
 
   if (isFsSupportsStream) {
     bufferOrStream =
-      /** @type {import("fs").createReadStream} */
+      /** @type {typeof import("fs").createReadStream} */
       (outputFileSystem.createReadStream)(filename, {
         start,
         end,

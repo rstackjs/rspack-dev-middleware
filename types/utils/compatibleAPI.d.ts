@@ -1,3 +1,7 @@
+/** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
+/** @typedef {import("../index.js").ServerResponse} ServerResponse */
+/** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
+/** @typedef {import("../index.js").EXPECTED_ANY} EXPECTED_ANY */
 export type IncomingMessage = import("../index.js").IncomingMessage;
 export type ServerResponse = import("../index.js").ServerResponse;
 export type OutputFileSystem = import("../index.js").OutputFileSystem;
@@ -72,50 +76,6 @@ export type ExpectedServerResponse = {
   setState?: ((name: string, value: EXPECTED_ANY) => void) | undefined;
 };
 /**
- * @param {string} filename filename
- * @param {OutputFileSystem} outputFileSystem output file system
- * @param {number} start start
- * @param {number} end end
- * @returns {{ bufferOrStream: (Buffer | import("fs").ReadStream), byteLength: number }} result with buffer or stream and byte length
- */
-export function createReadStreamOrReadFileSync(
-  filename: string,
-  outputFileSystem: OutputFileSystem,
-  start: number,
-  end: number,
-): {
-  bufferOrStream: Buffer | import("fs").ReadStream;
-  byteLength: number;
-};
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @param {(string | Buffer)=} data data
- */
-export function finish<
-  Response extends ServerResponse & ExpectedServerResponse,
->(res: Response, data?: (string | Buffer) | undefined): void;
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @returns {boolean} true when headers were sent, otherwise false
- */
-export function getHeadersSent<
-  Response extends ServerResponse & ExpectedServerResponse,
->(res: Response): boolean;
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @returns {Response} res res
- */
-export function getOutgoing<
-  Response extends ServerResponse & ExpectedServerResponse,
->(res: Response): Response;
-/** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
-/** @typedef {import("../index.js").ServerResponse} ServerResponse */
-/** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
-/** @typedef {import("../index.js").EXPECTED_ANY} EXPECTED_ANY */
-/**
  * @typedef {object} ExpectedIncomingMessage
  * @property {((name: string) => string | string[] | undefined)=} getHeader get header extra method
  * @property {(() => string | undefined)=} getMethod get method extra method
@@ -142,7 +102,7 @@ export function getOutgoing<
  * @param {string} name name
  * @returns {string | string[] | undefined} request header
  */
-export function getRequestHeader<
+declare function getRequestHeader<
   Request extends IncomingMessage & ExpectedIncomingMessage,
 >(req: Request, name: string): string | string[] | undefined;
 /**
@@ -150,7 +110,7 @@ export function getRequestHeader<
  * @param {Request} req req
  * @returns {string | undefined} request method
  */
-export function getRequestMethod<
+declare function getRequestMethod<
   Request extends IncomingMessage & ExpectedIncomingMessage,
 >(req: Request): string | undefined;
 /**
@@ -158,69 +118,35 @@ export function getRequestMethod<
  * @param {Request} req req
  * @returns {string | undefined} request URL
  */
-export function getRequestURL<
+declare function getRequestURL<
   Request extends IncomingMessage & ExpectedIncomingMessage,
 >(req: Request): string | undefined;
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @param {number} code code
+ * @returns {void}
+ */
+declare function setStatusCode<
+  Response extends ServerResponse & ExpectedServerResponse,
+>(res: Response, code: number): void;
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @returns {number} status code
+ */
+declare function getStatusCode<
+  Response extends ServerResponse & ExpectedServerResponse,
+>(res: Response): number;
 /**
  * @template {ServerResponse & ExpectedServerResponse} Response
  * @param {Response} res res
  * @param {string} name name
  * @returns {string | string[] | undefined | number} header
  */
-export function getResponseHeader<
+declare function getResponseHeader<
   Response extends ServerResponse & ExpectedServerResponse,
 >(res: Response, name: string): string | string[] | undefined | number;
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @returns {string[]} header names
- */
-export function getResponseHeaders<
-  Response extends ServerResponse & ExpectedServerResponse,
->(res: Response): string[];
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @returns {number} status code
- */
-export function getStatusCode<
-  Response extends ServerResponse & ExpectedServerResponse,
->(res: Response): number;
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- */
-export function initState<
-  Response extends ServerResponse & ExpectedServerResponse,
->(res: Response): void;
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @param {import("fs").ReadStream} bufferOrStream buffer or stream
- */
-export function pipe<Response extends ServerResponse & ExpectedServerResponse>(
-  res: Response,
-  bufferOrStream: import("fs").ReadStream,
-): void;
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @param {string} name name
- * @returns {void}
- */
-export function removeResponseHeader<
-  Response extends ServerResponse & ExpectedServerResponse,
->(res: Response, name: string): void;
-/**
- * @template {ServerResponse & ExpectedServerResponse} Response
- * @param {Response} res res
- * @param {string | Buffer} bufferOrString buffer or string
- * @returns {void}
- */
-export function send<Response extends ServerResponse & ExpectedServerResponse>(
-  res: Response,
-  bufferOrString: string | Buffer,
-): void;
 /**
  * @template {ServerResponse & ExpectedServerResponse} Response
  * @param {Response} res res
@@ -228,7 +154,7 @@ export function send<Response extends ServerResponse & ExpectedServerResponse>(
  * @param {number | string | Readonly<string[]>} value value
  * @returns {Response} response
  */
-export function setResponseHeader<
+declare function setResponseHeader<
   Response extends ServerResponse & ExpectedServerResponse,
 >(
   res: Response,
@@ -239,18 +165,111 @@ export function setResponseHeader<
  * @template {ServerResponse & ExpectedServerResponse} Response
  * @param {Response} res res
  * @param {string} name name
- * @param {EXPECTED_ANY} value state
  * @returns {void}
  */
-export function setState<
+declare function removeResponseHeader<
   Response extends ServerResponse & ExpectedServerResponse,
->(res: Response, name: string, value: EXPECTED_ANY): void;
+>(res: Response, name: string): void;
 /**
  * @template {ServerResponse & ExpectedServerResponse} Response
  * @param {Response} res res
- * @param {number} code code
+ * @returns {string[]} header names
+ */
+declare function getResponseHeaders<
+  Response extends ServerResponse & ExpectedServerResponse,
+>(res: Response): string[];
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @returns {boolean} true when headers were sent, otherwise false
+ */
+declare function getHeadersSent<
+  Response extends ServerResponse & ExpectedServerResponse,
+>(res: Response): boolean;
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @param {import("fs").ReadStream} bufferOrStream buffer or stream
+ */
+declare function pipe<Response extends ServerResponse & ExpectedServerResponse>(
+  res: Response,
+  bufferOrStream: import("fs").ReadStream,
+): void;
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @param {string | Buffer} bufferOrString buffer or string
  * @returns {void}
  */
-export function setStatusCode<
+declare function send<Response extends ServerResponse & ExpectedServerResponse>(
+  res: Response,
+  bufferOrString: string | Buffer,
+): void;
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @param {(string | Buffer)=} data data
+ */
+declare function finish<
   Response extends ServerResponse & ExpectedServerResponse,
->(res: Response, code: number): void;
+>(res: Response, data?: (string | Buffer) | undefined): void;
+/**
+ * @param {string} filename filename
+ * @param {OutputFileSystem} outputFileSystem output file system
+ * @param {number} start start
+ * @param {number} end end
+ * @returns {{ bufferOrStream: (Buffer | import("fs").ReadStream), byteLength: number }} result with buffer or stream and byte length
+ */
+declare function createReadStreamOrReadFileSync(
+  filename: string,
+  outputFileSystem: OutputFileSystem,
+  start: number,
+  end: number,
+): {
+  bufferOrStream: Buffer | import("fs").ReadStream;
+  byteLength: number;
+};
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @returns {Response} res res
+ */
+declare function getOutgoing<
+  Response extends ServerResponse & ExpectedServerResponse,
+>(res: Response): Response;
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ */
+declare function initState<
+  Response extends ServerResponse & ExpectedServerResponse,
+>(res: Response): void;
+/**
+ * @template {ServerResponse & ExpectedServerResponse} Response
+ * @param {Response} res res
+ * @param {string} name name
+ * @param {EXPECTED_ANY} value state
+ * @returns {void}
+ */
+declare function setState<
+  Response extends ServerResponse & ExpectedServerResponse,
+>(res: Response, name: string, value: EXPECTED_ANY): void;
+export {
+  createReadStreamOrReadFileSync,
+  finish,
+  getHeadersSent,
+  getOutgoing,
+  getRequestHeader,
+  getRequestMethod,
+  getRequestURL,
+  getResponseHeader,
+  getResponseHeaders,
+  getStatusCode,
+  initState,
+  pipe,
+  removeResponseHeader,
+  send,
+  setResponseHeader,
+  setState,
+  setStatusCode,
+};

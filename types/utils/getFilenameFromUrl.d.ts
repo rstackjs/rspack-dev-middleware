@@ -1,12 +1,7 @@
-export default getFilenameFromUrl;
 export type IncomingMessage = import("../index.js").IncomingMessage;
 export type OutputFileSystem = import("../index.js").OutputFileSystem;
 export type ServerResponse = import("../index.js").ServerResponse;
 export type FSStats = import("fs").Stats;
-export type FilenameWithExtra = {
-  filename: string;
-  extra: Extra;
-};
 export type Extra = {
   /**
    * stats
@@ -34,14 +29,18 @@ export type Extra = {
  * @param {string} input
  * @returns {string}
  */
-export class FilenameError extends Error {
+declare class FilenameError extends Error {
+  statusCode: number | undefined;
   /**
    * @param {string} message message
    * @param {number=} code error code
    */
   constructor(message: string, code?: number | undefined);
-  statusCode: number | undefined;
 }
+export type FilenameWithExtra = {
+  filename: string;
+  extra: Extra;
+};
 /**
  * @template {IncomingMessage} Request
  * @template {ServerResponse} Response
@@ -56,3 +55,5 @@ declare function getFilenameFromUrl<
   context: import("../index.js").FilledContext<Request, Response>,
   url: string,
 ): FilenameWithExtra | undefined;
+export { FilenameError };
+export default getFilenameFromUrl;

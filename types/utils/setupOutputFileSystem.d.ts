@@ -1,4 +1,3 @@
-export default setupOutputFileSystem;
 export type MultiCompiler = import("@rspack/core").MultiCompiler;
 export type DevServerOption = import("../index.js").DevServerOption;
 export type IncomingMessage = import("../index.js").IncomingMessage;
@@ -21,3 +20,4 @@ declare function setupOutputFileSystem<
     "watching" | "outputFileSystem"
   >,
 ): void;
+export default setupOutputFileSystem;
