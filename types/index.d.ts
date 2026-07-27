@@ -168,8 +168,7 @@ export type Options<
    * modify response data
    */
   modifyResponseData?:
-    | ModifyResponseData<RequestInternal, ResponseInternal>
-    | undefined;
+    ModifyResponseData<RequestInternal, ResponseInternal> | undefined;
   /**
    * options to generate etag header
    */

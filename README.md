@@ -258,9 +258,7 @@ The function follows the same premise as [`Array#filter`](https://developer.mozi
 ```js
 import { rspack } from "@rspack/core";
 
-const configuration = {
-  /* Rspack configuration */
-};
+const configuration = {/* Rspack configuration */};
 const compiler = rspack(configuration);
 
 devMiddleware(compiler, {
@@ -287,9 +285,7 @@ import myOutputFileSystem from "my-fs";
 myOutputFileSystem.join = join;
 myOutputFileSystem.mkdirp = mkdirp;
 
-const compiler = rspack({
-  /* Rspack configuration */
-});
+const compiler = rspack({/* Rspack configuration */});
 
 devMiddleware(compiler, { outputFileSystem: myOutputFileSystem });
 ```
@@ -301,9 +297,7 @@ Allows to set up a callback to change the response data.
 ```js
 import { rspack } from "@rspack/core";
 
-const configuration = {
-  /* Rspack configuration */
-};
+const configuration = {/* Rspack configuration */};
 const compiler = rspack(configuration);
 
 devMiddleware(compiler, {
@@ -339,9 +333,7 @@ import { rspack } from "@rspack/core";
 import { devMiddleware } from "@rspack/dev-middleware";
 import express from "express";
 
-const compiler = rspack({
-  /* Rspack configuration */
-});
+const compiler = rspack({/* Rspack configuration */});
 
 const instance = devMiddleware(compiler);
 
@@ -373,9 +365,7 @@ import { rspack } from "@rspack/core";
 import { devMiddleware } from "@rspack/dev-middleware";
 import express from "express";
 
-const compiler = rspack({
-  /* Rspack configuration */
-});
+const compiler = rspack({/* Rspack configuration */});
 
 const instance = devMiddleware(compiler);
 
@@ -412,9 +402,7 @@ import { rspack } from "@rspack/core";
 import { devMiddleware } from "@rspack/dev-middleware";
 import express from "express";
 
-const compiler = rspack({
-  /* Rspack configuration */
-});
+const compiler = rspack({/* Rspack configuration */});
 
 const instance = devMiddleware(compiler);
 
@@ -445,9 +433,7 @@ import { rspack } from "@rspack/core";
 import { devMiddleware } from "@rspack/dev-middleware";
 import express from "express";
 
-const compiler = rspack({
-  /* Rspack configuration */
-});
+const compiler = rspack({/* Rspack configuration */});
 
 const instance = devMiddleware(compiler);
 
@@ -530,9 +516,7 @@ import { devMiddleware } from "@rspack/dev-middleware";
 import express from "express";
 import isObject from "is-object";
 
-const compiler = rspack({
-  /* Rspack configuration */
-});
+const compiler = rspack({/* Rspack configuration */});
 
 const app = express();
 
