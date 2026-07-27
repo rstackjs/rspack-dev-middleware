@@ -1,7 +1,7 @@
 import { defineConfig, globalIgnores, ts } from "@rslint/core";
 
 export default defineConfig([
-  globalIgnores(["test/fixtures/**"]),
+  globalIgnores(["test/fixtures/broken.js"]),
   ts.configs.recommended,
   {
     rules: {
