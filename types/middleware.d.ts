@@ -22,8 +22,7 @@ export type SendErrorOptions<
    * modify response data callback
    */
   modifyResponseData?:
-    | import("./index.js").ModifyResponseData<Request, Response>
-    | undefined;
+    import("./index.js").ModifyResponseData<Request, Response> | undefined;
 };
 /**
  * @template {IncomingMessage} Request
