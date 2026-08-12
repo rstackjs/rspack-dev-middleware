@@ -14,7 +14,7 @@ function escapeHtml(string) {
 
   let escape;
   let html = "";
-  let index = 0;
+  let index;
   let lastIndex = 0;
 
   for ({ index } = match; index < str.length; index++) {
