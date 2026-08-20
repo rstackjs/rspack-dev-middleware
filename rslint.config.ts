@@ -1,4 +1,4 @@
-import { defineConfig, globalIgnores, js, ts } from "@rslint/core";
+import { defineConfig, globalIgnores, globals, js, ts } from "@rslint/core";
 
 export default defineConfig([
   globalIgnores(["test/fixtures/broken.js"]),
@@ -11,8 +11,11 @@ export default defineConfig([
   },
   {
     files: ["test/**/*"],
-    rules: {
-      "no-undef": "off",
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.rstest,
+      },
     },
   },
   {
