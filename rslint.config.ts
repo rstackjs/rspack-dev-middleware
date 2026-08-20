@@ -35,8 +35,8 @@ export default defineConfig([
   },
   {
     files: ["scripts/**/*"],
-    rules: {
-      "no-undef": "off",
+    languageOptions: {
+      globals: globals.node,
     },
   },
 ]);
