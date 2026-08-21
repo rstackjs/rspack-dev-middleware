@@ -1,4 +1,4 @@
-import { defineConfig, globalIgnores, globals, js, ts } from "@rslint/core";
+import { defineConfig, globalIgnores, js, ts } from "@rslint/core";
 
 export default defineConfig([
   globalIgnores(["test/fixtures/broken.js"]),
@@ -7,36 +7,14 @@ export default defineConfig([
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
-    },
-  },
-  {
-    files: ["test/**/*"],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.rstest,
-      },
+      "no-undef": "off",
     },
   },
   {
     files: ["src/**/*.js"],
-    languageOptions: {
-      globals: {
-        Buffer: "readonly",
-        URL: "readonly",
-        console: "readonly",
-        process: "readonly",
-      },
-    },
     rules: {
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/no-unsafe-function-type": "off",
-    },
-  },
-  {
-    files: ["scripts/**/*"],
-    languageOptions: {
-      globals: globals.node,
     },
   },
 ]);
