@@ -45,13 +45,13 @@ jobs:
           run_install: true
 
       - name: Run checks
-        run: pnpm run lint
+        run: pnpm run check
 
-      - name: Build types
-        run: pnpm run build:types
+      - name: Build
+        run: pnpm run build
 
       - name: Check types
-        run: if [ -n "$(git status types --porcelain)" ]; then echo "Missing types. Update types by running 'pnpm run build:types'"; exit 1; else echo "All types are valid"; fi
+        run: if [ -n "$(git status types --porcelain)" ]; then echo "Missing types. Update types by running 'pnpm run build'"; exit 1; else echo "All types are valid"; fi
 
   test:
     name: Test - ${{ matrix.os }} - Node v${{ matrix.node-version }}
