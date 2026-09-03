@@ -14,7 +14,6 @@ npm-debug.log*
 Thumbs.db
 .idea
 *.iml
-.vscode
 *.sublime-project
 *.sublime-workspace
 yarn.lock

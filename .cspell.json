@@ -26,6 +26,7 @@
     "nosniff",
     "rslint",
     "rspack",
+    "rstack",
     "rstackjs",
     "rstest",
     "sokra",
