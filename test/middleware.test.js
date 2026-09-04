@@ -929,6 +929,70 @@ describe.each([
     });
 
     describe("basic", () => {
+      // Regression test for a public path without a trailing slash.
+      describe("should not allow path traversal when publicPath has no trailing slash", () => {
+        let compiler;
+
+        const rootPath = path.resolve(
+          __dirname,
+          "./outputs/traversal-no-slash-public-path",
+        );
+        const outputPath = path.resolve(rootPath, "dist");
+
+        beforeAll(async () => {
+          compiler = getCompiler({
+            ...webpackConfig,
+            output: {
+              filename: "bundle.js",
+              path: outputPath,
+              publicPath: "/static",
+            },
+          });
+
+          [server, req, instance] = await frameworkFactory(
+            name,
+            framework,
+            compiler,
+          );
+
+          instance.context.outputFileSystem.mkdirSync(outputPath, {
+            recursive: true,
+          });
+          instance.context.outputFileSystem.writeFileSync(
+            path.resolve(outputPath, "index.html"),
+            "HTML",
+          );
+          instance.context.outputFileSystem.writeFileSync(
+            path.resolve(outputPath, "file..txt"),
+            "DOTS",
+          );
+          // A sensitive file placed one level above the served output root.
+          instance.context.outputFileSystem.writeFileSync(
+            path.resolve(outputPath, "../secret.txt"),
+            "TOP SECRET",
+          );
+        });
+
+        afterAll(async () => {
+          await close(server, instance);
+        });
+
+        it("should serve legitimate files under the public path", async () => {
+          const indexResponse = await req.get("/static/index.html");
+          const dotsResponse = await req.get("/staticfile..txt");
+
+          expect(indexResponse.statusCode).toBe(200);
+          expect(dotsResponse.statusCode).toBe(200);
+        });
+
+        it("should reject a path that resolves above the output path", async () => {
+          const response = await req.get("/static../secret.txt");
+
+          expect(response.statusCode).toBe(403);
+          expect(response.text).not.toContain("TOP SECRET");
+        });
+      });
+
       describe("should work", () => {
         let compiler;
         let codeContent;

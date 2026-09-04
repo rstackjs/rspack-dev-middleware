@@ -130,8 +130,15 @@ function getFilenameFromUrl(context, url) {
         throw new FilenameError("Bad Request", 400);
       }
 
+      // Only decoded paths containing two consecutive dots can produce a
+      // parent-directory segment through `path.join`.
+      const mayHaveUpPath = pathname.includes("..");
+
       // ".." is malicious
-      if (UP_PATH_REGEXP.test(path.normalize(`./${pathname}`))) {
+      if (
+        mayHaveUpPath &&
+        UP_PATH_REGEXP.test(path.normalize(`./${pathname}`))
+      ) {
         throw new FilenameError("Forbidden", 403);
       }
 
@@ -143,6 +150,19 @@ function getFilenameFromUrl(context, url) {
         outputPath,
         pathname.slice(publicPathPathname.length),
       );
+
+      if (mayHaveUpPath) {
+        // A public path without a trailing slash can consume the characters
+        // before `..`, turning a safe-looking pathname such as
+        // `/assets../secret` into `../secret` after the prefix is stripped.
+        // Validate the final candidate while keeping ordinary requests on the
+        // fast path.
+        const relative = path.relative(outputPath, filename);
+
+        if (relative === ".." || relative.startsWith(`..${path.sep}`)) {
+          throw new FilenameError("Forbidden", 403);
+        }
+      }
 
       /** @type {boolean | undefined} */
       let immutable = undefined;
