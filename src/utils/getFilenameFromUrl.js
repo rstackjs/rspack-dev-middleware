@@ -159,11 +159,7 @@ function getFilenameFromUrl(context, url) {
         // fast path.
         const relative = path.relative(outputPath, filename);
 
-        if (
-          relative === ".." ||
-          relative.startsWith(`..${path.sep}`) ||
-          path.isAbsolute(relative)
-        ) {
+        if (relative === ".." || relative.startsWith(`..${path.sep}`)) {
           throw new FilenameError("Forbidden", 403);
         }
       }
