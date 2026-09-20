@@ -218,6 +218,7 @@ declare function finish<
  * @param {OutputFileSystem} outputFileSystem output file system
  * @param {number} start start
  * @param {number} end end
+ * @param {number} len byte length of the range, or of the whole file
  * @returns {{ bufferOrStream: (Buffer | import("fs").ReadStream), byteLength: number }} result with buffer or stream and byte length
  */
 declare function createReadStreamOrReadFileSync(
@@ -225,6 +226,7 @@ declare function createReadStreamOrReadFileSync(
   outputFileSystem: OutputFileSystem,
   start: number,
   end: number,
+  len: number,
 ): {
   bufferOrStream: Buffer | import("fs").ReadStream;
   byteLength: number;

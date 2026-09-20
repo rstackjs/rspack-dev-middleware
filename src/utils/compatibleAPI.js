@@ -218,6 +218,7 @@ function finish(res, data) {
  * @param {OutputFileSystem} outputFileSystem output file system
  * @param {number} start start
  * @param {number} end end
+ * @param {number} len byte length of the range, or of the whole file
  * @returns {{ bufferOrStream: (Buffer | import("fs").ReadStream), byteLength: number }} result with buffer or stream and byte length
  */
 function createReadStreamOrReadFileSync(
@@ -225,6 +226,7 @@ function createReadStreamOrReadFileSync(
   outputFileSystem,
   start,
   end,
+  len,
 ) {
   /** @type {Buffer | import("fs").ReadStream} */
   let bufferOrStream;
@@ -243,8 +245,9 @@ function createReadStreamOrReadFileSync(
         end,
       });
 
-    // Handle files with zero bytes
-    byteLength = end === 0 ? 0 : end - start + 1;
+    // An empty file and a one-byte file both end at offset 0, so the length
+    // is the caller's byte count. A stat without a size keeps the arithmetic
+    byteLength = Number.isFinite(len) ? len : end - start + 1;
   } else {
     bufferOrStream = outputFileSystem.readFileSync(filename);
     ({ byteLength } = bufferOrStream);
