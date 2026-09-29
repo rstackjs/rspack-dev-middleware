@@ -1,5 +1,5 @@
 import { Node, Superblock } from "@jsonjoy.com/fs-core";
-import memfs, { Volume, createFsFromVolume } from "memfs";
+import { Volume, createFsFromVolume } from "memfs";
 
 /**
  * Rspack emits complete buffers and truncates files before replacing them.
@@ -47,25 +47,7 @@ class OutputSuperblock extends Superblock {
  * @returns {import("memfs").IFs} memory file system
  */
 function createMemoryFileSystem() {
-  const candidate = memfs.createFsFromVolume(
-    new Volume(new OutputSuperblock()),
-  );
-
-  if (
-    candidate &&
-    typeof candidate.readFileSync === "function" &&
-    typeof candidate.statSync === "function"
-  ) {
-    return candidate;
-  }
-
-  const outputFileSystem = createFsFromVolume(
-    new Volume(new OutputSuperblock()),
-  );
-  if (candidate) {
-    Object.assign(outputFileSystem, candidate);
-  }
-  return outputFileSystem;
+  return createFsFromVolume(new Volume(new OutputSuperblock()));
 }
 
 export default createMemoryFileSystem;
