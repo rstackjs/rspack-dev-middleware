@@ -16,6 +16,7 @@
     "finalhandler",
     "fullhash",
     "hono",
+    "jsonjoy",
     "leadinghash",
     "memfs",
     "middie",
