@@ -40,7 +40,7 @@
     "@types/node": "^24.19.2",
     "@types/on-finished": "^2.3.5",
     "@types/range-parser": "^1.2.7",
-    "connect-next": "^4.0.3",
+    "connect-next": "^5.0.0",
     "cspell": "^10.3.6",
     "deepmerge": "^4.3.1",
     "execa": "^9.6.1",
