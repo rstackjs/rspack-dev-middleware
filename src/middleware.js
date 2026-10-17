@@ -703,6 +703,7 @@ function wrapper(context) {
               extra.outputFileSystem,
               start,
               end,
+              len,
             );
 
             ({ bufferOrStream, byteLength } = result);
@@ -848,6 +849,7 @@ function wrapper(context) {
             extra.outputFileSystem,
             start,
             end,
+            len,
           ));
         } catch (error) {
           await errorHandler(/** @type {NodeJS.ErrnoException} */ (error));

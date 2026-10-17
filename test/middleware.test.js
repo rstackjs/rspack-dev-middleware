@@ -1053,6 +1053,10 @@ describe.each([
             path.resolve(outputPath, "empty-file.txt"),
             "",
           );
+          instance.context.outputFileSystem.writeFileSync(
+            path.resolve(outputPath, "one-byte.txt"),
+            "a",
+          );
         });
 
         afterAll(async () => {
@@ -1461,6 +1465,25 @@ describe.each([
           expect(response.headers["content-type"]).toBe(
             "text/plain; charset=utf-8",
           );
+        });
+
+        it('should return "200" code for the "GET" request and "Content-Length" of "1" when file has one byte', async () => {
+          const response = await req.get("/one-byte.txt");
+
+          expect(response.statusCode).toBe(200);
+          expect(response.headers["content-length"]).toBe("1");
+          expect(response.text).toBe("a");
+        });
+
+        it('should return "206" code for the "GET" request with a one-byte range', async () => {
+          const response = await req
+            .get("/one-byte.txt")
+            .set("Range", "bytes=0-0");
+
+          expect(response.statusCode).toBe(206);
+          expect(response.headers["content-range"]).toBe("bytes 0-0/1");
+          expect(response.headers["content-length"]).toBe("1");
+          expect(response.text).toBe("a");
         });
 
         it('should return the "200" code for the "GET" request to the "image image.svg" file', async () => {
