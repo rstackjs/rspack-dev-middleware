@@ -1,7 +1,7 @@
 import path from "node:path";
+import { finished } from "node:stream";
 
 import { lookup, mimes } from "mrmime";
-import onFinishedStream from "on-finished";
 import rangeParser from "range-parser";
 
 import {
@@ -920,7 +920,7 @@ function wrapper(context) {
 
       if (outgoing) {
         // Response finished, cleanup
-        onFinishedStream(outgoing, cleanup);
+        finished(outgoing, cleanup);
       }
     }
 

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { createServer } from "node:http";
 import path from "node:path";
+import { Readable } from "node:stream";
 
 import Hapi from "@hapi/hapi";
 import { serve } from "@hono/node-server";
@@ -3681,10 +3682,22 @@ describe.each([
         });
 
         it("should work with piping stream", async () => {
-          const response1 = await req.get("/file.text");
+          const stream = Readable.from(["text"], { autoDestroy: false });
+          const createReadStream = rs
+            .spyOn(instance.context.outputFileSystem, "createReadStream")
+            .mockReturnValue(stream);
 
-          expect(response1.statusCode).toBe(200);
-          expect(nextWasCalled).toBe(false);
+          try {
+            const response = await req.get("/file.text");
+
+            expect(response.statusCode).toBe(200);
+            expect(response.text).toBe("text");
+            expect(stream.destroyed).toBe(true);
+            expect(nextWasCalled).toBe(false);
+          } finally {
+            createReadStream.mockRestore();
+            stream.destroy();
+          }
         });
 
         it("should not allow to get files above root", async () => {
