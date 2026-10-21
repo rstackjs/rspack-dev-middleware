@@ -2,7 +2,6 @@ import path from "node:path";
 import querystring from "node:querystring";
 
 import getPaths from "./getPaths.js";
-import memorize from "./memorize.js";
 
 /** @typedef {import("../index.js").IncomingMessage} IncomingMessage */
 /** @typedef {import("../index.js").OutputFileSystem} OutputFileSystem */
@@ -10,19 +9,12 @@ import memorize from "./memorize.js";
 /** @typedef {import("fs").Stats} FSStats */
 
 /**
- * @param {string} input input
- * @returns {string} unescape input
+ * @param {string} url url
+ * @returns {string} decoded pathname
  */
-function decode(input) {
-  return querystring.unescape(input);
+function getPathnameFromUrl(url) {
+  return querystring.unescape(new URL(url, "http://localhost").pathname);
 }
-
-const memoizedParse = memorize((url) => {
-  const urlObject = new URL(url, "http://localhost");
-
-  // We can't change pathname in URL directly because it won't decode correctly.
-  return { ...urlObject, pathname: decode(urlObject.pathname) };
-});
 
 const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
 
@@ -88,12 +80,11 @@ function getFilenameFromUrl(context, url) {
         ? ["index.html"]
         : [options.index];
 
-  /** @type {URL} */
-  let urlObject;
+  /** @type {string} */
+  let pathname;
 
   try {
-    // The `url` property of the `request` is contains only  `pathname`, `search` and `hash`
-    urlObject = memoizedParse(url);
+    pathname = getPathnameFromUrl(url);
   } catch {
     return;
   }
@@ -106,19 +97,16 @@ function getFilenameFromUrl(context, url) {
   } of paths) {
     /** @type {string | undefined} */
     let filename;
-    /** @type {URL} */
-    let publicPathObject;
+    /** @type {string} */
+    let publicPathPathname;
 
     try {
-      publicPathObject = memoizedParse(
+      publicPathPathname = getPathnameFromUrl(
         publicPath !== "auto" && publicPath ? publicPath : "/",
       );
     } catch {
       continue;
     }
-
-    const { pathname } = urlObject;
-    const { pathname: publicPathPathname } = publicPathObject;
 
     if (
       pathname &&
