@@ -118,33 +118,24 @@ function getFilenameFromUrl(context, url) {
         throw new FilenameError("Bad Request", 400);
       }
 
-      // Only decoded paths containing two consecutive dots can produce a
-      // parent-directory segment through `path.join`.
-      const mayHaveUpPath = pathname.includes("..");
+      const relativePathname = pathname.slice(publicPathPathname.length);
 
-      // ".." is malicious
+      // Stripping a public path without a trailing slash can turn
+      // `/assets../secret` into `../secret`. Check the remainder before joining.
+      const mayHaveUpPath = relativePathname.includes("..");
+
       if (
         mayHaveUpPath &&
-        UP_PATH_REGEXP.test(path.normalize(`./${pathname}`))
+        UP_PATH_REGEXP.test(path.normalize(`./${relativePathname}`))
       ) {
         throw new FilenameError("Forbidden", 403);
       }
 
-      // Strip the `pathname` property from the `publicPath` option from the start of requested url
-      // `/complex/foo.js` => `foo.js`
-      // and add outputPath
-      // `foo.js` => `/home/user/my-project/dist/foo.js`
-      filename = path.join(
-        outputPath,
-        pathname.slice(publicPathPathname.length),
-      );
+      filename = path.join(outputPath, relativePathname);
 
       if (mayHaveUpPath) {
-        // A public path without a trailing slash can consume the characters
-        // before `..`, turning a safe-looking pathname such as
-        // `/assets../secret` into `../secret` after the prefix is stripped.
-        // Validate the final candidate while keeping ordinary requests on the
-        // fast path.
+        // Keep the final containment check as a backstop for platform-specific
+        // path behavior, without adding work for ordinary requests.
         const relative = path.relative(outputPath, filename);
 
         if (relative === ".." || relative.startsWith(`..${path.sep}`)) {
@@ -163,9 +154,8 @@ function getFilenameFromUrl(context, url) {
         // Lazy evaluate immutable because it may be expensive to get asset info
         get immutable() {
           if (immutable === undefined) {
-            const assetName = pathname.slice(publicPathPathname.length);
             immutable = Boolean(
-              compilation.getAsset(assetName)?.info?.immutable,
+              compilation.getAsset(relativePathname)?.info?.immutable,
             );
           }
           return immutable;
