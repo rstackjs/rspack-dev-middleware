@@ -137,19 +137,14 @@ const statuses = {
   500: "Internal Server Error",
 };
 
-const parseRangeHeaders = memorize(
-  /**
-   * @param {string} value value
-   * @returns {import("range-parser").Result | import("range-parser").Ranges} ranges
-   */
-  (value) => {
-    const [len, rangeHeader] = value.split("|");
-
-    return rangeParser(Number(len), rangeHeader, {
-      combine: true,
-    });
-  },
-);
+/**
+ * @param {number} size file size
+ * @param {string} rangeHeader Range header
+ * @returns {import("range-parser").Result | import("range-parser").Ranges} ranges
+ */
+function parseRangeHeaders(size, rangeHeader) {
+  return rangeParser(size, rangeHeader, { combine: true });
+}
 
 const getETag = memorize(() => etag);
 const getEscapeHtml = memorize(() => escapeHtml);
@@ -692,7 +687,7 @@ function wrapper(context) {
           if (rangeHeader) {
             const parsedRanges =
               /** @type {import("range-parser").Ranges | import("range-parser").Result} */
-              (parseRangeHeaders(`${size}|${rangeHeader}`));
+              (parseRangeHeaders(size, rangeHeader));
 
             if (
               parsedRanges !== -2 &&
@@ -795,7 +790,7 @@ function wrapper(context) {
       if (rangeHeader) {
         let parsedRanges =
           /** @type {import("range-parser").Ranges | import("range-parser").Result | []} */
-          (parseRangeHeaders(`${size}|${rangeHeader}`));
+          (parseRangeHeaders(size, rangeHeader));
 
         // If-Range support
         if (!isRangeFresh()) {
