@@ -990,6 +990,12 @@ describe.each([
           expect(response.statusCode).toBe(403);
           expect(response.text).not.toContain("TOP SECRET");
         });
+
+        it("should reject a path that leaves and re-enters the output path", async () => {
+          const response = await req.get("/static../dist/index.html");
+
+          expect(response.statusCode).toBe(403);
+        });
       });
 
       describe("should work", () => {
