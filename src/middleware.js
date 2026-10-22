@@ -1,7 +1,7 @@
 import path from "node:path";
 import { finished } from "node:stream";
 
-import { lookup } from "mrmime";
+import { mimes } from "mrmime";
 import rangeParser from "range-parser";
 
 import {
@@ -53,8 +53,8 @@ const UTF8_CHARSET_MIME_TYPES = new Set([
  * @returns {string | undefined} content type header value
  */
 function getContentType(extension, mimeTypes) {
-  const mimeType =
-    mimeTypes.get(extension.trim().slice(1).toLowerCase()) ?? lookup(extension);
+  const ext = extension.trim().slice(1).toLowerCase();
+  const mimeType = mimeTypes.get(ext) ?? mimes[ext];
 
   if (!mimeType) {
     return undefined;
