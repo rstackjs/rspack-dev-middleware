@@ -118,12 +118,16 @@ function getFilenameFromUrl(context, url) {
         throw new FilenameError("Bad Request", 400);
       }
 
+      // Strip the public path prefix from the decoded pathname:
+      // `/complex/foo.js` => `foo.js`.
       const relativePathname = pathname.slice(publicPathPathname.length);
+
+      // Only decoded paths containing two consecutive dots can produce a
+      // parent-directory segment through `path.join`.
+      const mayHaveUpPath = relativePathname.includes("..");
 
       // Stripping a public path without a trailing slash can turn
       // `/assets../secret` into `../secret`. Check the remainder before joining.
-      const mayHaveUpPath = relativePathname.includes("..");
-
       if (
         mayHaveUpPath &&
         UP_PATH_REGEXP.test(path.normalize(`./${relativePathname}`))
@@ -131,6 +135,7 @@ function getFilenameFromUrl(context, url) {
         throw new FilenameError("Forbidden", 403);
       }
 
+      // Add outputPath: `foo.js` => `/home/user/my-project/dist/foo.js`.
       filename = path.join(outputPath, relativePathname);
 
       if (mayHaveUpPath) {
