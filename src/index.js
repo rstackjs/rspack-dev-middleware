@@ -1,5 +1,3 @@
-import { mimes } from "mrmime";
-
 import middleware from "./middleware.js";
 import getFilenameFromUrl from "./utils/getFilenameFromUrl.js";
 import ready from "./utils/ready.js";
@@ -199,16 +197,6 @@ const noop = () => {};
  * @returns {API<RequestInternal, ResponseInternal>} rspack dev middleware
  */
 function rdm(compiler, options = {}) {
-  const { mimeTypes } = options;
-
-  if (mimeTypes) {
-    // mrmime.lookup closes over the exported dictionary, so overrides
-    // need to update the object in place.
-    for (const [extension, type] of Object.entries(mimeTypes)) {
-      mimes[extension.toLowerCase()] = type;
-    }
-  }
-
   /**
    * @type {WithOptional<Context<RequestInternal, ResponseInternal>, "watching" | "outputFileSystem">}
    */

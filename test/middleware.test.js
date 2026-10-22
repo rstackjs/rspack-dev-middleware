@@ -12,7 +12,7 @@ import finalhandler from "finalhandler";
 import { Hono } from "hono";
 import koa from "koa";
 import memfs, { Volume, createFsFromVolume } from "memfs";
-import { lookup, mimes } from "mrmime";
+import { lookup } from "mrmime";
 import router from "router";
 import request from "supertest";
 
@@ -46,8 +46,6 @@ const UTF8_CHARSET_MIME_TYPES = new Set([
   "application/json",
   "application/manifest+json",
 ]);
-
-mimes.usdz = "model/vnd.usdz+zip";
 
 async function startServer(name, app) {
   return new Promise((resolve, reject) => {
@@ -3907,6 +3905,45 @@ describe.each([
     });
 
     describe("mimeTypes option", () => {
+      it("should isolate MIME overrides between instances", async () => {
+        const defaultType = lookup("js");
+        const expectedTypes = [
+          "text/plain; charset=utf-8",
+          "text/html; charset=utf-8",
+          getContentTypeHeader(),
+        ];
+        const instances = [];
+
+        try {
+          for (const mimeTypes of [
+            { JS: "text/plain" },
+            { js: "text/html" },
+            undefined,
+          ]) {
+            instances.push(
+              await frameworkFactory(
+                name,
+                framework,
+                getCompiler(webpackConfig),
+                {
+                  mimeTypes,
+                },
+              ),
+            );
+          }
+
+          for (const [index, [, request]] of instances.entries()) {
+            const response = await request.get("/bundle.js").expect(200);
+            expect(response.headers["content-type"]).toBe(expectedTypes[index]);
+          }
+          expect(lookup("js")).toBe(defaultType);
+        } finally {
+          await Promise.all(
+            instances.map(([server, , instance]) => close(server, instance)),
+          );
+        }
+      });
+
       describe('should set the correct value for "Content-Type" header to known MIME type', () => {
         beforeAll(async () => {
           const outputPath = path.resolve(__dirname, "./outputs/basic");

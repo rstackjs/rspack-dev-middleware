@@ -1,7 +1,7 @@
 import path from "node:path";
 import { finished } from "node:stream";
 
-import { lookup, mimes } from "mrmime";
+import { mimes } from "mrmime";
 import rangeParser from "range-parser";
 
 import {
@@ -47,14 +47,14 @@ const UTF8_CHARSET_MIME_TYPES = new Set([
   "application/manifest+json",
 ]);
 
-mimes.usdz = "model/vnd.usdz+zip";
-
 /**
- * @param {string} filename filename or extension
+ * @param {string} extension file extension including the leading dot
+ * @param {Map<string, string>} mimeTypes instance MIME mappings
  * @returns {string | undefined} content type header value
  */
-function getContentType(filename) {
-  const mimeType = lookup(filename);
+function getContentType(extension, mimeTypes) {
+  const ext = extension.trim().slice(1).toLowerCase();
+  const mimeType = mimeTypes.get(ext) ?? mimes[ext];
 
   if (!mimeType) {
     return undefined;
@@ -172,6 +172,14 @@ const MAX_MAX_AGE = 31536000000;
  * @returns {import("./index.js").Middleware<Request, Response>} wrapper
  */
 function wrapper(context) {
+  const mimeTypes = new Map([["usdz", "model/vnd.usdz+zip"]]);
+
+  for (const [extension, type] of Object.entries(
+    context.options.mimeTypes || {},
+  )) {
+    mimeTypes.set(extension.toLowerCase(), type);
+  }
+
   return async function middleware(req, res, next) {
     /**
      * @param {NodeJS.ErrnoException=} err an error
@@ -733,7 +741,7 @@ function wrapper(context) {
       ) {
         removeResponseHeader(res, "Content-Type");
         // content-type name (like application/javascript; charset=utf-8) or false
-        const contentType = getContentType(path.extname(filename));
+        const contentType = getContentType(path.extname(filename), mimeTypes);
 
         // Only set content-type header if media type is known
         // https://tools.ietf.org/html/rfc7231#section-3.1.1.5
