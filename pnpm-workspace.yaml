@@ -1,5 +1,5 @@
 minimumReleaseAgeExclude:
-  - "@rslib/*" # cspell:ignore rslib rsbuild
+  - "@rslib/*"
   - "@rslint/*"
   - "@rstackjs/*"
   - "rsbuild-plugin-*"
