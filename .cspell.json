@@ -25,6 +25,8 @@
     "myhtml",
     "noextension",
     "nosniff",
+    "rsbuild",
+    "rslib",
     "rslint",
     "rspack",
     "rstack",
